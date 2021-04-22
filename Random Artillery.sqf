@@ -1,0 +1,105 @@
+/* Random artillery impacts
+
+TODO
+
+*/
+
+//Version 4
+//WORKS in DS MP
+//CHANGED uisleep to sleep (https://discordapp.com/channels/105462288051380224/105462984087728128/702843960330027098)
+_handle = [] spawn {
+feuer = 1;
+while {feuer == 1} do {
+private _allHCs = entities "HeadlessClient_F";
+private _humanPlayers = allPlayers - _allHCs;
+_humanPlayers = count _humanPlayers; 
+if (_humanPlayers > 0) then {
+private ["_shelltype", "_shellspread", "_shell", "_delay","_altitude"];    
+_shelltype = "Sh_155mm_AMOS";
+_shellspread = 1000;
+_altitude = 2000;       
+_position = [27000, 23200,_altitude];
+  _shell = createVehicle [_shelltype, _position, [], _shellspread];    
+  _shell setVelocity [0, 0, -50];
+  diag_log format ["Feuer %1", time];
+  } else {
+diag_log "No players present - random artillery fire cancelled";
+};
+_delay = random [1, 60, 120];
+sleep _delay;
+};
+};
+
+
+//Version 3
+//does it clog up memory?
+//ADDED random interval
+//Removed CBA_fnc_addPerFrameHandler
+_handle = [] spawn {
+feuer = 1;
+while {feuer == 1} do {
+private _allHCs = entities "HeadlessClient_F";
+private _humanPlayers = allPlayers - _allHCs;
+_humanPlayers = count _humanPlayers; 
+if (_humanPlayers > 0) then {
+private ["_shelltype", "_shellspread", "_shell", "_delay","_altitude"];    
+_shelltype = "Sh_155mm_AMOS";
+_shellspread = 1000;
+_altitude = 2000;       
+_position = [27000, 23200,_altitude];
+  _shell = createVehicle [_shelltype, _position, [], _shellspread];    
+  _shell setVelocity [0, 0, -50];
+  diag_log format ["Feuer %1", time];
+  } else {
+diag_log "No players present - random artillery fire cancelled";
+};
+_delay = random [1, 60, 120];
+uisleep _delay;
+};
+};
+
+
+// Version 2
+//ADDED serverempty check
+randomartillery = [{
+private _allHCs = entities "HeadlessClient_F";
+private _humanPlayers = allPlayers - _allHCs;
+_humanPlayers = count _humanPlayers; 
+if (_humanPlayers > 0) then {
+private ["_shelltype", "_shellspread", "_nshell", "_shell", "_i","_delay","_altitude"];    
+_shelltype = "Sh_155mm_AMOS";
+_shellspread = 1000;        
+_position = [27000, 23200,2000];
+  _shell = createVehicle [_shelltype, _position, [], _shellspread];    
+  _shell setVelocity [0, 0, -50];
+} else {
+diag_log "No players present - random artillery fire cancelled";
+};  
+}, 60] call CBA_fnc_addPerFrameHandler;
+
+// Version 1 0,0094 ms
+randomartillery = [{
+private ["_shelltype", "_shellspread", "_nshell", "_shell", "_i","_delay","_altitude"];    
+_shelltype = "Sh_155mm_AMOS";
+_shellspread = 1000;        
+_position = [27000, 23200,2000];
+  _shell = createVehicle [_shelltype, _position, [], _shellspread];    
+  _shell setVelocity [0, 0, -50];     
+}, 60] call CBA_fnc_addPerFrameHandler;
+ 
+ 
+ //randomized interval
+randomartillery = [] spawn {
+feuer = 1;
+while {feuer == 1} do {
+private ["_shelltype", "_shellspread", "_nshell", "_shell", "_i","_delay","_altitude"];    
+_shelltype = "Sh_155mm_AMOS";
+_shellspread = 1000;        
+_position = [27000, 23200,2000];
+  _shell = createVehicle [_shelltype, _position, [], _shellspread];    
+  _shell setVelocity [0, 0, -50];
+  systemChat format ["Feuer %1", time];
+  _delay = random 10;
+uisleep _delay;
+};
+};
