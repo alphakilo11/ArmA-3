@@ -1,5 +1,4 @@
-Firebase Token:
-1//09MBJgIKg5HHLCgYIARAAGAkSNwF-L9Irawtdmxoa291_GQaBfyUvjMhoD1fhPb5NXqZY1iYOhe7u-CVhgJ_7oyUhRYSjTqlu-Zo
+
 
 firebase deploy -m "Erde und Mond V 1.2"
 

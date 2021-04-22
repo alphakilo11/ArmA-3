@@ -9,6 +9,8 @@
 //fade in
 //create extraction point (with respawn and arsenal, to allow dead prisoners a "relief mission")
 */
+
+//"-2" will not work in SP and includes Headless Clients
 {
  cutText ["A black cat went past us, and then another that looked just like it.","BLACK IN", 10];
     } remoteexeccall ["call", -2];

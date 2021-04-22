@@ -35,13 +35,4 @@ _x deleteGroupWhenEmpty true
 diag_log "Deleting empty groups";
 }, 600] call CBA_fnc_addPerFrameHandler;
 
-/*Add auto-transfer ownership of Zeus-placed units to Server/HC
-check if HC is available
-avoid leaders disembarking by temp locking vehicle
-this addEventHandler ["CuratorGroupPlaced", {
-	params ["_curator", "_group"];
-}];
 */
-//Add Vehicle Respawn
-//Add Vehicle usable as Respawn and respawning
-//auto-distribute Zeus-created groups

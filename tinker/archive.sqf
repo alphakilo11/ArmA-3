@@ -45,3 +45,13 @@ if (alive _plane) then {
 		{deletevehicle _x} foreach _crew;
 		deletegroup _group;
 */
+
+
+//does not work, because an empty vehicle is local to the server, and Waypoint Statments are executed on the clients
+[{
+private _position = [21100, 7500];
+private _vehicle = "O_APC_Wheeled_02_rcws_F" createVehicle _position;
+private _group = createVehicleCrew _vehicle;
+private _wp = _group addWaypoint [_position, 300];
+_wp setWaypointStatements ["true", "deleteVehicle this; {deleteVehicle _x} forEach (units (group this));
+"];}, [], 5] call CBA_fnc_waitAndExecute;
