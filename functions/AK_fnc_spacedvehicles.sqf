@@ -46,7 +46,7 @@ for "_x" from 1 to _number do
     _grp = createVehicleCrew _veh;
 	_grp setBehaviour _behaviour;
 	_grp deleteGroupWhenEmpty true;
-	_grp addWaypoint [_destpos,(_number*15)];
+	_grp addWaypoint [_destpos VectorAdd [_xPos,_yPos,0],10];
 	_spawnedgroups pushBack _grp;
 if (_yPos >= 550) then { 
         _yPos = 0; 
