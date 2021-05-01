@@ -50,7 +50,7 @@ for "_x" from 1 to _number do
 	_spawnedgroups pushBack _grp;
 if (_yPos >= 550) then { 
         _yPos = 0; 
-        _xPos = _xPos + 50; 
+        _xPos = _xPos + _spacing; 
     };
 };
 _spawnedgroups
