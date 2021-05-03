@@ -18,7 +18,7 @@ Returns:
 
 Example:
     (begin example)
-		[east, 14, (configFile >> "CfgGroups" >> "East" >> "OPF_F" >> "Infantry" >> "OIA_InfSquad"), [23000,18000,0], [15000,17000,0], 50, "COMBAT"] call AK_fnc_spacedgroups;
+		[east, 12, (configFile >> "CfgGroups" >> "East" >> "OPF_F" >> "Infantry" >> "OIA_InfSquad"), [23000,18000,0], [15000,17000,0], 50, "COMBAT"] call AK_fnc_spacedgroups;
     (end)
 
 Author:
@@ -26,9 +26,7 @@ Author:
 
 ---------------------------------------------------------------------------- */
 
-//TODO align "formation" with destination and make the attackers keep formation (use "{_x addWaypoint [[15000,17500,0],500];} forEach _array;"?)
-//TODO align vehicles with destination (use "[5000,5000,0] vectorAdd [5,4,0];"?)
-//PROBLEM vehicles "loose" their waypoints when fighting on the way (solve with loop resetting the waypoints?)
+//TODO setSkill
 
 AK_fnc_spacedgroups = {
 params [["_side", west], ["_number", 1, [0]], ["_type", (configFile >> "CfgGroups" >> "East" >> "OPF_F" >> "Infantry" >> "OIA_InfSquad")], ["_spawnpos", [], [[]]], ["_destpos", [], [[]]], ["_spacing", 50, [0]], ["_behaviour", "SAFE", [""]]];

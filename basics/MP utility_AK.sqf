@@ -14,6 +14,22 @@
 } 
 remoteExec ["call", 0];
 
+//once a minute
+fps1 = [{{ 
+ [ 
+  [clientOwner,(!hasInterface && !isDedicated), diag_fpsMin],  
+  { 
+   systemChat format 
+   [ 
+    "ClientOwner: %1. HC: %2. Min FPS: %3", 
+    _this select 0, _this select 1, _this select 2 
+   ]; 
+  } 
+ ] 
+ remoteExec ["call", remoteExecutedOwner];  
+}  
+remoteExec ["call", 0];}, 60, []] call CBA_fnc_addPerFrameHandler; 
+
 
 //logs the network ID of the selected unit when executed on the server (use Development Tools->Execute Code)
 _str = owner (_this select 1);
