@@ -1,4 +1,5 @@
-private [ "_pos", "_shelltype", "_shellspread", "_nshell", "_shell", "_i","_delay",”_alt”]; 
+//remove delay - use CBA eventhandler
+private [ "_pos", "_shelltype", "_shellspread", "_nshell", "_shell", "_delay", "_alt"]; 
 _pos = [0,0,0]; 
 _shelltype      = "Sh_155mm_AMOS"; 
 _shellspread = 8000; 

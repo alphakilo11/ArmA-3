@@ -32,11 +32,11 @@ Author:
 AK_fnc_spacedvehicles = {  
 params [["_number", 1, [0]], ["_type", "B_MBT_01_cannon_F", [""]], ["_spawnpos", [], [[]]], ["_destpos", [], [[]]], ["_side", west], ["_spacing", 50, [0]], ["_behaviour", "AWARE", [""]], ["_breitegefstr", 500, [0]], ["_platoonsize", 1, [0]]];  
   
-private ["_xPos", "_yPos", "_spawnedcrews", "_spawnedvehicles", "_spawnedgroups"];   
+private ["_xPos", "_yPos", "_spawnedvehicles", "_spawnedunits", "_spawnedgroups"];   
    
 _xPos = 0;   
 _yPos = 0;
-_spawnedcrews = [];
+_spawnedunits = [];
 _spawnedvehicles = [];  
 _spawnedgroups = [];
   
@@ -44,7 +44,7 @@ _spawnedgroups = [];
 for "_i" from 1 to _number do {
 	_spawned = ([(_spawnpos vectorAdd [_xPos, _yPos, 0]), (_spawnpos getDir _destpos), _type, _side] call BIS_fnc_spawnVehicle);
 	_spawnedvehicles pushBack (_spawned select 0);
-	{_spawnedcrews pushBack _x} forEach (_spawned select 1); 
+	{_spawnedunits pushBack _x} forEach (_spawned select 1); 
 	_spawnedgroups pushBack (_spawned select 2); 
     _yPos = _yPos + _spacing;   
    
@@ -67,7 +67,7 @@ if (_platoonsize > 1) then {
 		_a = _a +1;
 		};  
 	};  
-//assign waypoints  
+//assign waypoints etc  
 _xPos = 0;   
 _yPos = 0;  
 _spacing = _spacing * _platoonsize;  
@@ -81,5 +81,5 @@ _spacing = _spacing * _platoonsize;
         _xPos = _xPos + _spacing;   
     };
 } forEach _spawnedgroups;  
-[_spawnedcrews, _spawnedvehicles, _spawnedgroups];
+[_spawnedvehicles, _spawnedunits, _spawnedgroups];
 };  
