@@ -28,19 +28,20 @@ Author:
 
 ---------------------------------------------------------------------------- */
 
-//works on client, DS and HC. Also against Advanced Garbage collector ("spawned" number is not changing even when units die or get deleted)
-//BUG logger only tracks one side (use flatten?)
-//TODO replace AK_globalVar_1
-//TODO Restart battle
-//TODO remove systemChat
-//TODO add diag_log (always to server?)
-//MINOR ISSUE pretty complicated to get the number of empty vehicles
+// Also against Advanced Garbage collector ("spawned" number is not changing even when units die or get deleted)
+//TODO consolidate data
+//TODO add params
+//TODO get sides automatically (use pushBackUnique)
+// make all local variables private
+//MINOR ISSUE the code works via Advanced Developer Tools console, but not via ZEN (Execute code) (likely reason: comments)
+//MINOR ISSUE pretty complicated to get the number of empty vehicles (use "systemChat str (gunner (_this select 1));" instead?)
 
 AK_fnc_battlelogger = {
 [{
-_veh = AK_globalVar_1 select 0;
-_units = AK_globalVar_1 select 1;
-_groups = AK_globalVar_1 select 2;
+//function
+_veh = AK_battlingUnits select 0;
+_units = AK_battlingUnits select 1;
+_groups = AK_battlingUnits select 2;
 //determine empty vehicles
 _alivevehicles = [];
 {if (alive _x) then {_alivevehicles pushBack _x}} forEach _veh; 
@@ -49,23 +50,42 @@ _alivevehcrews = [];
 _number_alive_crews = [];
 {_number_alive_crews pushBack (count _x)} forEach _alivevehcrews;
 _emptyveh = {_x == 0} count _number_alive_crews;
+_timer = _timer +1;
+//data format:  units alive;dead;all vehicles alive;dead;empty;all groups all
+diag_log ("AKBL:" + str ({alive _x} count _units) + ";" + str ({!alive _x} count _units) + ";" + str (count _units) + ";" + str ({alive _x} count _veh) + ";" + str ({!alive _x} count _veh) + ";" + str _emptyveh + ";" + str (count _veh) + ";" + str (count _groups));
+}, //the number of groups is not updated
 
-systemChat ("units alive/dead/all: " + str ({alive _x} count _units) + "/" + str ({!alive _x} count _units) + "/" + str (count _units));
-systemChat ("vehicles alive/dead/empty/all: " + str ({alive _x} count _veh) + "/" + str ({!alive _x} count _veh) + "/" + str _emptyveh + "/" + str (count _veh));
-systemChat ("groups all: " + str (count _groups));},
-10,
-[],
-{systemChat "Battlelogger starting!";
-AK_globalVar_1 = [3, "B_MBT_01_cannon_F", [14000, 18000 ,0], [12000, 18000, 0], east, 85, "AWARE", 500, 1] call AK_fnc_spacedvehicles;
-AK_globalVar_1 = AK_globalVar_1 + ([3, "B_MBT_01_cannon_F", [12000, 18000 ,0], [14000, 18000, 0], independent, 85, "AWARE", 500, 1] call AK_fnc_spacedvehicles);
-},
+10, //delay in s
+
+[], //parameters
+
+// start
+{diag_log "AKBL Battlelogger starting!";
+_spawnedgroups1 = [10, "B_MBT_01_cannon_F", [14000, 17500 ,0], [12000, 17500, 0], east, 85, "AWARE", 500, 3] call AK_fnc_spacedvehicles;
+_spawnedgroups2 = [10, "B_MBT_01_cannon_F", [12000, 17510 ,0], [14000, 17510, 0], independent, 85, "AWARE", 500, 1] call AK_fnc_spacedvehicles;
+AK_battlingUnits = []; //initialize the global variable
+_timer = 0;
 {
-	systemChat "Battle over. Battlelogger shutting down";
-	{deleteVehicle _x} forEach (AK_globalVar_1 select 0);
-	{deleteVehicle _x} forEach (AK_globalVar_1 select 1);
-	{deleteGroup _x} forEach (AK_globalVar_1 select 2);
-	AK_globalVar_1 = nil;},
-{true},
-{({alive _x} count (AK_globalVar_1 select 1)) <= (count (AK_globalVar_1 select 1)/2)}
+AK_battlingUnits pushBack ((_spawnedgroups1 select _x) + (_spawnedgroups2 select _x));} forEach [0,1,2];
+{
+	_wp = _x addWaypoint [[0,0,0], 0];
+	_wp setWaypointType "CYCLE";} forEach (AK_battlingUnits select 2);
+},
+
+//end
+{
+//data format: vehicles remaining: East;West;Guer
+	diag_log format ["AKBL Result: %1;%2;%3. Battle over. Battlelogger shutting down", ({side _x == east} count (AK_battlingUnits select 0)), ({side _x == west} count (AK_battlingUnits select 0)), ({side _x == independent} count (AK_battlingUnits select 0)) ];
+	{deleteVehicle _x} forEach (AK_battlingUnits select 0);
+	{deleteVehicle _x} forEach (AK_battlingUnits select 1);
+	{deleteGroup _x} forEach (AK_battlingUnits select 2);
+	AK_battlingUnits = nil;},
+	
+{true}, //Run condition
+
+//exit Condition
+{(({alive _x} count (AK_battlingUnits select 1)) <= (count (AK_battlingUnits select 1)/2)) or _timer >= 60},
+
+"_timer"
 ] call CBA_fnc_createPerFrameHandlerObject;
 }

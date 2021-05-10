@@ -29,6 +29,7 @@ Author:
 
 ---------------------------------------------------------------------------- */
 //TODO align "formation" with destination and make the attackers keep formation (use "{_x addWaypoint [[15000,17500,0],500];} forEach _array;"?)
+//TODO avoid vehicles blowing up on spawn
 AK_fnc_spacedvehicles = {  
 params [["_number", 1, [0]], ["_type", "B_MBT_01_cannon_F", [""]], ["_spawnpos", [], [[]]], ["_destpos", [], [[]]], ["_side", west], ["_spacing", 50, [0]], ["_behaviour", "AWARE", [""]], ["_breitegefstr", 500, [0]], ["_platoonsize", 1, [0]]];  
   
