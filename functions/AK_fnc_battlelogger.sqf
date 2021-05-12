@@ -29,6 +29,7 @@ Author:
 ---------------------------------------------------------------------------- */ 
  
 // Also against Advanced Garbage collector ("spawned" number is not changing even when units die or get deleted) 
+//TODO log round parameters (start position, type etc.)
 //TODO consolidate data 
 //TODO add params 
 //TODO get sides automatically (use pushBackUnique) 
@@ -98,4 +99,4 @@ AK_battlingUnits pushBack ((_spawnedgroups1 select _x) + (_spawnedgroups2 select
  
 "_timer" 
 ] call CBA_fnc_createPerFrameHandlerObject; 
-} 
+};
