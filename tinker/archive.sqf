@@ -1,3 +1,21 @@
+20210513
+//works against Advanced Garbage collector ("spawned" number is not changing even when units die or get deleted)
+//empty vehicles count as alive
+//the number of groups is reduced when groups get deleted during battle.
+_veh = AK_globalVar_1 select 0;
+_units = AK_globalVar_1 select 1;
+_groups = AK_globalVar_1 select 2;
+systemChat ("number of units alive/dead/spawned: " + str ({alive _x} count _units) + "/" + str ({!alive _x} count _units) + "/" + str (count _units));
+systemChat ("number of vehicles alive/dead/spawned: " + str ({alive _x} count _veh) + "/" + str ({!alive _x} count _veh) + "/" + str (count _veh));
+systemChat ("number of groups: " + str (count _groups)); 
+
+//clumsy
+_arguments = [[12, "B_MBT_01_cannon_F", [14000, 18000 ,0], [12000, 18000, 0], east, 85, "AWARE", 500, 3],[12, "B_MBT_01_cannon_F", [12000, 18000 ,0], [14000, 18000, 0], independent, 85, "AWARE", 500, 4], 6, 2];
+
+_arguments select 0 remoteExec ["AK_fnc_spacedvehicles", _arguments select 2];
+_arguments select 1 remoteExec ["AK_fnc_spacedvehicles", _arguments select 3];
+ 
+ 
 //20210503
 AK_fnc_spacedvehicles = {  
 params [["_number", 1, [0]], ["_type", "B_MBT_01_cannon_F", [""]], ["_spawnpos", [], [[]]], ["_destpos", [], [[]]], ["_spacing", 50, [0]], ["_behaviour", "AWARE", [""]], ["_breitegefstr", 500, [0]], ["_platoonsize", 1, [0]]];  
