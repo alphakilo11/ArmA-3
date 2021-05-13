@@ -1,13 +1,14 @@
 /* Has to run on the same machine as the battle - unless I make AK_battlingUnits global...
 Requires: AK_fnc_battlelogger, AK_fnc_spacedvehicles
-TODO log remaining vehicles per side
-TODO switch sides
-TODO stop AK_fnc_battlelogger when shutting down ABE (use prototype) ("(_AKBL getVariable "handle") call CBA_fnc_deletePerFrameHandlerObject;" didn't work)
-make all local variables private
+TODO stop AK_fnc_battlelogger when shutting down ABE (use prototype) ("(_AKBL getVariable "handle") call CBA_fnc_deletePerFrameHandlerObject;" didn't work) Likely reason: it was initialized inside an if statement
 */
+AK_fnc_automatedBattleEngine = {
 
 AK_ABE = [
-{ private _var = missionNamespace getVariable "AK_battlingUnits"; 
+{
+private ["_var"];
+
+_var = missionNamespace getVariable "AK_battlingUnits"; 
 if (isNil "_var") then { 
 	_AKBL = [] spawn AK_fnc_battlelogger;
 	_round = _round + 1; 
@@ -30,5 +31,6 @@ _round = 0;},
 
 {false},
 
-["_round", "_AKBL"]
+["_round"]
 ] call CBA_fnc_createPerFrameHandlerObject;
+};
