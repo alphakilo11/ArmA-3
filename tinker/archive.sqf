@@ -1,3 +1,70 @@
+20210514
+//Proof of concept (works in MP)
+{
+	[] spawn {
+		_AK_var_1 = [12, "B_MBT_01_cannon_F", [14000, 18000 ,0], [12000, 18000, 0], east, 85, "AWARE", 500, 3] call AK_fnc_spacedvehicles;
+	sleep 15;
+	{deleteVehicle _x} forEach (_AK_var_1 select 0);
+	{deleteVehicle _x} forEach (_AK_var_1 select 1);
+	{deleteGroup _x} forEach (_AK_var_1 select 2);
+	_AK_var_1 = nil;
+	};
+} remoteExec ["call", 6];
+
+
+//params: _side,
+//select a random _faction of _side
+//select random infantry groups of given _faction
+//form a platoon by repeating to spawn units until hitting 40
+
+
+private ["_cfgArray", "_xPos", "_yPos", "_veh"]; 
+ 
+_cfgArray = "(  
+ (getNumber (_x >> 'scope') >= 2) &&  
+ { 
+  getNumber (_x >> 'side') == 1} 
+)" configClasses (configFile >> "CfgVehicles");
+_cfgArray; 
+
+
+//works as long as no vehicles are included
+private ["_cfgArray", "_faction", "_group", "_groupname", "_soldiers"];
+
+_cfgArray = "true" configClasses (configFile >> "CfgGroups" >> "West");  
+_faction = configName (selectRandom _cfgArray); 
+_cfgArray = "true" configClasses (configFile >> "CfgGroups" >> "West" >> _faction); 
+_arm = configName (selectRandom _cfgArray); 
+_cfgArray = "true" configClasses (configFile >> "CfgGroups" >> "West" >> _faction >> _arm); 
+_soldiers = 0;
+while { _soldiers < 40} do {
+	_group = (selectRandom _cfgArray);
+	_groupname = configName _group;
+	_soldiers = _soldiers + (count ("true" configClasses (configFile >> "CfgGroups" >> "West" >> _faction >> _arm >> _groupname)));
+	[[23000, 19000, 0], west, _group] call BIS_fnc_spawnGroup;
+};
+
+
+private ["_cfgArray", "_faction", "_group", "_groupname", "_units", "_soldiers"]; 
+ 
+_cfgArray = "true" configClasses (configFile >> "CfgGroups" >> "West");   
+_faction = configName (selectRandom _cfgArray);  
+_cfgArray = "true" configClasses (configFile >> "CfgGroups" >> "West" >> _faction);  
+_arm = configName (selectRandom _cfgArray);  
+_cfgArray = "true" configClasses (configFile >> "CfgGroups" >> "West" >> _faction >> _arm);  
+_soldiers = 0; 
+while { _soldiers < 40} do { 
+ _group = (selectRandom _cfgArray); 
+ _groupname = configName _group;
+	_units = "true" configClasses (configFile >> "CfgGroups" >> "West" >> _faction >> _arm >> _groupname);
+	_isman = [];
+	{_isman pushback ((configName _x) typeOf "Man")} forEach _units;
+ _soldiers = _soldiers + (count _units); 
+ //[[23000, 19000, 0], west, _group] call BIS_fnc_spawnGroup; 
+};
+_isman
+
+
 20210513
 //works against Advanced Garbage collector ("spawned" number is not changing even when units die or get deleted)
 //empty vehicles count as alive

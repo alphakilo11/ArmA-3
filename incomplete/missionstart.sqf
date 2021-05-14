@@ -6,6 +6,9 @@
 //TODO set real weather
 //TODO set AI skill
 
+//Hints: Flagpoles might be teleporters, Look for (ACE)Arsenals in ammo vehicles/crates 
+
+
 //set Global&JIP ViewDistance (0.0142 ms)
 5500 remoteExec ["setviewDistance", -2, "Viewdistance"];
 5500 remoteExec ["setObjectViewDistance", -2, "Objectdistance"];
