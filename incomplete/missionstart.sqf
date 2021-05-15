@@ -18,7 +18,7 @@
 {[[(missionStart select [0,5]), time] call BIS_fnc_CalculateDateTime, true, true] call BIS_fnc_setDate;} remoteExec ["call", 2];
 
 //get IDs and check FPS once a minute
-fps1 = [{{ 
+AK_handle_fps = [{{ 
  [ 
   [clientOwner,(!hasInterface && !isDedicated), diag_fpsMin],  
   { 
