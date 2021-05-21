@@ -9,7 +9,7 @@ Parameters:
     0: _number		- Number of Vehicles <NUMBER> (default: 1)
     1: _type		- Type of Vehicle <STRING>
 	2: _spawnpos	- Spawn Position <ARRAY>
-	3: _destpos		- Destination <ARRAY>
+	3: _destpos		- Destination. [] to stay at position. <ARRAY>
 	   _side		- <SIDE>
 	4: _spacing		- Spacing <NUMBER> (default: 50 m)
 	5: _behaviour	- Group behaviour [optional] <STRING> (default: "AWARE")
@@ -31,7 +31,17 @@ Author:
 //TODO align "formation" with destination and make the attackers keep formation (use "{_x addWaypoint [[15000,17500,0],500];} forEach _array;"?)
 //TODO avoid vehicles blowing up on spawn
 AK_fnc_spacedvehicles = {  
-params [["_number", 1, [0]], ["_type", "B_MBT_01_cannon_F", [""]], ["_spawnpos", [], [[]]], ["_destpos", [], [[]]], ["_side", west], ["_spacing", 50, [0]], ["_behaviour", "AWARE", [""]], ["_breitegefstr", 500, [0]], ["_platoonsize", 1, [0]]];  
+params [
+["_number", 1, [0]],
+["_type", "B_MBT_01_cannon_F", [""]],
+["_spawnpos", [], [[]]],
+["_destpos", [], [[]]],
+["_side", west],
+["_spacing", 50, [0]],
+["_behaviour", "AWARE", [""]],
+["_breitegefstr", 500, [0]],
+["_platoonsize", 1, [0]]
+];  
   
 private ["_xPos", "_yPos", "_spawnedvehicles", "_spawnedunits", "_spawnedgroups"];   
    
@@ -43,7 +53,7 @@ _spawnedgroups = [];
   
 //spawn  
 for "_i" from 1 to _number do {
-	_spawned = ([(_spawnpos vectorAdd [_xPos, _yPos, 0]), (_spawnpos getDir _destpos), _type, _side] call BIS_fnc_spawnVehicle);
+	_spawned = ([(_spawnpos vectorAdd [_xPos, _yPos, 0]), (_spawnpos getDir _destpos/* This fails when the _destpos is no coordinate*/), _type, _side] call BIS_fnc_spawnVehicle);
 	_spawnedvehicles pushBack (_spawned select 0);
 	{_spawnedunits pushBack _x} forEach (_spawned select 1); 
 	_spawnedgroups pushBack (_spawned select 2); 
@@ -74,13 +84,15 @@ _yPos = 0;
 _spacing = _spacing * _platoonsize;  
 {
 	_x setBehaviour _behaviour;  
-	_x deleteGroupWhenEmpty true;  
-	_x addWaypoint [_destpos VectorAdd [_xPos,_yPos,0],10];  
-    _yPos = _yPos + _spacing;  
-	if (_yPos > _breitegefstr) then {   
-        _yPos = 0;   
-        _xPos = _xPos + _spacing;   
-    };
+	_x deleteGroupWhenEmpty true;
+	if !(count _destpos == 0) then {
+		_x addWaypoint [_destpos VectorAdd [_xPos,_yPos,0],10];  
+		_yPos = _yPos + _spacing;  
+		if (_yPos > _breitegefstr) then {   
+			_yPos = 0;   
+			_xPos = _xPos + _spacing;   
+		};
+	};
 } forEach _spawnedgroups;  
 [_spawnedvehicles, _spawnedunits, _spawnedgroups];
 };  

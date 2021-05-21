@@ -1,3 +1,31 @@
+20210518
+//works (sometimes will spawn no units)
+private _cfgFaction = str text (selectRandom ([1] call AK_fnc_cfgFactionTable));
+private _side = west;
+private _numberOfUnits = 0;
+private _timeout = 0;
+private _spawnedgroups = [];
+private _AZ = [21380, 16390,0];
+private _vfgrm = _AZ vectorAdd [-1000,0,0];
+while {_numberOfUnits < 40 && _timeout < 41} do {
+_cfggroup = selectRandom ([_cfgFaction] call AK_fnc_cfgGroupTable);
+_grp = [_vfgrm, _side, _cfggroup, [], [], [], [], [], 180, false, 0] call BIS_fnc_spawnGroup;
+_spawnedgroups pushBack _grp;
+_numberOfUnits = _numberOfUnits + count (units _grp);
+_grp deleteGroupWhenEmpty true;
+_grp addWaypoint [_AZ, 100];
+_timeout = _timeout + 1;
+};
+if (_timeout >= 41) then {diag_log "Spawning failed."};
+_spawnedgroups
+
+
+//Only works from time to time...
+_groups = [west, "West", [23000, 19000,0]] call AK_fnc_spawnRandomInfPlatoon;
+{[_x, [22000,19000,0], (28 * (count _groups))] call CBA_fnc_taskAttack} forEach _groups;
+
+
+
 20210514
 //Proof of concept (works in MP)
 {

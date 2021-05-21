@@ -1,7 +1,6 @@
 //creates a number of groups at _AZ which will defend an area (size of which is based on taktik Handakt OPFOR values) .
 //Works local and on DS
 //REQUIRED: CBA
-//TODO remove messages
 //Params _AZ 3D position
 /*
 example:

@@ -136,6 +136,100 @@ AK_battlingUnits pushBack ((_spawnedgroups1 select _x) + (_spawnedgroups2 select
 ] call CBA_fnc_createPerFrameHandlerObject; 
 };
 /* ----------------------------------------------------------------------------
+Function: AK_fnc_cfgFactionTable
+
+Description:
+    Creates a table of factions.
+	Use to provide input to AK_fnc_cfgGroupTable.
+	
+Parameters:
+    0: _side		- 0 = OPFOR, 1 = BLUFOR, 2 = Independent <NUMBER>
+	1: _configName	- false = full config entry, true = configName <BOOLEAN> (default: true)
+
+Returns:
+	<ARRAY>
+
+Example:
+    (begin example)
+		[2] call AK_fnc_cfgFactionTable;
+    (end)
+
+Author:
+    AK
+
+---------------------------------------------------------------------------- */
+
+AK_fnc_cfgFactionTable = {
+params ["_side", ["_configName", 1]];
+switch (_configName) do {
+	case 1: {"getNumber (_x >> 'side') == _side" configClasses (configFile >> "CfgFactionClasses") apply {configName _x};};
+	case 0: {"getNumber (_x >> 'side') == _side" configClasses (configFile >> "CfgFactionClasses");};
+};
+};
+
+/* ----------------------------------------------------------------------------
+Function: AK_fnc_cfgGroupTable
+
+Description:
+    Creates a table of all groups from a given faction. Some factions have no defined groups.
+	
+Parameters:
+    0: _cfgfaction	- Faction <STRING> (default: "BLU_F")
+
+Returns:
+	<ARRAY>
+
+Example:
+    (begin example)
+		["BLU_F"] call AK_fnc_cfgGroupTable; 
+    (end)
+
+Author:
+    AK
+
+---------------------------------------------------------------------------- */
+
+AK_fnc_cfgGroupTable = {
+params [["_cfgfaction","BLU_F", []]];
+private ["_cfgSide", "_newCfgEntry", "_arm", "_groups"];
+
+//get side of _cfgfaction
+_cfgSide = getNumber (configFile >> "CfgFactionClasses" >> _cfgfaction >> "side"); 
+_newCfgEntry = ("getNumber (_x >> 'side') == _cfgSide" configClasses (configFile >> "CfgGroups") apply {configName _x}) select 0; 
+_newCfgEntry = configFile >> "CfgGroups" >> _newCfgEntry;
+//iterate through arms and get all groups that have matching sides
+_arm = "true" configClasses (_newCfgEntry >> _cfgfaction) apply {configName _x}; 
+_groups = []; 
+{_groups pushBack ("getNumber (_x >> 'side') == _cfgSide" configClasses (_newCfgEntry >> _cfgfaction >> _x));} forEach _arm; 
+flatten _groups; 
+};/* ----------------------------------------------------------------------------
+Function: AK_fnc_cfgUnitTable
+
+Description:
+    Creates a table of units. Use with createUnit.
+	
+Parameters:
+    0: _cfgfaction	- Faction <STRING> (default: "BLU_F")
+    1: _cfgkind		- Kind of Vehicle <STRING> (default: "CAManBase")
+
+Returns:
+	<ARRAY>
+
+Example:
+    (begin example)
+		["rhsgref_faction_chdkz", "CAManBase"] call AK_fnc_cfgUnitTable;
+    (end)
+
+Author:
+    AK
+
+---------------------------------------------------------------------------- */
+
+AK_fnc_cfgUnitTable = {
+params [["_cfgfaction", "BLU_F", []], ["_cfgkind", "CAManBase", []]];
+private _unittable = "getText (_x >> 'faction') == _cfgfaction and configName _x isKindOf _cfgkind and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles") apply {configName _x};
+_unittable
+};/* ----------------------------------------------------------------------------
 Function: AK_fnc_cleangrouplist
 
 Description:
@@ -191,6 +285,64 @@ _shell = "F_40mm_White" createVehicle (_position Vectoradd [0,0,150]);
 _shell setVelocity [0, 0, -1];
 };
 /* ----------------------------------------------------------------------------
+Function: AK_fnc_moveRandomPlatoons
+
+Description:
+    Spawns random platoons and lets them move toward an objective. When vehicles are spawned a _pltstrength = 40 platoon might end up with up to 20 vehicles.
+	
+Parameters:
+    0: _cfgSide		- 0 = OPFOR, 1 = BLUFOR, 2 = Independent Config's Side <NUMBER> (default: 1)
+	1: _side		- Affiliation of the spawned units. <SIDE> (default: west)
+	2: _AZ			- Objective <ARRAY> (default: [500,500,0])
+	3: _pltstrength	- Minimum Number of Units per platoon (max. depends on group strength) <NUMBER> (default: 40)
+	4: _maxveh		- Maximum number of vehicles per group. <NUMBER> (default: 0)
+
+Returns:
+	<ARRAY>
+
+Example:
+    (begin example)
+		[1, west, [21380, 16390, 0], 40, 0] call AK_fnc_moveRandomPlatoons; 
+    (end)
+
+Author:
+    AK
+
+---------------------------------------------------------------------------- */
+//TODO change _vfgrm
+AK_fnc_moveRandomPlatoons = {
+params [
+	["_cfgSide", 1, [0]],
+	["_side", west, [west]],
+	["_AZ", [500,500,0], [[]]],
+	["_pltstrength", 40, [0]],
+	["_maxveh", 0, [0]]
+];
+
+private ["_cfgFaction", "_numberOfUnits", "_timeout", "_spawnedgroups", "_vfgrm", "_facing"];
+
+_cfgFaction = str text (selectRandom ([_cfgSide, 1] call AK_fnc_cfgFactionTable));
+_numberOfUnits = 0;
+_timeout = 0;
+_spawnedgroups = [];
+_vfgrm = _AZ vectorAdd [1000,0,0];
+_facing = _vfgrm getDir _AZ;
+
+while {_numberOfUnits < _pltstrength && _timeout < (_pltstrength +1)} do {
+	_cfggroup = selectRandom ([_cfgFaction] call AK_fnc_cfgGroupTable);
+	_grp = [_vfgrm, _side, _cfggroup, [], [], [], [], [], _facing, false, _maxveh] call BIS_fnc_spawnGroup;
+	_spawnedgroups pushBack _grp;
+	_numberOfUnits = _numberOfUnits + count (units _grp);
+	_grp deleteGroupWhenEmpty true;
+	_grp addWaypoint [_AZ, 100];
+	_timeout = _timeout + 1;
+};
+if (_timeout >= (_pltstrength + 1)) then {
+	_this call AK_fnc_moveRandomPlatoons;
+	diag_log "Spawning failed.";
+};
+_spawnedgroups
+};/* ----------------------------------------------------------------------------
 Function: AK_fnc_spacedvehicles
 
 Description:
@@ -276,3 +428,27 @@ _spacing = _spacing * _platoonsize;
 } forEach _spawnedgroups;  
 [_spawnedvehicles, _spawnedunits, _spawnedgroups];
 };  
+//creates a number of groups at _AZ which will defend an area (size of which is based on taktik Handakt OPFOR values) .
+//Works local and on DS
+//REQUIRED: CBA
+//TODO remove messages
+//Params _AZ 3D position
+/*
+example:
+[[21100, 7400, 0], 12] call AK_fnc_defend;
+*/
+
+AK_fnc_defend ={
+	params ["_AZ", "_numberofgroups"];
+	
+	
+	for "_i" from 1 to _numberofgroups step 1 do {
+		private _side = West;
+		private _grouptype = configFile >> "CfgGroups" >> "West" >> "BLU_F" >> "Mechanized" >> "BUS_MechInfSquad";
+		private _radius = (_numberofgroups * 77);
+		private _vfgrm = [_AZ, 0, _radius] call BIS_fnc_findSafePos;
+		private _gruppe = [_vfgrm, _side, _grouptype] call BIS_fnc_spawnGroup;
+		_gruppe deleteGroupWhenEmpty true;
+		[_gruppe, _AZ, _radius] call CBA_fnc_taskDefend;
+	};
+};

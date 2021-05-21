@@ -2,7 +2,7 @@
 Function: AK_fnc_moveRandomPlatoons
 
 Description:
-    Spawns random platoons and lets them move toward an objective.
+    Spawns random platoons and lets them move toward an objective. When vehicles are spawned a _pltstrength = 40 platoon might end up with up to 20 vehicles.
 	
 Parameters:
     0: _cfgSide		- 0 = OPFOR, 1 = BLUFOR, 2 = Independent Config's Side <NUMBER> (default: 1)

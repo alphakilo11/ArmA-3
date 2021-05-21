@@ -20,11 +20,11 @@
 //get IDs and check FPS once a minute
 AK_handle_fps = [{{ 
  [ 
-  [clientOwner,(!hasInterface && !isDedicated), diag_fpsMin],  
+  [clientOwner,(!hasInterface && !isDedicated), diag_fps],  
   { 
    systemChat format 
    [ 
-    "ClientOwner: %1. HC: %2. Min FPS: %3", 
+    "ClientOwner: %1. HC: %2. FPS: %3", 
     _this select 0, _this select 1, _this select 2 
    ]; 
   } 
