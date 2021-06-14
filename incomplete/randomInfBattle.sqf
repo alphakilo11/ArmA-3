@@ -3,6 +3,7 @@ I want a Battlefield that feels authentic.
 This is already very taxing in terms of performance - try without nice-to-have mods?
 GLITCH the random spawning can result in the battle not starting for some time.
 BUG spawning (even on dedicated server) studders clients - spawn instead of call?
+BUG when the function runs for a long time, it will completely overwhelm the game engine
 IDEA weather changes?
 IDEA accelerate time?
 TODO Spawn flares only at night
