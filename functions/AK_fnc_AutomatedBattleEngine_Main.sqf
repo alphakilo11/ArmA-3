@@ -18,7 +18,7 @@ if (isNil "_var") then {
 	
 60,
 	
-["some_params", [1,2,3]],
+["some_params", [1,2,3]], //Artefakt
 
 {diag_log format ["AKBL Battle Engine starting! %1", _this getVariable "params"];
 _round = 0;},
