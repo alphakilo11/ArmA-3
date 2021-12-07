@@ -20,7 +20,7 @@ Returns:
  
 Example: 
     (begin example) 
-   
+   no example?
     (end) 
  
 Author: 
