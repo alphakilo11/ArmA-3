@@ -12,7 +12,7 @@ Returns:
 
 Example:
     (begin example)
-		[getPos player] call AK_fnc_delete;
+		[list_of_groups] call AK_fnc_delete;
     (end)
 
 Author:
