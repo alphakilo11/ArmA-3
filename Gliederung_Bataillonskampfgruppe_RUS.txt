@@ -1,0 +1,13 @@
+Quelle: https://www.youtube.com/watch?v=wSDP-CmwcNM
+
+apc = [BTR-82A]
+ifv = [BMP-2, BMP-3]
+recon = [BRM-1K]
+mbt = [T-72, T-80, T-90, T-80U, T-72B3, T-80BWM, T-90A]
+
+kampfgruppe = [kampfteile, 
+kampfteile = [lmotSKp, motSKp, motSKp, PzKp]
+lmotSKp = [10, apc]
+motSKp = [10, ifv]
+PzKp = [10, mbt]
+
