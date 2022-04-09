@@ -5,9 +5,25 @@ ifv = [BMP-2, BMP-3]
 recon = [BRM-1K]
 mbt = [T-72, T-80, T-90, T-80U, T-72B3, T-80BWM, T-90A]
 
-kampfgruppe = [kampfteile, 
-kampfteile = [lmotSKp, motSKp, motSKp, PzKp]
+kampfgruppe = [kommando, kampf, kampfunterstuetzung, fuehrung, cyber, einsatzunterstuetzung]
+kommando = [3, ifv] 
+kampf = [lmotSKp, motSKp, motSKp, PzKp]
+kampfunterstuetzung = [GrW, l_FlA, SSch, PAL, Pi, Pi(BSA), Art, m_FlA, l_RakW, m_RakW]
+fuehrung = [Aufkl, UAV]
+cyber = [IKTTr, EloKaTr]
+einsatzunterstuetzung = [NT_Kdt, NT_Mun, NT_BetrM, NT_Vers, NT_I, San]
 lmotSKp = [10, apc]
 motSKp = [10, ifv]
 PzKp = [10, mbt]
+GrW,
+l_FlA,
+l_FlA,
+SSch,
+PAL,
+Pi,
+Pi(BSA) = 
+Art = 
+m_FlA = 
+l_RakW = 
+m_RakW = 
 
