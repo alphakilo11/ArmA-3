@@ -1,9 +1,19 @@
 Quelle: https://www.youtube.com/watch?v=wSDP-CmwcNM
 
 apc = [BTR-82A]
+apc_mortar = [???]
+apc_fla = [???]
 ifv = [BMP-2, BMP-3]
-recon = [BRM-1K]
 mbt = [T-72, T-80, T-90, T-80U, T-72B3, T-80BWM, T-90A]
+recon = [BRM-1K]
+spg = [2S1, 2S19, 2S3]
+tank_AA = [2S6]
+tank_RakW = [TOS-1]
+truck_FlA = [96K6]
+truck_mun = [???]
+truck_RakW = [BM21]
+truck_sniper = [???]
+truck_sRakW = [BM27, BM30]
 
 kampfgruppe = [kommando, kampf, kampfunterstuetzung, fuehrung, cyber, einsatzunterstuetzung]
 kommando = [3, ifv] 
@@ -15,15 +25,14 @@ einsatzunterstuetzung = [NT_Kdt, NT_Mun, NT_BetrM, NT_Vers, NT_I, San]
 lmotSKp = [10, apc]
 motSKp = [10, ifv]
 PzKp = [10, mbt]
-GrW,
-l_FlA,
-l_FlA,
-SSch,
-PAL,
-Pi,
+GrW = [3, apc_mortar]
+l_FlA = [3, apc_fla]
+SSch = [2, truck_sniper]
+PAL = [[2, ifv], [3, ???]]
+Pi = 
 Pi(BSA) = 
-Art = 
-m_FlA = 
-l_RakW = 
-m_RakW = 
+Art = [[2, ifv], [6, spg]]
+m_FlA = [[3, apc], [6, tank_AA], [6, truck_FlA]]
+l_RakW = [[1, apc], [1, ifv], [6, truck_RakW], [6, truck_mun]]
+m_RakW = [[1, apc], [1, ifv], [3, truck_sRakW], [3, tank_RakW], [6, truck_mun]]
 
