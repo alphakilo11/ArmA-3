@@ -34,5 +34,5 @@ Pi(BSA) =
 Art = [[2, ifv], [6, spg]]
 m_FlA = [[3, apc], [6, tank_AA], [6, truck_FlA]]
 l_RakW = [[1, apc], [1, ifv], [6, truck_RakW], [6, truck_mun]]
-m_RakW = [[1, apc], [1, ifv], [3, truck_sRakW], [3, tank_RakW], [6, truck_mun]]
+m_RakW = [[1, apc], [1, ifv], [3, truck_sRakW], [3, tank_RakW], [6, truck_mun]] # durchbruchsartillerie
 
