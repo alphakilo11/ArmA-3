@@ -1,4 +1,5 @@
 //TODO use variables
+//IDEA hide trees to improve performance (eg: {	_x hideObjectGlobal true;} forEach _trees;)
 
 //works in 3DEN graphic but will not influence the mission.
 _pos = [8000,10100,0]; 
