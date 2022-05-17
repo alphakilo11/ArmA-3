@@ -1,4 +1,5 @@
 //kinda works, but the functions are never executed so the result is: "It's {time}, {group Zeus1} is at {position Zeus1}"
+//POSSIBLE REASON these are functions an you have to call them before handing them over - TRY [[_pos(), _zeit(), _gruppe()], _tellme] remoteExec ["spawn",2];
 private _pos = {position Zeus1};
 private _zeit = {time};
 private _gruppe = {group Zeus1};

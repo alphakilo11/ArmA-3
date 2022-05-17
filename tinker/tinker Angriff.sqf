@@ -6,7 +6,7 @@
 //CHECK is _absitzen even necessary? Infantry might dismount on their own as soon as combat starts.
 //TODO fix units not dismounting on server (The OnActivation code is executed globally, a.k.a on every client!)
 //TODO make _vfgrm flexible
-//TODO remove messages and diag_log
+//TODO omit messages and diag_log (unless in debug mode)
 //TODO include GKGF-density factor 28,2 [what? apples?]
 //TODO remove RHS dependency
 //IDEA convert to defence after taking objective

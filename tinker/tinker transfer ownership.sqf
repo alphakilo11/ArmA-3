@@ -2,7 +2,7 @@
 _array = [];
 {
 	if ((groupOwner _x) == 2) then {
-	_array pushBack _x; 
+		_array pushBack _x; 
 	};
 } forEach _allGroups; 
 

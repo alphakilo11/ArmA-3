@@ -1,4 +1,0 @@
-_array = [];
-{_array pushBack objectParent _x;}
-forEach units unlucky;
-_array;
