@@ -14,12 +14,12 @@ as some fractions appear on multiple sides, it might be hard for players to IFF
 if some arms have groups with infantry and groups with vehicles inhomogenous platoons might be spawned
 
 example
-	[west, "West", [23000, 19000,0]] call AK_fnc_spawnRandomInfPlatoon;
+	[west, "West", [23000, 19000,0], [23000,18000,0], 40] call AK_fnc_spawnRandomInfPlatoon;
 end
 */
 
 AK_fnc_spawnRandomInfPlatoon = {
-params ["_side", "_configside", "_position"];
+params ["_side", "_configside", "_position", "_attackposition", "_platoon_size"];
 
 private ["_cfgArray", "_cfg_faction", "_cfg_arm", "_cfg_group", "_cfg_groupname", "_cfg_units", "_soldiers", "_vehicles", "_isNoMan", "_timeout", "_spawnedgroups"]; 
  
@@ -31,7 +31,7 @@ _cfgArray = "true" configClasses (configFile >> "CfgGroups" >> _configside >> _c
 _soldiers = 0;
 _timeout = 0;
 _spawnedgroups = [];
-while { (_soldiers < 40) && (_timeout < 100)} do { 
+while { (_soldiers < _platoon_size) && (_timeout < 100)} do { 
 	_cfg_group = (selectRandom _cfgArray); 
 	_cfg_groupname = configName _cfg_group;
 	_cfg_units = "true" configClasses (configFile >> "CfgGroups" >> _configside >> _cfg_faction >> _cfg_arm >> _cfg_groupname);
@@ -49,7 +49,7 @@ while { (_soldiers < 40) && (_timeout < 100)} do {
 	_timeout = _timeout + 1;
 	};
 {_x deleteGroupWhenEmpty true;
-_x addWaypoint [[23000,18000,0], 50];
+_x addWaypoint [_attackposition, 50];
 } forEach _spawnedgroups; 
 _spawnedgroups;
 };
