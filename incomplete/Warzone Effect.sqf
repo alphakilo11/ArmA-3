@@ -1,3 +1,5 @@
+//TODO use variables
+
 //works in 3DEN graphic but will not influence the mission.
 _pos = [8000,10100,0]; 
 _radius = 1000; 
