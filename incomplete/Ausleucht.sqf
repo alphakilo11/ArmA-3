@@ -9,6 +9,7 @@ AK_ausleuchten = [{
 private _shell = "rhs_ammo_flare_m485" createVehicle ([14600,20700,0] Vectoradd [0,0,500]);      
 _shell setVelocity [0, 0, -1];
 },120] call CBA_fnc_addperFrameHandler;
+transform to function
 */
 
 
