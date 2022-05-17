@@ -1,4 +1,6 @@
 /* ----------------------------------------------------------------------------
+!!!MADE OBSOLETE BY LM_fnc_delete.sqf!!!
+
 Function: AK_fnc_delete
 
 Description:
