@@ -1,6 +1,9 @@
 //both work in Achilles Execute Code Module (local&server) but not in Debug Console. u/s global (will spawn multiples).
 //use: call bis_fnc_spawnVehicle ?
 //TODO use CBA_fnc_perFrameHandler
+//TODO convert to function
+//TODO use variables!!!
+
 _unlucky = "B_Plane_CAS_01_dynamicLoadout_F" createVehicle [8000,10100,150];
 createVehicleCrew _unlucky;
 _unlucky setVelocity [0,150,550];
