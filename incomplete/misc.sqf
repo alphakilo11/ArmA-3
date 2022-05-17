@@ -43,3 +43,8 @@ for "_i" from 1 to 12 do {
 _gruppe = [[21000,14500,0], west, 8] call BIS_fnc_spawnGroup;
 _gruppe addWaypoint [[21500,14500,0], 100]; 
 };
+
+// Variables can be created in the "Namespace" of a unit (or object). Example from https://github.com/FreestyleBuild/A3-map-tracking:
+_unit setVariable ["trackingData", [[getPos _unit, getDir _unit, date, speed _unit]]];
+	private _x = (_unit getVariable "trackingData");
+	_x append [[getPos _unit, getDir _unit, date, speed _unit]];
