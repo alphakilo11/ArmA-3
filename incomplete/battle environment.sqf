@@ -1,6 +1,8 @@
 //WIP Battlefield simulation
 //aircraft seem to have a high performance impact
 //TODO make aircraft disappear
+//TODO use variables
+//TODO use random groups / soldiers from a specific faction
 
 AK_fnc_Battlesimulation = {
 
