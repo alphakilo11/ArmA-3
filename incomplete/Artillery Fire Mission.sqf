@@ -5,6 +5,7 @@
 //"B_T_MBT_01_mlrs_F" vanilla NATO MLRS
 //TODO only spawn, if not already present
 //TODO add dispersion
+//TODO transform to  function
 
 
 //V 5
