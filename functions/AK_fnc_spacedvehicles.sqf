@@ -30,6 +30,8 @@ Author:
 ---------------------------------------------------------------------------- */
 //TODO align "formation" with destination and make the attackers keep formation (use "{_x addWaypoint [[15000,17500,0],500];} forEach _array;"?)
 //TODO avoid vehicles blowing up on spawn
+//TODO add an option to return netID?
+
 AK_fnc_spacedvehicles = {  
 params [
 ["_number", 1, [0]],

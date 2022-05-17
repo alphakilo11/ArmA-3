@@ -13,8 +13,8 @@
 5500 remoteExec ["setviewDistance", -2, "Viewdistance"];
 5500 remoteExec ["setObjectViewDistance", -2, "Objectdistance"];
 2 remoteExec ["setTerrainGrid", -2, "Terraingrid"];
+
 //set real time (0.0789 ms)
-//TODO rewrite to execute it on the server
 {[[(missionStart select [0,5]), time] call BIS_fnc_CalculateDateTime, true, true] call BIS_fnc_setDate;} remoteExec ["call", 2];
 
 //get IDs and check FPS once a minute

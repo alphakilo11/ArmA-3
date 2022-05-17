@@ -1,10 +1,5 @@
 
 
-firebase deploy -m "Erde und Mond V 1.2"
-
-https://www.nasa.gov/sites/default/files/thumbnails/image/stsci-h-p2109b-f-1098x1098.png
-
-
 WW1 angriff an der Somme im britischen Sektor: ~22,5 km, 20 Divisionen, 1437 Geschütze (~1,5 Mio Granaten, ~10 Batterien pro km)
 
 
