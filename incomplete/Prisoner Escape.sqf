@@ -24,8 +24,3 @@ _pos = (_building buildingPos -1);
 {
 _x setUnitLoadout (configFile >> "EmptyLoadout");
 } forEach allplayers;
-
-
-
-
-
