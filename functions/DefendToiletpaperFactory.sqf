@@ -7,7 +7,7 @@ The hostiles will spawn within a radius of _radius.
 _pos is the ground zero of the whole scenario and is defined as the players position.
 
 */
-
+AK_fnc_defendToiletPaperFactory = {
 private _pos = getPosATL player;
 private _objective = createVehicle ["Land_Factory_Main_F", _pos, [], 100, 'NONE'];
 private _markerstr = createMarker ["military1",(getPos _objective)];
@@ -41,3 +41,4 @@ _newGroup setFormation 'STAG COLUMN';
  _newGroup setSpeedMode 'FULL';
 _newWaypoint = _newGroup addWaypoint [_pos, 0];
  _newWaypoint setWaypointType "SAD";
+ };
