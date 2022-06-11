@@ -1,4 +1,5 @@
 /*
+Author: hypnomatic
 General init for the tracer function
 */
 hyp_var_tracer_tracedUnits = [];
