@@ -6,6 +6,20 @@ This will create a huge building and 2 + _numberofprivates hostiles approaching 
 The hostiles will spawn within a radius of _radius.
 _pos is the ground zero of the whole scenario and is defined as the players position.
 
+Klopapier-Lager bewachen
+    "Land_Factory_Main_F" größer und cooler weil man raufklettern kann
+    "Land_dp_smallFactory_F"
+Raum mit Leuten die nix tun (Stab)
+
+Add 1 Group of defenders (for flair) (Police with waypoint dismissed)
+Add task
+Add triggerable waves
+Add Blackout at Missionstart
+Add Arsenal/Equipment
+Change hostiles
+Add random clothes and gear to hostiles
+
+
 */
 AK_fnc_defendToiletPaperFactory = {
 private _pos = getPosATL player;
