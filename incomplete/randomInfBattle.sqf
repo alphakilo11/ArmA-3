@@ -20,6 +20,11 @@ AK_var_eastUnits = "configName _x isKindOf 'CAManBase' and getNumber (_x >> 'sco
 AK_pos_Center = [14602, 20777, 0];
 AK_pos_spawnWest = AK_pos_Center vectorAdd [-1000, 0, 0];
 AK_pos_spawnEast = AK_pos_Center vectorAdd [1000, 0, 0];
+// create marker 
+private _markerstr = createMarker ["military1", AK_pos_Center];
+_markerstr setMarkerShape "ICON";
+_markerstr setMarkerType "hd_objective";
+_markerstr setMarkerText "Objective";
 
 //almost the same code twice - this cries for a function
 AK_blufor = [{
