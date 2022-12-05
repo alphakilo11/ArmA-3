@@ -24,7 +24,6 @@ Author:
 
 ---------------------------------------------------------------------------- */
 //BUG sometimes nothing is spawned, but groups are returned
-//BUG vehicles will blow up on spawn
 AK_fnc_moveRandomPlatoons = {
 params [
 	["_cfgSide", 1, [0]],
