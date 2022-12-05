@@ -18,7 +18,7 @@ if (isNil "_var") then {
 	
 60,
 	
-["some_params", [1,2,3]],
+["some_params", [1,2,3]], //Artefakt
 
 {diag_log format ["AKBL Battle Engine starting! %1", _this getVariable "params"];
 _round = 0;},
@@ -33,7 +33,8 @@ _round = 0;},
 
 ["_round"]
 ] call CBA_fnc_createPerFrameHandlerObject;
-};/* ---------------------------------------------------------------------------- 
+};
+/* ---------------------------------------------------------------------------- 
 Function: AK_fnc_battlelogger 
  
 Description: 
@@ -55,7 +56,7 @@ Returns:
  
 Example: 
     (begin example) 
-   
+   no example?
     (end) 
  
 Author: 
@@ -243,7 +244,7 @@ Returns:
 
 Example:
     (begin example)
-		[getPos player] call AK_fnc_delete;
+		[list_of_groups] call AK_fnc_delete;
     (end)
 
 Author:
@@ -257,6 +258,171 @@ _deletedindex = [];
 _deletedindex sort false;
 {_groups deleteAt _x} forEach _deletedindex;
 _groups;
+};
+/*
+The Achilles Execute Code Module doesn't like double-slashes, therefore I have to put all comments in here and the code has to be copy-pasted without this block.
+
+Inspired by the toilet paper shortage in Austria in 2020 this scenario has the players defending a toilet paper factory
+This will create a huge building and 2 + _numberofprivates hostiles approaching it.
+The hostiles will spawn within a radius of _radius.
+_pos is the ground zero of the whole scenario and is defined as the players position.
+
+Klopapier-Lager bewachen
+    "Land_Factory_Main_F" größer und cooler weil man raufklettern kann
+    "Land_dp_smallFactory_F"
+Raum mit Leuten die nix tun (Stab)
+
+Add 1 Group of defenders (for flair) (Police with waypoint dismissed)
+Add task
+Add triggerable waves
+Add Blackout at Missionstart
+Add Arsenal/Equipment
+Change hostiles
+Add random clothes and gear to hostiles
+
+
+*/
+AK_fnc_defendToiletPaperFactory = {
+private _pos = getPosATL player;
+private _objective = createVehicle ["Land_Factory_Main_F", _pos, [], 100, 'NONE'];
+private _markerstr = createMarker ["military1",(getPos _objective)];
+_markerstr setMarkerShape "ICON";
+_markerstr setMarkerType "n_support";
+_markerstr setMarkerText "Klopapierlager";
+private _numberofprivates = 10;
+private _radius = 2000;
+private _typeofunit = ["LOP_BH_Infantry_model_OFI_TRI","LOP_BH_Infantry_model_OFI_M81",'LOP_BH_Infantry_model_OFI_LIZ',"LOP_BH_Infantry_model_OFI_FWDL","LOP_BH_Infantry_model_OFI_ACU","LOP_BH_Infantry_model_M81_TRI","LOP_BH_Infantry_model_M81_LIZ","LOP_BH_Infantry_model_M81_FWDL","LOP_BH_Infantry_model_M81_CHOCO","LOP_BH_Infantry_model_M81_ACU","LOP_BH_Infantry_model_M81","LOP_BH_Infantry_AR","LOP_BH_Infantry_AR_2","LOP_BH_Infantry_AR_Asst","LOP_BH_Infantry_AR_Asst_2","LOP_BH_Infantry_AT","LOP_BH_Infantry_base","LOP_BH_Infantry_Corpsman","LOP_BH_Infantry_Driver","LOP_BH_Infantry_GL","LOP_BH_Infantry_IED","LOP_BH_Infantry_Marksman"];
+ private _newGroup = createGroup east;
+ _newUnit = _newGroup createUnit ["LOP_BH_Infantry_SL", _pos, [], _radius, 'CAN_COLLIDE'];
+ _newUnit setSkill 0.5;
+ _newUnit setRank 'SERGEANT';
+ _newUnit setFormDir 210.828;
+ _newUnit setDir 210.828;
+_newUnit = _newGroup createUnit ["LOP_BH_Infantry_TL", _pos, [], _radius, 'CAN_COLLIDE'];
+ _newUnit setSkill 0.5;
+ _newUnit setRank 'CORPORAL';
+ _newUnit setFormDir 180.016;
+ _newUnit setDir 180.016;
+ private _a =0;
+ while {_a = _a + 1; _a < (_numberofprivates + 1)} do {
+_newUnit = _newGroup createUnit [(selectRandom _typeofunit), _pos, [], _radius, 'CAN_COLLIDE'];
+ _newUnit setSkill 0.5;
+ _newUnit setRank 'PRIVATE';
+ _a + 1;
+ };
+_newGroup setFormation 'STAG COLUMN';
+ _newGroup setCombatMode 'RED';
+ _newGroup setBehaviour 'AWARE';
+ _newGroup setSpeedMode 'FULL';
+_newWaypoint = _newGroup addWaypoint [_pos, 0];
+ _newWaypoint setWaypointType "SAD";
+ };
+/* ----------------------------------------------------------------------------
+Function: AK_fnc_endlessconvoy
+
+Description:
+    Create a vehicle moving from A to B. Upon reaching B it is deleted
+
+Parameters:
+    - Type of Vehicle (Config Entry)
+    - Starting Position (XYZ)
+- End Location (XYZ)
+
+Optional:
+- Speed Limit (km/h)
+
+Example:
+    (begin example)
+    ["B_Truck_01_box_F", [23500,18400,0], [23000,17000,0]] call AK_fnc_endlessconvoy
+    (end)
+
+Returns:
+    Nil
+
+Author:
+    AK
+
+---------------------------------------------------------------------------- */
+
+//1.initiate function
+AK_fnc_endlessconvoy = {
+params ["_verhicletype", "_startloc", "_endloc", ["_speedlimit", -1]];
+private _vehicle = _verhicletype createVehicle _startloc;
+_vehicle setDir (_startloc getDir _endloc);
+createVehicleCrew _vehicle;
+_vehicle limitSpeed _speedlimit;
+private _grp = group _vehicle;
+_grp setBehaviour "SAFE";
+private _wp = _grp addWaypoint [_endloc, 50];  
+_wp setWaypointStatements ["true", "_vehicleleader = vehicle leader this; {deleteVehicle _x} forEach crew _vehicleleader + [_vehicleleader]; deleteGroup (group this);"] ;
+};
+
+//2. loop function
+Testversuch = [] spawn {
+for "_x" from 0 to 1 step 0 do {
+["B_Truck_01_box_F", [23500,18400,0], [23000,17000,0]] call AK_fnc_endlessconvoy;
+sleep 15;
+};
+};
+
+//3. stop function
+terminate Testversuch;
+
+
+//Multiplayer Code (works on Dedicated Server)
+[[],{ AK_fnc_endlessconvoy = {
+params ["_verhicletype", "_startloc", "_endloc", ["_speedlimit", -1]];
+private _vehicle = _verhicletype createVehicle _startloc;
+_vehicle setDir (_startloc getDir _endloc);
+createVehicleCrew _vehicle;
+_vehicle limitSpeed _speedlimit;
+private _grp = group _vehicle;
+_grp setBehaviour "SAFE";
+private _wp = _grp addWaypoint [_endloc, 50];  
+_wp setWaypointStatements ["true", "_vehicleleader = vehicle leader this; {deleteVehicle _x} forEach crew _vehicleleader + [_vehicleleader]; deleteGroup (group this);"] ;
+};
+ 
+}  ]
+remoteExec ["spawn", 2];
+
+[[],{Testversuch = [] spawn {
+for "_x" from 0 to 1 step 0 do {
+["B_Truck_01_box_F", [23500,18400,0], [23000,17000,0]] call AK_fnc_endlessconvoy;
+sleep 15;
+};
+};}] remoteExec ["call", 2];
+
+[[],{terminate Testversuch;}] remoteExec ["call", 2];
+/* ----------------------------------------------------------------------------
+Function: AK_fnc_findString
+
+Description:
+    Searches an array of strings for a certain string and returns an array containing all hits.
+	
+Parameters:
+    0: _string	- string to search for <STRING> 
+    1: _array	- array to search in <ARRAY>
+
+Returns:
+	<ARRAY>
+
+Example:
+    (begin example)
+		["LIB_", ["LIB_P38","LIB_P08","LIB_M1896","WaltherPPK"]] call AK_fnc_findString;
+    (end)
+
+Author:
+    AK
+
+---------------------------------------------------------------------------- */
+AK_fnc_findString = {
+params ["_string", "_array"];
+private _hitArray = [];
+{ 
+if ([_string, _x] call BIS_fnc_inString) then {
+_hitArray pushBack _x;}
+} forEach _array;
+_hitArray
 };/* ----------------------------------------------------------------------------
 Function: AK_fnc_flare
 
@@ -309,7 +475,7 @@ Author:
     AK
 
 ---------------------------------------------------------------------------- */
-//TODO change _vfgrm
+//TODO repair spawn BUG
 AK_fnc_moveRandomPlatoons = {
 params [
 	["_cfgSide", 1, [0]],
@@ -325,7 +491,7 @@ _cfgFaction = str text (selectRandom ([_cfgSide, 1] call AK_fnc_cfgFactionTable)
 _numberOfUnits = 0;
 _timeout = 0;
 _spawnedgroups = [];
-_vfgrm = _AZ vectorAdd [1000,0,0];
+_vfgrm = _AZ vectorAdd [random [-1500, 0, 1500],random [-1500, 0, 1500],0];
 _facing = _vfgrm getDir _AZ;
 
 while {_numberOfUnits < _pltstrength && _timeout < (_pltstrength +1)} do {
@@ -338,7 +504,7 @@ while {_numberOfUnits < _pltstrength && _timeout < (_pltstrength +1)} do {
 	_timeout = _timeout + 1;
 };
 if (_timeout >= (_pltstrength + 1)) then {
-	_this call AK_fnc_moveRandomPlatoons;
+	/*_this call AK_fnc_moveRandomPlatoons;*/
 	diag_log "Spawning failed.";
 };
 _spawnedgroups
@@ -353,7 +519,7 @@ Parameters:
     0: _number		- Number of Vehicles <NUMBER> (default: 1)
     1: _type		- Type of Vehicle <STRING>
 	2: _spawnpos	- Spawn Position <ARRAY>
-	3: _destpos		- Destination <ARRAY>
+	3: _destpos		- Destination. [] to stay at position. <ARRAY>
 	   _side		- <SIDE>
 	4: _spacing		- Spacing <NUMBER> (default: 50 m)
 	5: _behaviour	- Group behaviour [optional] <STRING> (default: "AWARE")
@@ -367,6 +533,19 @@ Example:
     (begin example)
 		[4, "B_MBT_01_cannon_F", [23000, 18000 ,0], [22000, 18000, 0], west, 85, "SAFE", 500, 1] spawn AK_fnc_spacedvehicles;
     (end)
+	
+	(begin advanced example)
+
+	//spawn units
+	neuegruppen = [14, "B_MBT_01_cannon_F", [23000,18000,0], [15000,17000,0], 50, "COMBAT"] call AK_fnc_spacedvehicles;
+	neuegruppen;
+
+	//add additional Waypoint
+	{_x addWaypoint [[10000,10000,0],500]} forEach neuegruppen;
+
+	//delete
+	[neuegruppen] call LM_fnc_delete;
+	(end)
 
 Author:
     AK
@@ -374,8 +553,20 @@ Author:
 ---------------------------------------------------------------------------- */
 //TODO align "formation" with destination and make the attackers keep formation (use "{_x addWaypoint [[15000,17500,0],500];} forEach _array;"?)
 //TODO avoid vehicles blowing up on spawn
+//TODO add an option to return netID?
+
 AK_fnc_spacedvehicles = {  
-params [["_number", 1, [0]], ["_type", "B_MBT_01_cannon_F", [""]], ["_spawnpos", [], [[]]], ["_destpos", [], [[]]], ["_side", west], ["_spacing", 50, [0]], ["_behaviour", "AWARE", [""]], ["_breitegefstr", 500, [0]], ["_platoonsize", 1, [0]]];  
+params [
+["_number", 1, [0]],
+["_type", "B_MBT_01_cannon_F", [""]],
+["_spawnpos", [], [[]]],
+["_destpos", [], [[]]],
+["_side", west],
+["_spacing", 50, [0]],
+["_behaviour", "AWARE", [""]],
+["_breitegefstr", 500, [0]],
+["_platoonsize", 1, [0]]
+];  
   
 private ["_xPos", "_yPos", "_spawnedvehicles", "_spawnedunits", "_spawnedgroups"];   
    
@@ -387,7 +578,7 @@ _spawnedgroups = [];
   
 //spawn  
 for "_i" from 1 to _number do {
-	_spawned = ([(_spawnpos vectorAdd [_xPos, _yPos, 0]), (_spawnpos getDir _destpos), _type, _side] call BIS_fnc_spawnVehicle);
+	_spawned = ([(_spawnpos vectorAdd [_xPos, _yPos, 0]), (_spawnpos getDir _destpos/* This fails when the _destpos is no coordinate*/), _type, _side] call BIS_fnc_spawnVehicle);
 	_spawnedvehicles pushBack (_spawned select 0);
 	{_spawnedunits pushBack _x} forEach (_spawned select 1); 
 	_spawnedgroups pushBack (_spawned select 2); 
@@ -418,20 +609,21 @@ _yPos = 0;
 _spacing = _spacing * _platoonsize;  
 {
 	_x setBehaviour _behaviour;  
-	_x deleteGroupWhenEmpty true;  
-	_x addWaypoint [_destpos VectorAdd [_xPos,_yPos,0],10];  
-    _yPos = _yPos + _spacing;  
-	if (_yPos > _breitegefstr) then {   
-        _yPos = 0;   
-        _xPos = _xPos + _spacing;   
-    };
+	_x deleteGroupWhenEmpty true;
+	if !(count _destpos == 0) then {
+		_x addWaypoint [_destpos VectorAdd [_xPos,_yPos,0],10];  
+		_yPos = _yPos + _spacing;  
+		if (_yPos > _breitegefstr) then {   
+			_yPos = 0;   
+			_xPos = _xPos + _spacing;   
+		};
+	};
 } forEach _spawnedgroups;  
 [_spawnedvehicles, _spawnedunits, _spawnedgroups];
 };  
 //creates a number of groups at _AZ which will defend an area (size of which is based on taktik Handakt OPFOR values) .
 //Works local and on DS
 //REQUIRED: CBA
-//TODO remove messages
 //Params _AZ 3D position
 /*
 example:

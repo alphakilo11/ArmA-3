@@ -23,7 +23,8 @@ Author:
     AK
 
 ---------------------------------------------------------------------------- */
-//TODO change _vfgrm
+//BUG sometimes nothing is spawned, but groups are returned
+//BUG vehicles will blow up on spawn
 AK_fnc_moveRandomPlatoons = {
 params [
 	["_cfgSide", 1, [0]],
@@ -39,12 +40,13 @@ _cfgFaction = str text (selectRandom ([_cfgSide, 1] call AK_fnc_cfgFactionTable)
 _numberOfUnits = 0;
 _timeout = 0;
 _spawnedgroups = [];
-_vfgrm = _AZ vectorAdd [1000,0,0];
+_vfgrm = _AZ vectorAdd [random [-1500, 0, 1500],random [-1500, 0, 1500],0];
 _facing = _vfgrm getDir _AZ;
 
 while {_numberOfUnits < _pltstrength && _timeout < (_pltstrength +1)} do {
 	_cfggroup = selectRandom ([_cfgFaction] call AK_fnc_cfgGroupTable);
 	_grp = [_vfgrm, _side, _cfggroup, [], [], [], [], [], _facing, false, _maxveh] call BIS_fnc_spawnGroup;
+	_vfgrm = _vfgrm vectorAdd [10, 0, 0];
 	_spawnedgroups pushBack _grp;
 	_numberOfUnits = _numberOfUnits + count (units _grp);
 	_grp deleteGroupWhenEmpty true;
@@ -52,7 +54,7 @@ while {_numberOfUnits < _pltstrength && _timeout < (_pltstrength +1)} do {
 	_timeout = _timeout + 1;
 };
 if (_timeout >= (_pltstrength + 1)) then {
-	_this call AK_fnc_moveRandomPlatoons;
+	/*_this call AK_fnc_moveRandomPlatoons;*/
 	diag_log "Spawning failed.";
 };
 _spawnedgroups
