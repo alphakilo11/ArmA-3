@@ -21,6 +21,7 @@ Example:
 
 Requires:
 	AK_fnc_moveRandomPlatoons
+	AK_fnc_storeFPS
 
 Author:
     AK
@@ -40,7 +41,7 @@ AK_fnc_battlezone = {
         ["_spawndelay", 300, [0]]
 	];
 
-	[{AK_var_ServerFPS = diag_fps; publicVariable "AK_var_ServerFPS";}, (_spawndelay / 10)] call CBA_fnc_addPerFrameHandler; //publish the servers FPS 
+	[{[] remoteExec ['AK_fnc_storeFPS', -2]}, (_spawndelay / 10)] call CBA_fnc_addPerFrameHandler; //publish the clients FPS
 
 	[{
         [_this select 0] params [
@@ -48,7 +49,7 @@ AK_fnc_battlezone = {
 		["_pltstrength", 40, [0]],
 		["_maxveh", 0, [0]]
 		];
-		if (AK_var_ServerFPS < 25) exitWith {diag_log 'AK_fnc_battlezone: low FPS, skipping spawn.'}; //check performance and skip spawning if too low
+		if (diag_fps < 25 or AK_var_ClientFPS < 25) exitWith {diag_log 'AK_fnc_battlezone: low FPS, skipping spawn.'}; //check performance and skip spawning if too low
 			
 		//debug
 		diag_log format ['Hello I am the server executing AK_fnc_battlezone and these are my variables: %1 - %2 - %3', _this select 0 select 0, _this select 0 select 1, _this select 0 select 2];
