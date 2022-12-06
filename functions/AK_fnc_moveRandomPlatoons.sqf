@@ -19,6 +19,10 @@ Example:
 		[1, west, [21380, 16390, 0], 40, 0] call AK_fnc_moveRandomPlatoons; 
     (end)
 
+Requires:
+	AK_fnc_cfgFactionTable
+	AK_fnc_cfgGroupTable
+
 Author:
     AK
 
@@ -27,7 +31,6 @@ Author:
 //BUG server lags when spawning - probably to to reading the configtable every time
 //REMARK auffaellig viele Lfz
 //ENHANCE add GroupTable to veriable 
-//ENHANCE respawn if FPS are >25
 AK_fnc_moveRandomPlatoons = {
 	params [
 		["_cfgSide", 1, [0]],
@@ -62,7 +65,7 @@ AK_fnc_moveRandomPlatoons = {
 	};
 	if (_timeout >= (_pltstrength + 1)) then {
 		/*_this call AK_fnc_moveRandomPlatoons;*/
-		diag_log "Spawning failed.";
+		systemChat "AK_fnc_moveRandomPlatoons: Spawning failed.";
 	};
 	_spawnedgroups
 };
