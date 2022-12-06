@@ -161,7 +161,10 @@ Author:
 ---------------------------------------------------------------------------- */
 
 AK_fnc_cfgFactionTable = {
-params ["_side", ["_configName", 1]];
+params [
+	"_side",
+	["_configName", 1]
+];
 switch (_configName) do {
 	case 1: {"getNumber (_x >> 'side') == _side" configClasses (configFile >> "CfgFactionClasses") apply {configName _x};};
 	case 0: {"getNumber (_x >> 'side') == _side" configClasses (configFile >> "CfgFactionClasses");};
@@ -191,7 +194,9 @@ Author:
 ---------------------------------------------------------------------------- */
 
 AK_fnc_cfgGroupTable = {
-params [["_cfgfaction","BLU_F", []]];
+params [
+    ["_cfgfaction","BLU_F", []]
+];
 private ["_cfgSide", "_newCfgEntry", "_arm", "_groups"];
 
 //get side of _cfgfaction
@@ -227,7 +232,10 @@ Author:
 ---------------------------------------------------------------------------- */
 
 AK_fnc_cfgUnitTable = {
-params [["_cfgfaction", "BLU_F", []], ["_cfgkind", "CAManBase", []]];
+params [
+    ["_cfgfaction", "BLU_F", []],
+    ["_cfgkind", "CAManBase", []]
+];
 private _unittable = "getText (_x >> 'faction') == _cfgfaction and configName _x isKindOf _cfgkind and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles") apply {configName _x};
 _unittable
 };/* ----------------------------------------------------------------------------
@@ -326,16 +334,27 @@ Description:
 Parameters:
     - Type of Vehicle (Config Entry)
     - Starting Position (XYZ)
-- End Location (XYZ)
+    - End Location (XYZ)
 
 Optional:
 - Speed Limit (km/h)
 
 Example:
     (begin example)
-    ["B_Truck_01_box_F", [23500,18400,0], [23000,17000,0]] call AK_fnc_endlessconvoy
+    ["B_Truck_01_box_F", [0,0,0], [5000,5000,0]] call AK_fnc_endlessconvoy
     (end)
 
+Advanced Example:
+    (begin example)
+    [[],{Testversuch = [] spawn {
+    for "_x" from 0 to 1 step 0 do {
+    ["B_Truck_01_box_F", [0,0,0], [5000,5000,0]] call AK_fnc_endlessconvoy;
+    sleep 15;
+    };
+    };}] remoteExec ["call", 2];
+
+    [[],{terminate Testversuch;}] remoteExec ["call", 2];
+    (end)
 Returns:
     Nil
 
@@ -346,7 +365,12 @@ Author:
 
 //1.initiate function
 AK_fnc_endlessconvoy = {
-params ["_verhicletype", "_startloc", "_endloc", ["_speedlimit", -1]];
+params [
+    "_verhicletype", 
+    "_startloc", 
+    "_endloc", 
+    ["_speedlimit", -1]
+];
 private _vehicle = _verhicletype createVehicle _startloc;
 _vehicle setDir (_startloc getDir _endloc);
 createVehicleCrew _vehicle;
@@ -356,43 +380,6 @@ _grp setBehaviour "SAFE";
 private _wp = _grp addWaypoint [_endloc, 50];  
 _wp setWaypointStatements ["true", "_vehicleleader = vehicle leader this; {deleteVehicle _x} forEach crew _vehicleleader + [_vehicleleader]; deleteGroup (group this);"] ;
 };
-
-//2. loop function
-Testversuch = [] spawn {
-for "_x" from 0 to 1 step 0 do {
-["B_Truck_01_box_F", [23500,18400,0], [23000,17000,0]] call AK_fnc_endlessconvoy;
-sleep 15;
-};
-};
-
-//3. stop function
-terminate Testversuch;
-
-
-//Multiplayer Code (works on Dedicated Server)
-[[],{ AK_fnc_endlessconvoy = {
-params ["_verhicletype", "_startloc", "_endloc", ["_speedlimit", -1]];
-private _vehicle = _verhicletype createVehicle _startloc;
-_vehicle setDir (_startloc getDir _endloc);
-createVehicleCrew _vehicle;
-_vehicle limitSpeed _speedlimit;
-private _grp = group _vehicle;
-_grp setBehaviour "SAFE";
-private _wp = _grp addWaypoint [_endloc, 50];  
-_wp setWaypointStatements ["true", "_vehicleleader = vehicle leader this; {deleteVehicle _x} forEach crew _vehicleleader + [_vehicleleader]; deleteGroup (group this);"] ;
-};
- 
-}  ]
-remoteExec ["spawn", 2];
-
-[[],{Testversuch = [] spawn {
-for "_x" from 0 to 1 step 0 do {
-["B_Truck_01_box_F", [23500,18400,0], [23000,17000,0]] call AK_fnc_endlessconvoy;
-sleep 15;
-};
-};}] remoteExec ["call", 2];
-
-[[],{terminate Testversuch;}] remoteExec ["call", 2];
 /* ----------------------------------------------------------------------------
 Function: AK_fnc_findString
 
@@ -475,39 +462,48 @@ Author:
     AK
 
 ---------------------------------------------------------------------------- */
-//TODO repair spawn BUG
+//BUG sometimes nothing is spawned, but groups are returned
+//BUG server lags when spawning - probably to to reading the configtable every time
+//REMARK auffaellig viele Lfz
+//ENHANCE add GroupTable to veriable 
+//ENHANCE respawn if FPS are >25
 AK_fnc_moveRandomPlatoons = {
-params [
-	["_cfgSide", 1, [0]],
-	["_side", west, [west]],
-	["_AZ", [500,500,0], [[]]],
-	["_pltstrength", 40, [0]],
-	["_maxveh", 0, [0]]
-];
+	params [
+		["_cfgSide", 1, [0]],
+		["_side", west, [west]], //east, west, resistance
+		["_AZ", [500,500,0], [[]]],
+		["_pltstrength", 40, [0]],
+		["_maxveh", 0, [0]]
+	];
 
-private ["_cfgFaction", "_numberOfUnits", "_timeout", "_spawnedgroups", "_vfgrm", "_facing"];
+	private ["_cfgFaction", "_numberOfUnits", "_timeout", "_spawnedgroups", "_vfgrm", "_facing"];
 
-_cfgFaction = str text (selectRandom ([_cfgSide, 1] call AK_fnc_cfgFactionTable));
-_numberOfUnits = 0;
-_timeout = 0;
-_spawnedgroups = [];
-_vfgrm = _AZ vectorAdd [random [-1500, 0, 1500],random [-1500, 0, 1500],0];
-_facing = _vfgrm getDir _AZ;
+	if (isNil "AK_var_fnc_moveRandomPlatoons_factiontables") then {
+		AK_var_fnc_moveRandomPlatoons_factiontables = [];
+		{AK_var_fnc_moveRandomPlatoons_factiontables pushBack ([_x] call AK_fnc_cfgFactionTable)} forEach [0,1,2];
+	};
+	_cfgFaction = str text (selectRandom (AK_var_fnc_moveRandomPlatoons_factiontables select _cfgSide));
+	_numberOfUnits = 0;
+	_timeout = 0;
+	_spawnedgroups = [];
+	_vfgrm = _AZ vectorAdd [random [-1500, 0, 1500],random [-1500, 0, 1500],0];
+	_facing = _vfgrm getDir _AZ;
 
-while {_numberOfUnits < _pltstrength && _timeout < (_pltstrength +1)} do {
-	_cfggroup = selectRandom ([_cfgFaction] call AK_fnc_cfgGroupTable);
-	_grp = [_vfgrm, _side, _cfggroup, [], [], [], [], [], _facing, false, _maxveh] call BIS_fnc_spawnGroup;
-	_spawnedgroups pushBack _grp;
-	_numberOfUnits = _numberOfUnits + count (units _grp);
-	_grp deleteGroupWhenEmpty true;
-	_grp addWaypoint [_AZ, 100];
-	_timeout = _timeout + 1;
-};
-if (_timeout >= (_pltstrength + 1)) then {
-	/*_this call AK_fnc_moveRandomPlatoons;*/
-	diag_log "Spawning failed.";
-};
-_spawnedgroups
+	while {_numberOfUnits < _pltstrength && _timeout < (_pltstrength +1)} do {
+		_cfggroup = selectRandom ([_cfgFaction] call AK_fnc_cfgGroupTable);
+		_grp = [_vfgrm, _side, _cfggroup, [], [], [], [], [], _facing, false, _maxveh] call BIS_fnc_spawnGroup;
+		_vfgrm = _vfgrm vectorAdd [10, 0, 0];
+		_spawnedgroups pushBack _grp;
+		_numberOfUnits = _numberOfUnits + count (units _grp);
+		_grp deleteGroupWhenEmpty true;
+		_grp addWaypoint [_AZ, 100];
+		_timeout = _timeout + 1;
+	};
+	if (_timeout >= (_pltstrength + 1)) then {
+		/*_this call AK_fnc_moveRandomPlatoons;*/
+		diag_log "Spawning failed.";
+	};
+	_spawnedgroups
 };/* ----------------------------------------------------------------------------
 Function: AK_fnc_spacedvehicles
 
