@@ -3,7 +3,7 @@ Function: AK_fnc_battlezone
 
 Description:
     Creates a battle between east and west. The player can fight alongside one of the parties or choose independent and fight both.
-	Execute on the server.
+	Execute on the server and use some kind of Garbage Collector otherwise the dead units will quickly kill performance.
 	
 Parameters:
     0: _AZ		- Objective <ARRAY> (default: [500,500,0])
@@ -30,9 +30,8 @@ Author:
 //ENHANCE let allies spawn on the same side of the battlefield
 //ENHANCE dynamically adapt to number of clients
 //ENHANCE consider client FPS
-//BUG default values of AK_fnc_moveRandomPlatoons are used 
+//ENHANCE cleanup the select select select mess
 //BUG in some cycles one side doesn't spawn 
-//VALIDATE no vehicles spawning?
 AK_fnc_battlezone = {
     params [
 		["_AZ", [1500,1500,0], [[]]],
