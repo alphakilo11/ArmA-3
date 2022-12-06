@@ -11,6 +11,8 @@ setviewDistance 5500;
 setObjectViewDistance 5500;
 setTerrainGrid 2; //50 removes grass, but the heightmap is very crude
 
+// prints the class name of the vehicle that the code is executed on
+systemChat format ["This is a %1", typeOf vehicle (_this select 1)]
 
 //Create an empty vehicle at player position. 3.16404 ms
 private _position = position player;

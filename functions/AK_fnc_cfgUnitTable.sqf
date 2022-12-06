@@ -22,7 +22,10 @@ Author:
 ---------------------------------------------------------------------------- */
 
 AK_fnc_cfgUnitTable = {
-params [["_cfgfaction", "BLU_F", []], ["_cfgkind", "CAManBase", []]];
+params [
+    ["_cfgfaction", "BLU_F", []],
+    ["_cfgkind", "CAManBase", []]
+];
 private _unittable = "getText (_x >> 'faction') == _cfgfaction and configName _x isKindOf _cfgkind and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles") apply {configName _x};
 _unittable
 };

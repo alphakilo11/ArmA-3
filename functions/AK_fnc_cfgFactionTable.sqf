@@ -23,7 +23,10 @@ Author:
 ---------------------------------------------------------------------------- */
 
 AK_fnc_cfgFactionTable = {
-params ["_side", ["_configName", 1]];
+params [
+	"_side",
+	["_configName", 1]
+];
 switch (_configName) do {
 	case 1: {"getNumber (_x >> 'side') == _side" configClasses (configFile >> "CfgFactionClasses") apply {configName _x};};
 	case 0: {"getNumber (_x >> 'side') == _side" configClasses (configFile >> "CfgFactionClasses");};

@@ -21,7 +21,9 @@ Author:
 ---------------------------------------------------------------------------- */
 
 AK_fnc_cfgGroupTable = {
-params [["_cfgfaction","BLU_F", []]];
+params [
+    ["_cfgfaction","BLU_F", []]
+];
 private ["_cfgSide", "_newCfgEntry", "_arm", "_groups"];
 
 //get side of _cfgfaction
