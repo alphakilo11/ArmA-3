@@ -168,7 +168,6 @@ Author:
 //ENHANCE choose factions
 //ENHANCE let allies spawn on the same side of the battlefield
 //ENHANCE dynamically adapt to number of clients
-//ENHANCE consider client FPS
 //ENHANCE cleanup the select select select mess
 //BUG in some cycles one side doesn't spawn 
 AK_fnc_battlezone = {
@@ -179,7 +178,7 @@ AK_fnc_battlezone = {
         ["_spawndelay", 300, [0]]
 	];
 
-	[{[] remoteExec ['AK_fnc_storeFPS', -2]}, (_spawndelay / 10)] call CBA_fnc_addPerFrameHandler; //publish the clients FPS
+//	[{[] remoteExec ['AK_fnc_storeFPS', -2]}, (_spawndelay / 10)] call CBA_fnc_addPerFrameHandler; //publish the clients FPS
 
 	[{
         [_this select 0] params [
@@ -187,7 +186,12 @@ AK_fnc_battlezone = {
 		["_pltstrength", 40, [0]],
 		["_maxveh", 0, [0]]
 		];
-		if (diag_fps < 25 or AK_var_ClientFPS < 25) exitWith {diag_log 'AK_fnc_battlezone: low FPS, skipping spawn.'}; //check performance and skip spawning if too low
+		[] remoteExec ['AK_fnc_storeFPS', 0]; //update min. FPS
+		if (AK_var_MinFPS < 25) exitWith {
+			diag_log 'AK_fnc_battlezone: low FPS, skipping spawn.';
+			AK_var_MinFPS = 60;
+			publicVariable "AK_var_MinFPS";
+		}; //check performance and skip spawning if too low
 			
 		//debug
 		diag_log format ['Hello I am the server executing AK_fnc_battlezone and these are my variables: %1 - %2 - %3', _this select 0 select 0, _this select 0 select 1, _this select 0 select 2];
@@ -687,7 +691,7 @@ _spacing = _spacing * _platoonsize;
 Function: AK_fnc_storeFPS
 
 Description:
-    Stores current FPS in a public Variable
+    Stores current FPS in a public Variable if it's lower than the curren value
 	Probably won't work with multiple clients.
 	
 Parameters:
@@ -706,8 +710,10 @@ Author:
 
 ---------------------------------------------------------------------------- */
 AK_fnc_storeFPS = {
-	AK_var_ClientFPS = diag_fps;
-	publicVariable "AK_var_ClientFPS";
+	_fps = diag_fps;
+	if !(isNil "AK_var_MinFPS" or _fps < AK_var_MinFPS) exitWith {}; //skip if fps are higher than current value
+	AK_var_MinFPS = _fps;
+	publicVariable "AK_var_MinFPS";
 };//creates a number of groups at _AZ which will defend an area (size of which is based on taktik Handakt OPFOR values) .
 //Works local and on DS
 //REQUIRED: CBA
