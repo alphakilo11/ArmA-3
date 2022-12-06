@@ -22,5 +22,5 @@ Author:
 ---------------------------------------------------------------------------- */
 AK_fnc_storeFPS = {
 	AK_var_ClientFPS = diag_fps;
-	publicVariable "AK_var_ServerFPS";
-}
+	publicVariable "AK_var_ClientFPS";
+};

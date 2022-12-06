@@ -30,7 +30,6 @@ Author:
 //ENHANCE choose factions
 //ENHANCE let allies spawn on the same side of the battlefield
 //ENHANCE dynamically adapt to number of clients
-//ENHANCE consider client FPS
 //ENHANCE cleanup the select select select mess
 //BUG in some cycles one side doesn't spawn 
 AK_fnc_battlezone = {

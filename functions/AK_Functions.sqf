@@ -707,8 +707,8 @@ Author:
 ---------------------------------------------------------------------------- */
 AK_fnc_storeFPS = {
 	AK_var_ClientFPS = diag_fps;
-	publicVariable "AK_var_ServerFPS";
-}//creates a number of groups at _AZ which will defend an area (size of which is based on taktik Handakt OPFOR values) .
+	publicVariable "AK_var_ClientFPS";
+};//creates a number of groups at _AZ which will defend an area (size of which is based on taktik Handakt OPFOR values) .
 //Works local and on DS
 //REQUIRED: CBA
 //Params _AZ 3D position
