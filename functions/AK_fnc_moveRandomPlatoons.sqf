@@ -46,6 +46,9 @@ AK_fnc_moveRandomPlatoons = {
 		AK_var_fnc_moveRandomPlatoons_factiontables = [];
 		{AK_var_fnc_moveRandomPlatoons_factiontables pushBack ([_x] call AK_fnc_cfgFactionTable)} forEach [0,1,2];
 	};
+	//debug
+    diag_log format ['Hello I am the server executing AK_fnc_moveRandomPlatoons and these are my variables: %1', _this];
+
 	_cfgFaction = str text (selectRandom (AK_var_fnc_moveRandomPlatoons_factiontables select _cfgSide));
 	_numberOfUnits = 0;
 	_timeout = 0;
@@ -65,7 +68,7 @@ AK_fnc_moveRandomPlatoons = {
 	};
 	if (_timeout >= (_pltstrength + 1)) then {
 		/*_this call AK_fnc_moveRandomPlatoons;*/
-		systemChat "AK_fnc_moveRandomPlatoons: Spawning failed.";
+		diag_log "AK_fnc_moveRandomPlatoons: Spawning failed.";
 	};
 	_spawnedgroups
 };
