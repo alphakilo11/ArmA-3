@@ -181,11 +181,12 @@ AK_fnc_battlezone = {
 //	[{[] remoteExec ['AK_fnc_storeFPS', -2]}, (_spawndelay / 10)] call CBA_fnc_addPerFrameHandler; //publish the clients FPS
 
 	[{
-        params [
+		(_this select 0) params [ 
 		["_AZ", [1500,1500,0], [[]]],
 		["_pltstrength", 40, [0]],
 		["_maxveh", 0, [0]]
 		];
+		diag_log format ['AK_fnc_battlezone: PerFrameHandler-Variables %1', _this];
 		//check performance and skip spawning if too low
 		[] remoteExec ['AK_fnc_storeFPS', 0]; //update min. FPS
 		if (AK_var_MinFPS < 25) exitWith {
@@ -197,8 +198,8 @@ AK_fnc_battlezone = {
 		//debug
 		diag_log format ['Hello I am the server executing AK_fnc_battlezone and these are my variables: %1 - %2 - %3', _this select 0 select 0, _this select 0 select 1, _this select 0 select 2];
 
-		[0, east, _this select 0 select 0, _this select 0 select 1, _this select 0 select 2] call AK_fnc_moveRandomPlatoons;
-		[1, west, _this select 0 select 0, _this select 0 select 1, _this select 0 select 2] call AK_fnc_moveRandomPlatoons; //spawn
+		[0, east, _AZ, _pltstrength, _maxveh] call AK_fnc_moveRandomPlatoons;
+		[1, west, _AZ, _pltstrength, _maxveh] call AK_fnc_moveRandomPlatoons; //spawn
 
     }, _spawndelay, [_AZ, _pltstrength, _maxveh]] call CBA_fnc_addPerFrameHandler;
 };/* ----------------------------------------------------------------------------
