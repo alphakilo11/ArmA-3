@@ -1,8 +1,40 @@
-/* Has to run on the same machine as the battle - unless I make AK_battlingUnits global...
-Requires: AK_fnc_battlelogger, AK_fnc_spacedvehicles
+/* ----------------------------------------------------------------------------
+Function:
+	AK_fnc_AutomatedBattleEngine_Main
+
+Requires:
+	AK_fnc_battlelogger, AK_fnc_spacedvehicles
+
+Description:
+    Create a Begegungsgefecht between two parties and logs the results.
+	
+Parameters:
+    0: _unitTypes		- Unit Types to choose from (Confignames) <ARRAY> (default: ["B_MBT_01_cannon_F"])
+	1: _location 		- Lower left corner of spawn area <ARRAY> (default: [0,0,0])
+
+Returns:
+	The PFH logic.  <LOCATION>
+
+Example:
+    (begin example)
+		["B_MBT_01_cannon_F"] call AK_fnc_automatedBattleEngine;
+    (end)
+
+Author:
+    AK
+
+---------------------------------------------------------------------------- */
+/* 
 TODO stop AK_fnc_battlelogger when shutting down ABE (use prototype) ("(_AKBL getVariable "handle") call CBA_fnc_deletePerFrameHandlerObject;" didn't work) Likely reason: it was initialized inside an if statement
 */
 AK_fnc_automatedBattleEngine = {
+
+params [
+	["_unitTypes", ["B_MBT_01_cannon_F"], [[]]],
+	["_location", [0,0,0], [[]]]
+	];
+AK_var_fnc_automatedBattleEngine_unitTypes = _unitTypes; // store Unittypes for further use (eg AK_fnc_battlelogger)
+AK_var_fnc_automatedBattleEngine_location = _location; // store location for further use (eg AK_fnc_battlelogger) 
 
 AK_ABE = [
 {
@@ -18,7 +50,7 @@ if (isNil "_var") then {
 	
 60,
 	
-["some_params", [1,2,3]], //Artefakt
+[], //Parameters passed to the function executing.  (optional) <ANY>
 
 {diag_log format ["AKBL Battle Engine starting! %1", _this getVariable "params"];
 _round = 0;},
