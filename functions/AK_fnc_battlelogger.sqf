@@ -82,7 +82,7 @@ diag_log ("AKBL:" + str ({alive _x} count _units) + ";" + str ({!alive _x} count
 //end 
 { 
     //data format: vehicles remaining: East;West;Guer 
-    diag_log format ["AKBL Result: Survivors: %1;%2;%3;%4. Battle over. Battlelogger shutting down", AK_var_fnc_battlelogger_typeEAST, ({side _x == east} count (AK_battlingUnits select 0)),  AK_var_fnc_battlelogger_typeINDEP, ({side _x == independent} count (AK_battlingUnits select 0)) ]; 
+    diag_log format ["AKBL Result: Survivors: %1;%2;%3;%4. Location : %5 %6 Battle over. Battlelogger shutting down", AK_var_fnc_battlelogger_typeEAST, ({side _x == east} count (AK_battlingUnits select 0)),  AK_var_fnc_battlelogger_typeINDEP, ({side _x == independent} count (AK_battlingUnits select 0)), worldName,  AK_var_fnc_automatedBattleEngine_location]; 
     {deleteVehicle _x} forEach (AK_battlingUnits select 0); 
     {deleteVehicle _x} forEach (AK_battlingUnits select 1); 
     {deleteGroup _x} forEach (AK_battlingUnits select 2); 
