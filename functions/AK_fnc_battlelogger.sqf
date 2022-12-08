@@ -21,7 +21,7 @@ Author:
 ---------------------------------------------------------------------------- */ 
  
 // Also against Advanced Garbage collector ("spawned" number is not changing even when units die or get deleted) 
-//TODO log round parameters (start position, type etc.)
+//TODO log round parameters (eg start position)
 //TODO consolidate data 
 //TODO add params 
 //TODO get sides automatically (use pushBackUnique) 
@@ -54,22 +54,20 @@ diag_log ("AKBL:" + str ({alive _x} count _units) + ";" + str ({!alive _x} count
  
 // start 
 {
-        //set variables ENHANCE find another way
+    //set variables ENHANCE find another way
     AK_var_fnc_battlelogger_typeEAST = (selectRandom AK_var_fnc_automatedBattleEngine_unitTypes);
     AK_var_fnc_battlelogger_typeINDEP = (selectRandom AK_var_fnc_automatedBattleEngine_unitTypes);
-    _PosSide1 = [];
-    _PosSide2 = [];
+    _PosSide1 = [AK_var_fnc_automatedBattleEngine_location, (AK_var_fnc_automatedBattleEngine_location vectorAdd [1000, 0, 0])];
+    _PosSide2 = [(AK_var_fnc_automatedBattleEngine_location vectorAdd [1000, 0, 0]), AK_var_fnc_automatedBattleEngine_location];
 
     diag_log format ["AKBL Battlelogger starting! %1 vs. %2", AK_var_fnc_battlelogger_typeEAST, AK_var_fnc_battlelogger_typeINDEP];
-
+    //alternate locations
     if (random 1 >= 0.5) then { 
-    _PosSide1 = [AK_var_fnc_automatedBattleEngine_location, (AK_var_fnc_automatedBattleEngine_location vectorAdd [2000, 0, 0])]; 
-    _PosSide2 = [(AK_var_fnc_automatedBattleEngine_location vectorAdd [2000, 0, 0]), AK_var_fnc_automatedBattleEngine_location]; 
-    } else { 
-    _PosSide1 = [(AK_var_fnc_automatedBattleEngine_location vectorAdd [2000, 0, 0]), AK_var_fnc_automatedBattleEngine_location]; 
-    _PosSide2 = [AK_var_fnc_automatedBattleEngine_location, (AK_var_fnc_automatedBattleEngine_location vectorAdd [2000, 0, 0])]; 
-    
-    }; 
+    _templocation = _PosSide1;
+    _PosSide1 = _PosSide2; 
+    _PosSide2 = _templocation; 
+    };
+
     _spawnedgroups1 = [10, AK_var_fnc_battlelogger_typeEAST, (_PosSide1 select 0), (_PosSide1 select 1), east, 85, "AWARE", 500, 1] call AK_fnc_spacedvehicles; 
     _spawnedgroups2 = [10, AK_var_fnc_battlelogger_typeINDEP, (_PosSide2 select 0), (_PosSide2 select 1), independent, 85, "AWARE", 500, 1] call AK_fnc_spacedvehicles; 
     AK_battlingUnits = []; //initialize the global variable 
@@ -84,7 +82,7 @@ diag_log ("AKBL:" + str ({alive _x} count _units) + ";" + str ({!alive _x} count
 //end 
 { 
     //data format: vehicles remaining: East;West;Guer 
-    diag_log format ["AKBL Result: Survivors: %1;%2;%3;%4. Battle over. Battlelogger shutting down", AK_var_fnc_battlelogger_typeEAST, ({side _x == east} count (AK_battlingUnits select 0)),  AK_var_fnc_battlelogger_typeINDEP, ({side _x == independent} count (AK_battlingUnits select 0)) ]; 
+    diag_log format ["AKBL Result: Survivors: %1;%2;%3;%4. Location : %5 %6 Battle over. Battlelogger shutting down", AK_var_fnc_battlelogger_typeEAST, ({side _x == east} count (AK_battlingUnits select 0)),  AK_var_fnc_battlelogger_typeINDEP, ({side _x == independent} count (AK_battlingUnits select 0)), worldName,  AK_var_fnc_automatedBattleEngine_location]; 
     {deleteVehicle _x} forEach (AK_battlingUnits select 0); 
     {deleteVehicle _x} forEach (AK_battlingUnits select 1); 
     {deleteGroup _x} forEach (AK_battlingUnits select 2); 
