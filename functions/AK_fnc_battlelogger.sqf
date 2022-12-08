@@ -12,7 +12,7 @@ Returns:
  
 Example: 
     (begin example) 
-   [] call AK_fnc_battlelogger
+    [] call AK_fnc_battlelogger
     (end) 
  
 Author: 
@@ -53,42 +53,49 @@ diag_log ("AKBL:" + str ({alive _x} count _units) + ";" + str ({!alive _x} count
 [], //parameters 
  
 // start 
-{diag_log "AKBL Battlelogger starting!"; 
-_PosSide1 = [];
-_PosSide2 = [];
-if (random 1 >= 0.5) then { 
- _PosSide1 = [[14000, 17500 ,0], [12000, 17500, 0]]; 
- _PosSide2 = [[12000, 17510 ,0], [14000, 17510, 0]]; 
-} else { 
- _PosSide1 = [[12000, 17510 ,0], [14000, 17510, 0]]; 
- _PosSide2 = [[14000, 17500 ,0], [12000, 17500, 0]]; 
- 
-}; 
-_spawnedgroups1 = [10, "B_MBT_01_cannon_F", (_PosSide1 select 0), (_PosSide1 select 1), east, 85, "AWARE", 500, 1] call AK_fnc_spacedvehicles; 
-_spawnedgroups2 = [10, "B_MBT_01_cannon_F", (_PosSide2 select 0), (_PosSide2 select 1), independent, 85, "AWARE", 500, 1] call AK_fnc_spacedvehicles; 
-AK_battlingUnits = []; //initialize the global variable 
-_timer = 0; 
-{ 
-AK_battlingUnits pushBack ((_spawnedgroups1 select _x) + (_spawnedgroups2 select _x));} forEach [0,1,2]; 
-{ 
- _wp = _x addWaypoint [[0,0,0], 0]; 
- _wp setWaypointType "CYCLE";} forEach (AK_battlingUnits select 2); 
+{
+        //set variables ENHANCE find another way
+    AK_var_fnc_battlelogger_typeEAST = (selectRandom AK_var_fnc_automatedBattleEngine_unitTypes);
+    AK_var_fnc_battlelogger_typeINDEP = (selectRandom AK_var_fnc_automatedBattleEngine_unitTypes);
+    _PosSide1 = [];
+    _PosSide2 = [];
+
+    diag_log format ["AKBL Battlelogger starting! %1 vs. %2", AK_var_fnc_battlelogger_typeEAST, AK_var_fnc_battlelogger_typeINDEP];
+
+    if (random 1 >= 0.5) then { 
+    _PosSide1 = [AK_var_fnc_automatedBattleEngine_location, (AK_var_fnc_automatedBattleEngine_location vectorAdd [2000, 0, 0])]; 
+    _PosSide2 = [(AK_var_fnc_automatedBattleEngine_location vectorAdd [2000, 0, 0]), AK_var_fnc_automatedBattleEngine_location]; 
+    } else { 
+    _PosSide1 = [(AK_var_fnc_automatedBattleEngine_location vectorAdd [2000, 0, 0]), AK_var_fnc_automatedBattleEngine_location]; 
+    _PosSide2 = [AK_var_fnc_automatedBattleEngine_location, (AK_var_fnc_automatedBattleEngine_location vectorAdd [2000, 0, 0])]; 
+    
+    }; 
+    _spawnedgroups1 = [10, AK_var_fnc_battlelogger_typeEAST, (_PosSide1 select 0), (_PosSide1 select 1), east, 85, "AWARE", 500, 1] call AK_fnc_spacedvehicles; 
+    _spawnedgroups2 = [10, AK_var_fnc_battlelogger_typeINDEP, (_PosSide2 select 0), (_PosSide2 select 1), independent, 85, "AWARE", 500, 1] call AK_fnc_spacedvehicles; 
+    AK_battlingUnits = []; //initialize the global variable 
+    _timer = 0; 
+    { 
+    AK_battlingUnits pushBack ((_spawnedgroups1 select _x) + (_spawnedgroups2 select _x));} forEach [0,1,2]; 
+    { 
+    _wp = _x addWaypoint [[0,0,0], 0]; 
+    _wp setWaypointType "CYCLE";} forEach (AK_battlingUnits select 2); 
 }, 
  
 //end 
 { 
-//data format: vehicles remaining: East;West;Guer 
- diag_log format ["AKBL Result: %1;%2;%3. Battle over. Battlelogger shutting down", ({side _x == east} count (AK_battlingUnits select 0)), ({side _x == west} count (AK_battlingUnits select 0)), ({side _x == independent} count (AK_battlingUnits select 0)) ]; 
- {deleteVehicle _x} forEach (AK_battlingUnits select 0); 
- {deleteVehicle _x} forEach (AK_battlingUnits select 1); 
- {deleteGroup _x} forEach (AK_battlingUnits select 2); 
- AK_battlingUnits = nil;}, 
+    //data format: vehicles remaining: East;West;Guer 
+    diag_log format ["AKBL Result: Survivors: %1;%2;%3;%4. Battle over. Battlelogger shutting down", AK_var_fnc_battlelogger_typeEAST, ({side _x == east} count (AK_battlingUnits select 0)),  AK_var_fnc_battlelogger_typeINDEP, ({side _x == independent} count (AK_battlingUnits select 0)) ]; 
+    {deleteVehicle _x} forEach (AK_battlingUnits select 0); 
+    {deleteVehicle _x} forEach (AK_battlingUnits select 1); 
+    {deleteGroup _x} forEach (AK_battlingUnits select 2); 
+    AK_battlingUnits = nil;
+ }, 
   
 {true}, //Run condition 
  
 //exit Condition 
 {(({alive _x} count (AK_battlingUnits select 1)) <= (count (AK_battlingUnits select 1)/2)) or _timer >= 60}, 
  
-"_timer" 
+"_timer" //List of local variables that are serialized between executions.  (optional) <CODE>
 ] call CBA_fnc_createPerFrameHandlerObject; 
 };
