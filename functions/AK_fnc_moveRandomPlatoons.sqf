@@ -42,18 +42,18 @@ AK_fnc_moveRandomPlatoons = {
 
 	private ["_cfgFaction", "_numberOfUnits", "_timeout", "_spawnedgroups", "_vfgrm", "_facing"];
 
-	if (isNil "AK_var_fnc_moveRandomPlatoons_factiontables") then {
-		//populate faction tables
-		_sides = [0,1,2];
-		AK_var_fnc_moveRandomPlatoons_factiontables = [];
-		{AK_var_fnc_moveRandomPlatoons_factiontables pushBack ([_x] call AK_fnc_cfgFactionTable)} forEach _sides;
-		//populate group tables
-		AK_var_fnc_moveRandomPlatoons_GroupTables = [];
-		{
-			AK_var_fnc_moveRandomPlatoons_GroupTables pushBack [];
-			_workingTable = AK_var_fnc_moveRandomPlatoons_GroupTables select _x;
-			{{_workingTable pushBack ([_x] call AK_fnc_cfgGroupTable)} forEach _x} forEach [AK_var_fnc_moveRandomPlatoons_factiontables select _x];
-		} forEach _sides;
+	if (isNil "AK_var_fnc_moveRandomPlatoons_factiontables") then { 
+	//populate faction tables 
+	_sides = [0,1,2]; 
+	AK_var_fnc_moveRandomPlatoons_factiontables = []; 
+	{AK_var_fnc_moveRandomPlatoons_factiontables pushBack ([_x] call AK_fnc_cfgFactionTable)} forEach _sides; 
+	//populate group tables 
+	AK_var_fnc_moveRandomPlatoons_GroupTables = []; 
+	{ 
+	AK_var_fnc_moveRandomPlatoons_GroupTables pushBack []; 
+	_workingTable = AK_var_fnc_moveRandomPlatoons_GroupTables select _x; 
+	{{_workingTable pushBack ([_x] call AK_fnc_cfgGroupTable)} forEach _x} forEach [AK_var_fnc_moveRandomPlatoons_factiontables select _x]; 
+	} forEach _sides; 
 	};
 	//debug
     //diag_log format ['Hello I am the server executing AK_fnc_moveRandomPlatoons and these are my variables: %1', _this];
@@ -66,7 +66,7 @@ AK_fnc_moveRandomPlatoons = {
 	_facing = _vfgrm getDir _AZ;
 
 	while {_numberOfUnits < _pltstrength && _timeout < (_pltstrength +1)} do {
-		_cfggroup = selectRandom ([_cfgFaction] call AK_fnc_cfgGroupTable);
+		_cfggroup = selectRandom (AK_var_fnc_moveRandomPlatoons_GroupTables select _cfgSide select ((AK_var_fnc_moveRandomPlatoons_factiontables select _cfgSide) findIf {_x == _cfgFaction}));
 		_grp = [_vfgrm, _side, _cfggroup, [], [], [], [], [], _facing, false, _maxveh] call BIS_fnc_spawnGroup;
 		_vfgrm = _vfgrm vectorAdd [10, 0, 0];
 		_spawnedgroups pushBack _grp;
@@ -77,7 +77,7 @@ AK_fnc_moveRandomPlatoons = {
 	};
 	if (_timeout >= (_pltstrength + 1)) then {
 		/*_this call AK_fnc_moveRandomPlatoons;*/
-		diag_log "AK_fnc_moveRandomPlatoons: Spawning failed.";
+		diag_log format ["AK_fnc_moveRandomPlatoons: Hit timeout, %1 units spawned.", _numberOfUnits];
 	};
 	_spawnedgroups
 };

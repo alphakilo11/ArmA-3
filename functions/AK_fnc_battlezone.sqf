@@ -43,7 +43,7 @@ AK_fnc_battlezone = {
 //	[{[] remoteExec ['AK_fnc_storeFPS', -2]}, (_spawndelay / 10)] call CBA_fnc_addPerFrameHandler; //publish the clients FPS
 
 	[{
-        [_this select 0] params [
+        params [
 		["_AZ", [1500,1500,0], [[]]],
 		["_pltstrength", 40, [0]],
 		["_maxveh", 0, [0]]
