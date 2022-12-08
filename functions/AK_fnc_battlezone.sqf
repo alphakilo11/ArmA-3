@@ -48,12 +48,13 @@ AK_fnc_battlezone = {
 		["_pltstrength", 40, [0]],
 		["_maxveh", 0, [0]]
 		];
+		//check performance and skip spawning if too low
 		[] remoteExec ['AK_fnc_storeFPS', 0]; //update min. FPS
 		if (AK_var_MinFPS < 25) exitWith {
 			diag_log 'AK_fnc_battlezone: low FPS, skipping spawn.';
 			AK_var_MinFPS = 60;
 			publicVariable "AK_var_MinFPS";
-		}; //check performance and skip spawning if too low
+		}; 
 			
 		//debug
 		diag_log format ['Hello I am the server executing AK_fnc_battlezone and these are my variables: %1 - %2 - %3', _this select 0 select 0, _this select 0 select 1, _this select 0 select 2];
