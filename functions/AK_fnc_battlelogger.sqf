@@ -48,7 +48,7 @@ AK_fnc_battlelogger = {
     diag_log ("AKBL:" + str ({alive _x} count _units) + ";" + str ({!alive _x} count _units) + ";" + str (count _units) + ";" + str ({alive _x} count _veh) + ";" + str ({!alive _x} count _veh) + ";" + str _emptyveh + ";" + str (count _veh) + ";" + str (count _groups)); //the number of groups is not updated
     //additional exit condition
     // if empty and dead vehicles account for at least half the total vehicles
-    if ((_emptyveh + ({!alive _x} count _veh)) >= ((count _veh) / 2)) then {
+    if ((({side _x == east} count (AK_battlingUnits select 0)) + ({side _x == independent} count (AK_battlingUnits select 0))) <= ((count _veh) / 2)) then {
         AK_var_fnc_battlelogger_stopBattle = true;
     };
 }, 
