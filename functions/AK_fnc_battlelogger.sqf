@@ -31,32 +31,38 @@ Author:
  
 AK_fnc_battlelogger = { 
 [{ 
-//function 
-_veh = AK_battlingUnits select 0; 
-_units = AK_battlingUnits select 1; 
-_groups = AK_battlingUnits select 2; 
-//determine empty vehicles 
-_alivevehicles = []; 
-{if (alive _x) then {_alivevehicles pushBack _x}} forEach _veh;  
-_alivevehcrews = []; 
-{_alivevehcrews pushBack crew _x} forEach _alivevehicles; 
-_number_alive_crews = []; 
-{_number_alive_crews pushBack (count _x)} forEach _alivevehcrews; 
-_emptyveh = {_x == 0} count _number_alive_crews; 
-_timer = _timer +1; 
-//data format:  units alive;dead;all vehicles alive;dead;empty;all groups all 
-diag_log ("AKBL:" + str ({alive _x} count _units) + ";" + str ({!alive _x} count _units) + ";" + str (count _units) + ";" + str ({alive _x} count _veh) + ";" + str ({!alive _x} count _veh) + ";" + str _emptyveh + ";" + str (count _veh) + ";" + str (count _groups)); 
-}, //the number of groups is not updated 
+    //function 
+    _veh = AK_battlingUnits select 0; 
+    _units = AK_battlingUnits select 1; 
+    _groups = AK_battlingUnits select 2; 
+    //determine empty vehicles 
+    _alivevehicles = []; 
+    {if (alive _x) then {_alivevehicles pushBack _x}} forEach _veh;  
+    _alivevehcrews = []; 
+    {_alivevehcrews pushBack crew _x} forEach _alivevehicles; 
+    _number_alive_crews = []; 
+    {_number_alive_crews pushBack (count _x)} forEach _alivevehcrews; 
+    _emptyveh = {_x == 0} count _number_alive_crews; 
+    _timer = _timer +1; 
+    //data format:  units alive;dead;all vehicles alive;dead;empty;all groups all 
+    diag_log ("AKBL:" + str ({alive _x} count _units) + ";" + str ({!alive _x} count _units) + ";" + str (count _units) + ";" + str ({alive _x} count _veh) + ";" + str ({!alive _x} count _veh) + ";" + str _emptyveh + ";" + str (count _veh) + ";" + str (count _groups)); //the number of groups is not updated
+    //additional exit condition
+    // if empty and dead vehicles account for at least half the total vehicles
+    if ((_emptyveh + ({!alive _x} count _veh)) >= ((count _veh) / 2)) then {
+        AK_var_fnc_battlelogger_stopBattle = true;
+    };
+}, 
  
-10, //delay in s 
+    10, //delay in s 
  
-[], //parameters 
+    [], //parameters 
  
 // start 
 {
     //set variables ENHANCE find another way
     AK_var_fnc_battlelogger_typeEAST = (selectRandom AK_var_fnc_automatedBattleEngine_unitTypes);
     AK_var_fnc_battlelogger_typeINDEP = (selectRandom AK_var_fnc_automatedBattleEngine_unitTypes);
+    AK_var_fnc_battlelogger_stopBattle = false;
     _PosSide1 = [AK_var_fnc_automatedBattleEngine_location, (AK_var_fnc_automatedBattleEngine_location vectorAdd [1000, 0, 0])];
     _PosSide2 = [(AK_var_fnc_automatedBattleEngine_location vectorAdd [1000, 0, 0]), AK_var_fnc_automatedBattleEngine_location];
 
@@ -89,11 +95,11 @@ diag_log ("AKBL:" + str ({alive _x} count _units) + ";" + str ({!alive _x} count
     AK_battlingUnits = nil;
  }, 
   
-{true}, //Run condition 
+    {true}, //Run condition 
  
-//exit Condition 
-{(({alive _x} count (AK_battlingUnits select 1)) <= (count (AK_battlingUnits select 1)/2)) or _timer >= 60}, 
+    //exit Condition 
+    {(({alive _x} count (AK_battlingUnits select 1)) <= (count (AK_battlingUnits select 1)/2)) or _timer >= 60 or AK_var_fnc_battlelogger_stopBattle == true}, 
  
-"_timer" //List of local variables that are serialized between executions.  (optional) <CODE>
+    "_timer" //List of local variables that are serialized between executions.  (optional) <CODE>
 ] call CBA_fnc_createPerFrameHandlerObject; 
 };
