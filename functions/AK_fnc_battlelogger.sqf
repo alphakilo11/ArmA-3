@@ -92,7 +92,7 @@ AK_fnc_battlelogger = {
             //data format: vehicle_type;remaining_vehicles
             east_veh_survivors = ({side _x == east} count (AK_battlingUnits select 0));
             indep_veh_survivors = ({side _x == independent} count (AK_battlingUnits select 0));
-            diag_log format ["AKBL Result: Survivors: %1;%2;%3;%4;%5;%6;%7;%8 Battle over. Battlelogger shutting down",
+            diag_log format ["AKBL Result: Survivors: %1;%2;%3;%4;%5;%6;%7;%8;%9;%10;%11;%12 Battle over. Battlelogger shutting down",
                 AK_var_fnc_battlelogger_Version,
                 AK_var_fnc_battlelogger_typeEAST,
                 east_veh_survivors,
@@ -100,7 +100,11 @@ AK_fnc_battlelogger = {
                 indep_veh_survivors,
                 AK_var_fnc_battlelogger_numberOfStartingVehicles,
                 worldName,
-                AK_var_fnc_automatedBattleEngine_location
+                AK_var_fnc_automatedBattleEngine_location,
+                AK_var_fnc_battlelogger_engagementDistance,
+                AK_var_fnc_battlelogger_vehSpacing,
+                AK_var_fnc_battlelogger_breiteGefStr,
+                AK_var_fnc_battlelogger_platoonSize
             ]; 
             {deleteVehicle _x} forEach (AK_battlingUnits select 0); 
             {deleteVehicle _x} forEach (AK_battlingUnits select 1); 
