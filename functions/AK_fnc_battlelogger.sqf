@@ -21,13 +21,9 @@ Author:
 ---------------------------------------------------------------------------- */ 
  
 // Also against Advanced Garbage collector ("spawned" number is not changing even when units die or get deleted) 
-//TODO log round parameters (eg start position)
-//TODO consolidate data 
-//TODO add params 
 //TODO get sides automatically (use pushBackUnique) 
 // make all local variables private 
 //MINOR ISSUE the code works via Advanced Developer Tools console, but not via ZEN (Execute code) (likely reason: comments) 
-//MINOR ISSUE pretty complicated to get the number of empty vehicles (use "systemChat str (gunner (_this select 1));" instead?) 
  
 AK_fnc_battlelogger = { 
 [{ 
