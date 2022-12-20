@@ -1,3 +1,6 @@
+//use on a vehicle to make it respawn
+[_this select 1] call BIS_fnc_moduleRespawnVehicle;
+
 //Array of tanks
 (("configName _x isKindOf 'tank' and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles")) apply {(configName _x)})
 
