@@ -45,6 +45,8 @@ if (isNil "_var") then {
 	_AKBL = [] spawn AK_fnc_battlelogger;
 	_round = _round + 1; 
 	diag_log format ["AKBL round %1", _round];
+} else {
+	diag_log "AK Automated Battle Engine already running.";
 };
 },
 	
