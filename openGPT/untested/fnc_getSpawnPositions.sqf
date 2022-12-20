@@ -50,4 +50,7 @@ _fnc_getSpawnPositions =
       {
         for "_column" from 0 to _numColumns - 1 do
         {
-          _spawnPositions pushBack [(_
+          _spawnPositions pushBack [(_)]
+        }
+      }
+    }
