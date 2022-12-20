@@ -27,6 +27,10 @@ AK_fnc_battlelogger = {
     AK_var_fnc_battlelogger_numberOfStartingVehicles = 10; // how many vehicles are spawned on each side
     AK_var_fnc_battlelogger_engagementDistance = [1000, 0, 0]; // how is the away teams spawn location displaced from AK_var_fnc_automatedBattleEngine_location
     AK_var_fnc_battlelogger_vehSpacing = 85;
+    AK_var_fnc_battlelogger_breiteGefStr = 500;
+    AK_var_fnc_battlelogger_platoonSize = 1;
+    AK_var_fnc_battlelogger_loggerInterval = 10; // s
+    AK_var_fnc_battlelogger_timeout = 600; // s
     [
         { 
             //function 
@@ -51,7 +55,7 @@ AK_fnc_battlelogger = {
             };
         }, 
         
-        10, //delay in s 
+        AK_var_fnc_battlelogger_loggerInterval, //delay in s 
         
         [], //parameters 
         
@@ -72,8 +76,8 @@ AK_fnc_battlelogger = {
             _PosSide2 = _templocation; 
             };
 
-            _spawnedgroups1 = [AK_var_fnc_battlelogger_numberOfStartingVehicles, AK_var_fnc_battlelogger_typeEAST, (_PosSide1 select 0), (_PosSide1 select 1), east, 85, "AWARE", 500, 1] call AK_fnc_spacedvehicles; 
-            _spawnedgroups2 = [AK_var_fnc_battlelogger_numberOfStartingVehicles, AK_var_fnc_battlelogger_typeINDEP, (_PosSide2 select 0), (_PosSide2 select 1), independent, 85, "AWARE", 500, 1] call AK_fnc_spacedvehicles; 
+            _spawnedgroups1 = [AK_var_fnc_battlelogger_numberOfStartingVehicles, AK_var_fnc_battlelogger_typeEAST, (_PosSide1 select 0), (_PosSide1 select 1), east, AK_var_fnc_battlelogger_vehSpacing, "AWARE", AK_var_fnc_battlelogger_breiteGefStr, AK_var_fnc_battlelogger_platoonSize] call AK_fnc_spacedvehicles; 
+            _spawnedgroups2 = [AK_var_fnc_battlelogger_numberOfStartingVehicles, AK_var_fnc_battlelogger_typeINDEP, (_PosSide2 select 0), (_PosSide2 select 1), independent, AK_var_fnc_battlelogger_vehSpacing, "AWARE", AK_var_fnc_battlelogger_breiteGefStr, AK_var_fnc_battlelogger_platoonSize] call AK_fnc_spacedvehicles; 
             AK_battlingUnits = []; //initialize the global variable 
             _timer = 0; 
             { 
@@ -107,7 +111,7 @@ AK_fnc_battlelogger = {
         {true}, //Run condition 
         
         //exit Condition 
-        {(({alive _x} count (AK_battlingUnits select 1)) <= (count (AK_battlingUnits select 1)/2)) or _timer >= 60 or AK_var_fnc_battlelogger_stopBattle == true}, 
+        {(({alive _x} count (AK_battlingUnits select 1)) <= (count (AK_battlingUnits select 1)/2)) or _timer >= (AK_var_fnc_battlelogger_timeout / AK_var_fnc_battlelogger_loggerInterval) or AK_var_fnc_battlelogger_stopBattle == true}, 
         
         "_timer" //List of local variables that are serialized between executions.  (optional) <CODE>
     ] call CBA_fnc_createPerFrameHandlerObject; 
