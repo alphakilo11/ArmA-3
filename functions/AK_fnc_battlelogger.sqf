@@ -105,7 +105,7 @@ AK_fnc_battlelogger = {
                 AK_var_fnc_battlelogger_breiteGefStr,
                 AK_var_fnc_battlelogger_platoonSize
             ]
-            diag_log format ["AKBL Result: %1 Battle over. Battlelogger shutting down", _summary]; 
+            diag_log format ["AKBL Result: %1 Battle over. Battlelogger shutting down", _summary]; // Do not remove 'AKBL Result: ' - see readme.txt for details
             {deleteVehicle _x} forEach (AK_battlingUnits select 0); 
             {deleteVehicle _x} forEach (AK_battlingUnits select 1); 
             {deleteGroup _x} forEach (AK_battlingUnits select 2); 
