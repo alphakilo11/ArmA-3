@@ -64,11 +64,12 @@ AK_fnc_battlelogger = {
             //set variables ENHANCE find another way
             AK_var_fnc_battlelogger_typeEAST = (selectRandom AK_var_fnc_automatedBattleEngine_unitTypes);
             AK_var_fnc_battlelogger_typeINDEP = (selectRandom AK_var_fnc_automatedBattleEngine_unitTypes);
+            AK_var_fnc_battlelogger_startTime = systemTime;
             AK_var_fnc_battlelogger_stopBattle = false;
             _PosSide1 = [AK_var_fnc_automatedBattleEngine_location, (AK_var_fnc_automatedBattleEngine_location vectorAdd AK_var_fnc_battlelogger_engagementDistance)];
             _PosSide2 = [(AK_var_fnc_automatedBattleEngine_location vectorAdd AK_var_fnc_battlelogger_engagementDistance), AK_var_fnc_automatedBattleEngine_location];
 
-            diag_log format ["AKBL %1 Battlelogger starting! %2 vs. %3;%4", AK_var_fnc_battlelogger_Version, AK_var_fnc_battlelogger_typeEAST, AK_var_fnc_battlelogger_typeINDEP, systemTime];
+            diag_log format ["AKBL %1 Battlelogger starting! %2 vs. %3", AK_var_fnc_battlelogger_Version, AK_var_fnc_battlelogger_typeEAST, AK_var_fnc_battlelogger_typeINDEP];
             //alternate locations
             if (random 1 >= 0.5) then { 
             _templocation = _PosSide1;
@@ -104,7 +105,8 @@ AK_fnc_battlelogger = {
                 AK_var_fnc_battlelogger_engagementDistance,
                 AK_var_fnc_battlelogger_vehSpacing,
                 AK_var_fnc_battlelogger_breiteGefStr,
-                AK_var_fnc_battlelogger_platoonSize
+                AK_var_fnc_battlelogger_platoonSize,
+                AK_var_fnc_battlelogger_startTime
             ];
             diag_log _summary; // Do not remove 'AKBL Result: ' - see readme.txt for details
             {deleteVehicle _x} forEach (AK_battlingUnits select 0); 
