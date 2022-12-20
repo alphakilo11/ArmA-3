@@ -1,7 +1,9 @@
 /* ----------------------------------------------------------------------------
 Function: AK_fnc_createDictionary
 
+
 Description:
+    WIP
     Creates a dictionary-like string from two arrays of keys and values.
     The intention is to use it together with https://docs.python.org/3/library/ast.html?highlight=ast%20literal_eval#ast.literal_eval
 	

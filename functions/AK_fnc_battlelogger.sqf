@@ -68,7 +68,7 @@ AK_fnc_battlelogger = {
             _PosSide1 = [AK_var_fnc_automatedBattleEngine_location, (AK_var_fnc_automatedBattleEngine_location vectorAdd AK_var_fnc_battlelogger_engagementDistance)];
             _PosSide2 = [(AK_var_fnc_automatedBattleEngine_location vectorAdd AK_var_fnc_battlelogger_engagementDistance), AK_var_fnc_automatedBattleEngine_location];
 
-            diag_log format ["AKBL %1 Battlelogger starting! %2 vs. %3", AK_var_fnc_battlelogger_Version, AK_var_fnc_battlelogger_typeEAST, AK_var_fnc_battlelogger_typeINDEP];
+            diag_log format ["AKBL %1 Battlelogger starting! %2 vs. %3;%4", AK_var_fnc_battlelogger_Version, AK_var_fnc_battlelogger_typeEAST, AK_var_fnc_battlelogger_typeINDEP, systemTime];
             //alternate locations
             if (random 1 >= 0.5) then { 
             _templocation = _PosSide1;
@@ -89,10 +89,9 @@ AK_fnc_battlelogger = {
         
         //end 
         { 
-            //data format: vehicle_type;remaining_vehicles
             east_veh_survivors = ({side _x == east} count (AK_battlingUnits select 0));
             indep_veh_survivors = ({side _x == independent} count (AK_battlingUnits select 0));
-            diag_log format ["AKBL Result: Survivors: %1;%2;%3;%4;%5;%6;%7;%8;%9;%10;%11;%12 Battle over. Battlelogger shutting down",
+            _summary = [
                 AK_var_fnc_battlelogger_Version,
                 AK_var_fnc_battlelogger_typeEAST,
                 east_veh_survivors,
@@ -105,7 +104,8 @@ AK_fnc_battlelogger = {
                 AK_var_fnc_battlelogger_vehSpacing,
                 AK_var_fnc_battlelogger_breiteGefStr,
                 AK_var_fnc_battlelogger_platoonSize
-            ]; 
+            ]
+            diag_log format ["AKBL Result: %1 Battle over. Battlelogger shutting down", _summary]; 
             {deleteVehicle _x} forEach (AK_battlingUnits select 0); 
             {deleteVehicle _x} forEach (AK_battlingUnits select 1); 
             {deleteGroup _x} forEach (AK_battlingUnits select 2); 
