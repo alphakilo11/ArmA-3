@@ -47,7 +47,7 @@ AK_fnc_battlelogger = {
             _emptyveh = {_x == 0} count _number_alive_crews; 
             _timer = _timer +1; 
             //data format:  units alive;dead;all vehicles alive;dead;empty;all groups all 
-            diag_log ("AKBL" + AK_var_fnc_battlelogger_Version + ":" + str ({alive _x} count _units) + ";" + str ({!alive _x} count _units) + ";" + str (count _units) + ";" + str ({alive _x} count _veh) + ";" + str ({!alive _x} count _veh) + ";" + str _emptyveh + ";" + str (count _veh) + ";" + str (count _groups)); //the number of groups is not updated
+            diag_log ("AKBL " + AK_var_fnc_battlelogger_Version + ":" + str ({alive _x} count _units) + ";" + str ({!alive _x} count _units) + ";" + str (count _units) + ";" + str ({alive _x} count _veh) + ";" + str ({!alive _x} count _veh) + ";" + str _emptyveh + ";" + str (count _veh) + ";" + str (count _groups)); //the number of groups is not updated
             //additional exit condition
             // if empty and dead vehicles account for at least half the total vehicles
             if ((({side _x == east} count (AK_battlingUnits select 0)) + ({side _x == independent} count (AK_battlingUnits select 0))) <= ((count _veh) / 2)) then {
@@ -92,6 +92,7 @@ AK_fnc_battlelogger = {
             east_veh_survivors = ({side _x == east} count (AK_battlingUnits select 0));
             indep_veh_survivors = ({side _x == independent} count (AK_battlingUnits select 0));
             _summary = [
+                "AKBL Result: ",
                 AK_var_fnc_battlelogger_Version,
                 AK_var_fnc_battlelogger_typeEAST,
                 east_veh_survivors,
@@ -105,7 +106,7 @@ AK_fnc_battlelogger = {
                 AK_var_fnc_battlelogger_breiteGefStr,
                 AK_var_fnc_battlelogger_platoonSize
             ];
-            diag_log format ["AKBL Result: %1 Battle over. Battlelogger shutting down", _summary]; // Do not remove 'AKBL Result: ' - see readme.txt for details
+            diag_log _summary; // Do not remove 'AKBL Result: ' - see readme.txt for details
             {deleteVehicle _x} forEach (AK_battlingUnits select 0); 
             {deleteVehicle _x} forEach (AK_battlingUnits select 1); 
             {deleteGroup _x} forEach (AK_battlingUnits select 2); 

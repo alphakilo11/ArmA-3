@@ -1,3 +1,4 @@
+// ChatGPT Dec 15 Version.
 // Define the function
 _fnc_createMapMarkers =
 {
