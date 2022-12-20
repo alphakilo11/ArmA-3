@@ -1,1 +1,1 @@
-Do NOT use 'Survivors: ' in the battlelogger result message, because this is used by ABE_Auswertung.py to identify the vanilla version.
+
