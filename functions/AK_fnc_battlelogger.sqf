@@ -106,7 +106,10 @@ AK_fnc_battlelogger = {
                 AK_var_fnc_battlelogger_vehSpacing,
                 AK_var_fnc_battlelogger_breiteGefStr,
                 AK_var_fnc_battlelogger_platoonSize,
-                AK_var_fnc_battlelogger_startTime
+                AK_var_fnc_battlelogger_startTime,
+                systemTime,
+                sunOrMoon,
+                moonIntensity
             ];
             diag_log _summary; // Do not remove 'AKBL Result: ' - see readme.txt for details
             {deleteVehicle _x} forEach (AK_battlingUnits select 0); 
