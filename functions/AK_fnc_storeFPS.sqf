@@ -22,7 +22,7 @@ Author:
 ---------------------------------------------------------------------------- */
 AK_fnc_storeFPS = {
 	_fps = diag_fps;
-	if !(isNil "AK_var_MinFPS" or _fps < AK_var_MinFPS) exitWith {}; //skip if fps are higher than current value
+	if !({isNil "AK_var_MinFPS"} or _fps < AK_var_MinFPS) exitWith {}; //skip if fps are higher than current value
 	AK_var_MinFPS = _fps;
 	publicVariable "AK_var_MinFPS";
 };
