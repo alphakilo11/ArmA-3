@@ -30,43 +30,43 @@ TODO stop AK_fnc_battlelogger when shutting down ABE (use prototype) ("(_AKBL ge
 */
 AK_fnc_automatedBattleEngine = {
 
-params [
-	["_unitTypes", ["B_MBT_01_cannon_F"], [[]]],
-	["_location", [0,0,0], [[]]],
-	["_delay", 60, [0]]
-	];
-AK_var_fnc_automatedBattleEngine_unitTypes = _unitTypes; // store Unittypes for further use (eg AK_fnc_battlelogger)
-AK_var_fnc_automatedBattleEngine_location = _location; // store location for further use (eg AK_fnc_battlelogger) 
+	params [
+		["_unitTypes", ["B_MBT_01_cannon_F"], [[]]],
+		["_location", [0,0,0], [[]]],
+		["_delay", 60, [0]]
+		];
+	AK_var_fnc_automatedBattleEngine_unitTypes = _unitTypes; // store Unittypes for further use (eg AK_fnc_battlelogger)
+	AK_var_fnc_automatedBattleEngine_location = _location; // store location for further use (eg AK_fnc_battlelogger) 
 
-AK_ABE = [
-{
-private ["_var"];
+	AK_ABE = [
+		{
+		private ["_var"];
 
-_var = missionNamespace getVariable "AK_battlingUnits"; 
-if (isNil "_var") then { 
-	_AKBL = [] spawn AK_fnc_battlelogger;
-	_round = _round + 1; 
-	diag_log format ["AKBL round %1", _round];
-} else {
-	diag_log "AK Automated Battle Engine already running.";
-};
-},
-	
-_delay,
-	
-[], //Parameters passed to the function executing.  (optional) <ANY>
+		_var = missionNamespace getVariable "AK_battlingUnits"; 
+		if (isNil "_var") then { 
+			_AKBL = [] spawn AK_fnc_battlelogger;
+			_round = _round + 1; 
+			diag_log format ["AKBL round %1", _round];
+		} else {
+			diag_log "AK Automated Battle Engine already running.";
+		};
+		},
 
-{diag_log format ["AKBL Battle Engine starting! %1", _this getVariable "params"];
-_round = 0;},
+		_delay,
 
-{
- diag_log format ["AKBL stopping Battle Engine! params: %1",   _this getVariable "params"];
- },
+		[], //Parameters passed to the function executing.  (optional) <ANY>
 
-{true},
+		{diag_log format ["AKBL Battle Engine starting! %1", _this getVariable "params"];
+		_round = 0;},
 
-{false},
+		{
+		 diag_log format ["AKBL stopping Battle Engine! params: %1",   _this getVariable "params"];
+		 },
 
-["_round"]
-] call CBA_fnc_createPerFrameHandlerObject;
+		{true},
+
+		{false},
+
+		["_round"]
+	] call CBA_fnc_createPerFrameHandlerObject;
 };
