@@ -41,7 +41,6 @@ AK_fnc_automatedBattleEngine = {
 	AK_ABE = [
 		{
 		private ["_var"];
-
 		_var = missionNamespace getVariable "AK_battlingUnits"; 
 		if (isNil "_var") then { 
 			_AKBL = [] spawn AK_fnc_battlelogger;
