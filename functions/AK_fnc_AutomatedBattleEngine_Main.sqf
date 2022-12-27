@@ -18,7 +18,7 @@ Returns:
 
 Example:
     (begin example) Battle between random tanks
-		[(("configName _x isKindOf 'tank' and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles")) apply {(configName _x)}), [4000, 7000,0]] call AK_fnc_automatedBattleEngine;
+		[(("configName _x isKindOf 'tank' and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles")) apply {(configName _x)}), [4000, 7000,0], 60] call AK_fnc_automatedBattleEngine;
     (end)
 
 Author:
