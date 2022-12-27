@@ -39,7 +39,7 @@ AK_fnc_automatedBattleEngine = {
 	AK_var_fnc_automatedBattleEngine_location = _location; // store location for further use (eg AK_fnc_battlelogger) 
 
 	AK_ABE = [
-		{
+		{ // The function you wish to execute.  <CODE>
 		private ["_var"];
 		_var = missionNamespace getVariable "AK_battlingUnits"; 
 		if (isNil "_var") then { 
@@ -51,21 +51,23 @@ AK_fnc_automatedBattleEngine = {
 		};
 		},
 
-		_delay,
+		_delay, // The amount of time in seconds between executions, 0 for every frame.  (optional, default: 0) <NUMBER>
 
 		[], //Parameters passed to the function executing.  (optional) <ANY>
 
-		{diag_log format ["AKBL Battle Engine starting! %1", _this getVariable "params"];
-		_round = 0;},
+		{ // Function that is executed when the PFH is added.  (optional) <CODE>
+			diag_log format ["AKBL Battle Engine starting! %1", _this getVariable "params"];
+			_round = 0;
+		},
 
-		{
-		 diag_log format ["AKBL stopping Battle Engine! params: %1",   _this getVariable "params"];
-		 },
+		{ // Function that is executed when the PFH is removed.  (optional) <CODE>
+		 	diag_log format ["AKBL stopping Battle Engine! params: %1",   _this getVariable "params"];
+		}, 
 
-		{true},
+		{true}, // Condition that has to return true for the PFH to be executed.  (optional, default {true}) <CODE>
 
-		{false},
+		{false}, //Condition that has to return true to delete the PFH object.  (optional, default {false}) <CODE>
 
-		["_round"]
+		["_round"] // List of local variables that are serialized between executions.  (optional) <CODE>
 	] call CBA_fnc_createPerFrameHandlerObject;
 };
