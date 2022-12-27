@@ -30,7 +30,7 @@ AK_fnc_battlelogger = {
     AK_var_fnc_battlelogger_breiteGefStr = 500;
     AK_var_fnc_battlelogger_platoonSize = 1;
     AK_var_fnc_battlelogger_loggerInterval = 10; // s
-    AK_var_fnc_battlelogger_timeout = 600; // s
+    AK_var_fnc_battlelogger_timeout = 140; // s
     [
         { 
             //function 
