@@ -56,12 +56,12 @@ AK_fnc_automatedBattleEngine = {
 		[], //Parameters passed to the function executing.  (optional) <ANY>
 
 		{ // Function that is executed when the PFH is added.  (optional) <CODE>
-			diag_log format ["AKBL Battle Engine starting! %1", _this getVariable "params"];
+			diag_log format ["AKBL Battle Engine starting!"];
 			_round = 0;
 		},
 
 		{ // Function that is executed when the PFH is removed.  (optional) <CODE>
-		 	diag_log format ["AKBL stopping Battle Engine! params: %1",   _this getVariable "params"];
+		 	diag_log format ["AKBL stopping Battle Engine!"];
 		}, 
 
 		{true}, // Condition that has to return true for the PFH to be executed.  (optional, default {true}) <CODE>
