@@ -38,13 +38,15 @@ AK_fnc_battlelogger = {
             _units = AK_battlingUnits select 1; 
             _groups = AK_battlingUnits select 2; 
             //determine empty vehicles 
+            /*
             _alivevehicles = []; 
             {if (alive _x) then {_alivevehicles pushBack _x}} forEach _veh;  
             _alivevehcrews = []; 
             {_alivevehcrews pushBack crew _x} forEach _alivevehicles; 
             _number_alive_crews = []; 
             {_number_alive_crews pushBack (count _x)} forEach _alivevehcrews; 
-            _emptyveh = {_x == 0} count _number_alive_crews; 
+            _emptyveh = {_x == 0} count _number_alive_crews;
+            */
             _timer = _timer +1; 
             //data format:  units alive;dead;all vehicles alive;dead;empty;all groups all 
             //diag_log ("AKBL " + AK_var_fnc_battlelogger_Version + ":" + str ({alive _x} count _units) + ";" + str ({!alive _x} count _units) + ";" + str (count _units) + ";" + str ({alive _x} count _veh) + ";" + str ({!alive _x} count _veh) + ";" + str _emptyveh + ";" + str (count _veh) + ";" + str (count _groups)); //the number of groups is not updated
