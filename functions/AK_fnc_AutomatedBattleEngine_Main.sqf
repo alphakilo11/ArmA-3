@@ -10,7 +10,8 @@ Description:
 	
 Parameters:
     0: _unitTypes		- Unit Types to choose from (Confignames) <ARRAY> (default: ["B_MBT_01_cannon_F"])
-	1: _location 		- Lower left corner of spawn area <ARRAY> (default: [0,0,0])
+    1: _location 		- Lower left corner of spawn area <ARRAY> (default: [0,0,0])
+    2: _delay			- Delay in seconds between execution of this function <INT> (default: 60)
 
 Returns:
 	The PFH logic.  <LOCATION>
@@ -31,7 +32,8 @@ AK_fnc_automatedBattleEngine = {
 
 params [
 	["_unitTypes", ["B_MBT_01_cannon_F"], [[]]],
-	["_location", [0,0,0], [[]]]
+	["_location", [0,0,0], [[]]],
+	["_delay", 60, [0]]
 	];
 AK_var_fnc_automatedBattleEngine_unitTypes = _unitTypes; // store Unittypes for further use (eg AK_fnc_battlelogger)
 AK_var_fnc_automatedBattleEngine_location = _location; // store location for further use (eg AK_fnc_battlelogger) 
@@ -50,7 +52,7 @@ if (isNil "_var") then {
 };
 },
 	
-60,
+_delay,
 	
 [], //Parameters passed to the function executing.  (optional) <ANY>
 
