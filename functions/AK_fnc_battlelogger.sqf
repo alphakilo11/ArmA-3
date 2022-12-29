@@ -51,7 +51,7 @@ AK_fnc_battlelogger = {
             */
             //additional exit condition
             // if empty and dead vehicles account for at least half the total vehicles
-            if ((({side _x == east} count (AK_battlingUnits select 0)) + ({side _x == independent} count (AK_battlingUnits select 0))) <= ((count _veh) / 2)) then {
+            if ((({side _x == east} count (AK_battlingUnits select 0)) + ({side _x == independent} count (AK_battlingUnits select 0))) <= AK_var_fnc_battlelogger_numberOfStartingVehicles then {
                 AK_var_fnc_battlelogger_stopBattle = true;
             //increment timer
             _timer = _timer +1; 
@@ -129,7 +129,7 @@ AK_fnc_battlelogger = {
         {true}, //Run condition 
         
         //exit Condition 
-        {(({alive _x} count (AK_battlingUnits select 1)) <= (count (AK_battlingUnits select 1)/2)) or _timer >= (AK_var_fnc_battlelogger_timeout / AK_var_fnc_battlelogger_loggerInterval) or AK_var_fnc_battlelogger_stopBattle == true}, 
+        {(({alive _x} count (AK_battlingUnits select 1)) <= AK_var_fnc_battlelogger_numberOfStartingVehicles or _timer >= (AK_var_fnc_battlelogger_timeout / AK_var_fnc_battlelogger_loggerInterval) or AK_var_fnc_battlelogger_stopBattle == true}, 
         
         "_timer" //List of local variables that are serialized between executions.  (optional) <CODE>
     ] call CBA_fnc_createPerFrameHandlerObject; 
