@@ -24,7 +24,7 @@ AK_fnc_storeFPS = {
 	_fps = diag_fps;
 	private ["_var"];
 	_var = missionNamespace getVariable "AK_var_MinFPS"; 
-	if !({isNil _var} or _fps < _var) exitWith {}; //skip if fps are higher than current value
+	if !((isNil _var) or (_fps < _var)) exitWith {}; //skip if fps are higher than current value
 	AK_var_MinFPS = _fps;
 	publicVariable "AK_var_MinFPS";
 };
