@@ -54,7 +54,7 @@ AK_fnc_battlelogger = {
             if ((({side _x == east} count (AK_battlingUnits select 0)) + ({side _x == independent} count (AK_battlingUnits select 0))) <= AK_var_fnc_battlelogger_numberOfStartingVehicles) then {
                 AK_var_fnc_battlelogger_stopBattle = true;
             //increment timer
-            _timer = _timer +1; 
+            //_timer = _timer +1; 
 
             };
         }, 
@@ -73,6 +73,7 @@ AK_fnc_battlelogger = {
             AK_var_fnc_battlelogger_typeEAST = (selectRandom AK_var_fnc_automatedBattleEngine_unitTypes);
             AK_var_fnc_battlelogger_typeINDEP = (selectRandom AK_var_fnc_automatedBattleEngine_unitTypes);
             AK_var_fnc_battlelogger_startTime = systemTime;
+            AK_var_fnc_battlelogger_start_time_float = serverTime; // only for the timeout, new variable iot not break ABE_auswertung.py
             AK_var_fnc_battlelogger_stopBattle = false;
             _PosSide1 = [AK_var_fnc_automatedBattleEngine_location, (AK_var_fnc_automatedBattleEngine_location vectorAdd AK_var_fnc_battlelogger_engagementDistance)];
             _PosSide2 = [(AK_var_fnc_automatedBattleEngine_location vectorAdd AK_var_fnc_battlelogger_engagementDistance), AK_var_fnc_automatedBattleEngine_location];
@@ -88,7 +89,7 @@ AK_fnc_battlelogger = {
             _spawnedgroups1 = [AK_var_fnc_battlelogger_numberOfStartingVehicles, AK_var_fnc_battlelogger_typeEAST, (_PosSide1 select 0), (_PosSide1 select 1), east, AK_var_fnc_battlelogger_vehSpacing, "AWARE", AK_var_fnc_battlelogger_breiteGefStr, AK_var_fnc_battlelogger_platoonSize] call AK_fnc_spacedvehicles; 
             _spawnedgroups2 = [AK_var_fnc_battlelogger_numberOfStartingVehicles, AK_var_fnc_battlelogger_typeINDEP, (_PosSide2 select 0), (_PosSide2 select 1), independent, AK_var_fnc_battlelogger_vehSpacing, "AWARE", AK_var_fnc_battlelogger_breiteGefStr, AK_var_fnc_battlelogger_platoonSize] call AK_fnc_spacedvehicles; 
             AK_battlingUnits = []; //initialize the global variable 
-            _timer = 0; 
+            //_timer = 0; 
             { 
             AK_battlingUnits pushBack ((_spawnedgroups1 select _x) + (_spawnedgroups2 select _x));} forEach [0,1,2]; 
             { 
@@ -130,11 +131,11 @@ AK_fnc_battlelogger = {
         
         //exit Condition 
         {
-            (({alive _x} count (AK_battlingUnits select 1)) <= AK_var_fnc_battlelogger_numberOfStartingVehicles) or 
-            (_timer >= (AK_var_fnc_battlelogger_timeout / AK_var_fnc_battlelogger_loggerInterval)) or 
-            (AK_var_fnc_battlelogger_stopBattle == true)
+            ((({alive _x} count (AK_battlingUnits select 1)) <= AK_var_fnc_battlelogger_numberOfStartingVehicles) or 
+            (serverTime >= (AK_var_fnc_battlelogger_timeout + AK_var_fnc_battlelogger_start_time_float) or 
+            (AK_var_fnc_battlelogger_stopBattle == true))
         }, 
         
-        "_timer" //List of local variables that are serialized between executions.  (optional) <CODE>
+        {} //List of local variables that are serialized between executions.  (optional) <CODE>
     ] call CBA_fnc_createPerFrameHandlerObject; 
 };
