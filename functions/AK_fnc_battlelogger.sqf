@@ -134,8 +134,8 @@ AK_fnc_battlelogger = {
         //exit Condition 
         {
             ((({alive _x} count (AK_battlingUnits select 1)) <= AK_var_fnc_battlelogger_numberOfStartingVehicles) or 
-            (serverTime >= (AK_var_fnc_battlelogger_timeout + AK_var_fnc_battlelogger_start_time_float)) or 
-            (AK_var_fnc_battlelogger_stopBattle == true))
+            (serverTime >= (AK_var_fnc_battlelogger_timeout + AK_var_fnc_battlelogger_start_time_float)) or //HEADSUP doesn't work in Singleplayer
+            (AK_var_fnc_battlelogger_stopBattle == true)) 
         }, 
         
         [] //List of local variables that are serialized between executions.  (optional) <CODE>
