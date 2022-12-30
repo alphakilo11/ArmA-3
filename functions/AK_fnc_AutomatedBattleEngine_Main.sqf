@@ -17,7 +17,8 @@ Returns:
 	The PFH logic.  <LOCATION>
 
 Example:
-    (begin example) Battle between random tanks
+	Battle between random armored vehicles (defined as 'tank' in the configFile)
+    (begin example)
 		[(("configName _x isKindOf 'tank' and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles")) apply {(configName _x)}), [4000, 7000,0], 60] call AK_fnc_automatedBattleEngine;
     (end)
 
