@@ -52,7 +52,7 @@ AK_fnc_automatedBattleEngine = {
 		if (isNil "_var") then { 
 			_AKBL = [] spawn AK_fnc_battlelogger;
 			_round = _round + 1; 
-			diag_log format ["AKBL round %1", _round];
+			diag_log format ["ABE round %1", _round];
 		} else {
 			diag_log "AK Automated Battle Engine already running.";
 		};
@@ -63,12 +63,12 @@ AK_fnc_automatedBattleEngine = {
 		[], //Parameters passed to the function executing.  (optional) <ANY>
 
 		{ // Function that is executed when the PFH is added.  (optional) <CODE>
-			diag_log format ["AKBL Battle Engine starting!"];
+			diag_log format ["ABE Battle Engine starting!"];
 			_round = 0;
 		},
 
 		{ // Function that is executed when the PFH is removed.  (optional) <CODE>
-		 	diag_log format ["AKBL stopping Battle Engine!"];
+		 	diag_log format ["ABE stopping Battle Engine!"];
 		}, 
 
 		{true}, // Condition that has to return true for the PFH to be executed.  (optional, default {true}) <CODE>
