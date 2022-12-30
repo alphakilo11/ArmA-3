@@ -120,10 +120,7 @@ AK_fnc_battlelogger = {
                 sunOrMoon,
                 moonIntensity
             ];
-            private _var = profileNamespace getVariable "33f73e6e-ebd3-40ee-b3b2-8fbc9e71a7cc";
-            _var pushBack _summary;
-		    profileNamespace setVariable ["33f73e6e-ebd3-40ee-b3b2-8fbc9e71a7cc", _var];
-            saveProfileNamespace;
+            diag_log _summary;
             
             //cleanup
             {deleteVehicle _x} forEach (AK_battlingUnits select 0); 

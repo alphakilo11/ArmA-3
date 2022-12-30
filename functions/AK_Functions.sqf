@@ -17,7 +17,8 @@ Returns:
 	The PFH logic.  <LOCATION>
 
 Example:
-    (begin example) Battle between random tanks
+	Battle between random armored vehicles (defined as 'tank' in the configFile)
+    (begin example)
 		[(("configName _x isKindOf 'tank' and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles")) apply {(configName _x)}), [4000, 7000,0], 60] call AK_fnc_automatedBattleEngine;
     (end)
 
@@ -36,7 +37,13 @@ AK_fnc_automatedBattleEngine = {
 		["_delay", 60, [0]]
 		];
 	AK_var_fnc_automatedBattleEngine_unitTypes = _unitTypes; // store Unittypes for further use (eg AK_fnc_battlelogger)
-	AK_var_fnc_automatedBattleEngine_location = _location; // store location for further use (eg AK_fnc_battlelogger) 
+	AK_var_fnc_automatedBattleEngine_location = _location; // store location for further use (eg AK_fnc_battlelogger)
+	// create variable for logging
+	private _var = profileNamespace getVariable "33f73e6e-ebd3-40ee-b3b2-8fbc9e71a7cc";
+	if (isNil "_var") then {
+		_var = [];
+		profileNamespace setVariable ["33f73e6e-ebd3-40ee-b3b2-8fbc9e71a7cc", _var];
+	};
 
 	AK_ABE = [
 		{ // The function you wish to execute.  <CODE>
@@ -45,7 +52,7 @@ AK_fnc_automatedBattleEngine = {
 		if (isNil "_var") then { 
 			_AKBL = [] spawn AK_fnc_battlelogger;
 			_round = _round + 1; 
-			diag_log format ["AKBL round %1", _round];
+			diag_log format ["ABE round %1", _round];
 		} else {
 			diag_log "AK Automated Battle Engine already running.";
 		};
@@ -56,12 +63,12 @@ AK_fnc_automatedBattleEngine = {
 		[], //Parameters passed to the function executing.  (optional) <ANY>
 
 		{ // Function that is executed when the PFH is added.  (optional) <CODE>
-			diag_log format ["AKBL Battle Engine starting!"];
+			diag_log format ["ABE Battle Engine starting!"];
 			_round = 0;
 		},
 
 		{ // Function that is executed when the PFH is removed.  (optional) <CODE>
-		 	diag_log format ["AKBL stopping Battle Engine!"];
+		 	diag_log format ["ABE stopping Battle Engine!"];
 		}, 
 
 		{true}, // Condition that has to return true for the PFH to be executed.  (optional, default {true}) <CODE>
@@ -175,7 +182,7 @@ AK_fnc_battlelogger = {
             east_veh_survivors = ({side _x == east} count (AK_battlingUnits select 0));
             indep_veh_survivors = ({side _x == independent} count (AK_battlingUnits select 0));
             _summary = [
-                "AKBL Result: ",
+                "AKBL Result: ", // Do not remove 'AKBL Result: ' - see readme.txt for details
                 AK_var_fnc_battlelogger_Version,
                 AK_var_fnc_battlelogger_typeEAST,
                 east_veh_survivors,
@@ -193,7 +200,12 @@ AK_fnc_battlelogger = {
                 sunOrMoon,
                 moonIntensity
             ];
-            diag_log _summary; // Do not remove 'AKBL Result: ' - see readme.txt for details
+            private _var = profileNamespace getVariable "33f73e6e-ebd3-40ee-b3b2-8fbc9e71a7cc";
+            _var pushBack _summary;
+		    profileNamespace setVariable ["33f73e6e-ebd3-40ee-b3b2-8fbc9e71a7cc", _var];
+            saveProfileNamespace;
+            
+            //cleanup
             {deleteVehicle _x} forEach (AK_battlingUnits select 0); 
             {deleteVehicle _x} forEach (AK_battlingUnits select 1); 
             {deleteGroup _x} forEach (AK_battlingUnits select 2); 

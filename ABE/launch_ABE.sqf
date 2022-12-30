@@ -106,7 +106,7 @@ _non_contenders = ['CUP_I_BMP2_AMB_NAPA',
  'LIB_SdKfz124_DLV',
  'CUP_B_AAV_Unarmed_USMC',
  'CUP_B_BMP_HQ_CZ',
- 'CUP_B_M113A3_HQ_GER']
-_randomTanks = (("configName _x isKindOf 'tank' and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles")) apply {(configName _x)})
-_contenders = _randomTanks - _non_contenders
+ 'CUP_B_M113A3_HQ_GER'];
+_randomTanks = (("configName _x isKindOf 'tank' and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles")) apply {(configName _x)});
+_contenders = _randomTanks - _non_contenders;
 [_contenders, [4000, 7000,0], 60] call AK_fnc_automatedBattleEngine;
