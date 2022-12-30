@@ -37,7 +37,13 @@ AK_fnc_automatedBattleEngine = {
 		["_delay", 60, [0]]
 		];
 	AK_var_fnc_automatedBattleEngine_unitTypes = _unitTypes; // store Unittypes for further use (eg AK_fnc_battlelogger)
-	AK_var_fnc_automatedBattleEngine_location = _location; // store location for further use (eg AK_fnc_battlelogger) 
+	AK_var_fnc_automatedBattleEngine_location = _location; // store location for further use (eg AK_fnc_battlelogger)
+	// create variable for logging
+	private _var = profileNamespace getVariable "33f73e6e-ebd3-40ee-b3b2-8fbc9e71a7cc";
+	if (isNil "_var") then {
+		_var = [];
+		profileNamespace setVariable ["33f73e6e-ebd3-40ee-b3b2-8fbc9e71a7cc", _var];
+	};
 
 	AK_ABE = [
 		{ // The function you wish to execute.  <CODE>

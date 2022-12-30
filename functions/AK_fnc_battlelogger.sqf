@@ -102,7 +102,7 @@ AK_fnc_battlelogger = {
             east_veh_survivors = ({side _x == east} count (AK_battlingUnits select 0));
             indep_veh_survivors = ({side _x == independent} count (AK_battlingUnits select 0));
             _summary = [
-                "AKBL Result: ",
+                "AKBL Result: ", // Do not remove 'AKBL Result: ' - see readme.txt for details
                 AK_var_fnc_battlelogger_Version,
                 AK_var_fnc_battlelogger_typeEAST,
                 east_veh_survivors,
@@ -120,7 +120,12 @@ AK_fnc_battlelogger = {
                 sunOrMoon,
                 moonIntensity
             ];
-            diag_log _summary; // Do not remove 'AKBL Result: ' - see readme.txt for details
+            private _var = profileNamespace getVariable "33f73e6e-ebd3-40ee-b3b2-8fbc9e71a7cc";
+            _var pushBack _summary;
+		    profileNamespace setVariable ["33f73e6e-ebd3-40ee-b3b2-8fbc9e71a7cc", _var];
+            saveProfileNamespace;
+            
+            //cleanup
             {deleteVehicle _x} forEach (AK_battlingUnits select 0); 
             {deleteVehicle _x} forEach (AK_battlingUnits select 1); 
             {deleteGroup _x} forEach (AK_battlingUnits select 2); 
