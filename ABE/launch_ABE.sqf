@@ -110,3 +110,6 @@ _non_contenders = ['CUP_I_BMP2_AMB_NAPA',
 _randomTanks = (("configName _x isKindOf 'tank' and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles")) apply {(configName _x)});
 _contenders = _randomTanks - _non_contenders;
 [_contenders, [4000, 7000,0], 60] call AK_fnc_automatedBattleEngine;
+setviewDistance 1600; 
+setObjectViewDistance 1600; 
+setTerrainGrid 3.125; //50 removes grass, but the heightmap is very crude

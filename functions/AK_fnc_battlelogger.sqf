@@ -17,6 +17,7 @@ Example:
 
 Caveats:
     the code works via Advanced Developer Tools console, but not via ZEN (Execute code) (likely reason: comments)
+    does NOT work in singleplayer (see HEADSUP)
 
 Author: 
     AK 
@@ -35,20 +36,7 @@ AK_fnc_battlelogger = {
         { 
             //function 
             _veh = AK_battlingUnits select 0; 
-            /*
-            _units = AK_battlingUnits select 1; 
-            _groups = AK_battlingUnits select 2; 
-            //determine empty vehicles 
-            _alivevehicles = []; 
-            {if (alive _x) then {_alivevehicles pushBack _x}} forEach _veh;  
-            _alivevehcrews = []; 
-            {_alivevehcrews pushBack crew _x} forEach _alivevehicles; 
-            _number_alive_crews = []; 
-            {_number_alive_crews pushBack (count _x)} forEach _alivevehcrews; 
-            _emptyveh = {_x == 0} count _number_alive_crews;
-            //data format:  units alive;dead;all vehicles alive;dead;empty;all groups all 
-            diag_log ("AKBL " + AK_var_fnc_battlelogger_Version + ":" + str ({alive _x} count _units) + ";" + str ({!alive _x} count _units) + ";" + str (count _units) + ";" + str ({alive _x} count _veh) + ";" + str ({!alive _x} count _veh) + ";" + str _emptyveh + ";" + str (count _veh) + ";" + str (count _groups)); //the number of groups is not updated
-            */
+
             //additional exit condition
             // if empty and dead vehicles account for at least half the total vehicles
             if ((({side _x == east} count (AK_battlingUnits select 0)) + ({side _x == independent} count (AK_battlingUnits select 0))) <= AK_var_fnc_battlelogger_numberOfStartingVehicles) then {

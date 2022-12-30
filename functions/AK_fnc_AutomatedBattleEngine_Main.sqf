@@ -38,7 +38,6 @@ AK_fnc_automatedBattleEngine = {
 		];
 	AK_var_fnc_automatedBattleEngine_unitTypes = _unitTypes; // store Unittypes for further use (eg AK_fnc_battlelogger)
 	AK_var_fnc_automatedBattleEngine_location = _location; // store location for further use (eg AK_fnc_battlelogger)
-	// create variable for logging
 
 	AK_ABE = [
 		{ // The function you wish to execute.  <CODE>
