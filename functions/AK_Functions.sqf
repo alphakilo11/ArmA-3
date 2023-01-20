@@ -664,11 +664,11 @@ Parameters:
     1: _type		- Type of Vehicle <STRING>
 	2: _spawnpos	- Spawn Position <ARRAY>
 	3: _destpos		- Destination. [] to stay at position. <ARRAY>
-	   _side		- <SIDE>
-	4: _spacing		- Spacing <NUMBER> (default: 50 m)
-	5: _behaviour	- Group behaviour [optional] <STRING> (default: "AWARE")
-	6: _breitegefstr- Width of the Area of responsibility <NUMBER> (default: 500 m)
-	7: _platoonsize	- Number of vehicles forming one group <NUMBER> (default: 1)
+	4:   _side		- <SIDE>
+	5: _spacing		- Spacing <NUMBER> (default: 50 m)
+	6: _behaviour	- Group behaviour [optional] <STRING> (default: "AWARE")
+	7: _breitegefstr- Width of the Area of responsibility <NUMBER> (default: 500 m)
+	8: _platoonsize	- Number of vehicles forming one group <NUMBER> (default: 1)
 
 Returns:
 	[spawned crews, spawned vehicles, _spawnedgroups]
