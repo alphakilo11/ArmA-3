@@ -52,5 +52,4 @@ AK_fnc_populateMap = {
  _y = _y + _spacing;  
  };  
  [_referencePosition, _areaSideLength, _spacing, _groupType, _side, _numberOfGroups, _groupCounter]   
-};  
- 
+};
