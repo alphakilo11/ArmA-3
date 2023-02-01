@@ -4,7 +4,7 @@ AK_fnc_populateMap = {
   288 is the group limit for each side  
   
   Example:  
-   [[0, 0, 0], worldSize, true, configFile >> "CfgGroups" >> "West" >> "BLU_F" >> "Infantry" >> "BUS_InfSquad", independent, 287] spawn AK_fnc_populateMap;  
+   [[0, 0, 0], worldSize, true, configFile >> "CfgGroups" >> "Indep" >> "IND_C_F" >> "Infantry" >> "BanditCombatGroup", independent, 290, true, true] call AK_fnc_populateMap;  
  */  
   
  params [  
@@ -53,4 +53,4 @@ AK_fnc_populateMap = {
  };  
  [_referencePosition, _areaSideLength, _spacing, _groupType, _side, _numberOfGroups, _groupCounter]   
 };  
-[[5500, 3700, 0], 1000, true, configFile >> "CfgGroups" >> "Indep" >> "IND_C_F" >> "Infantry" >> "BanditCombatGroup", independent, 290, true, true] call AK_fnc_populateMap; 
+ 
