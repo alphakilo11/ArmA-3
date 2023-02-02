@@ -458,7 +458,73 @@ _newGroup setFormation 'STAG COLUMN';
 _newWaypoint = _newGroup addWaypoint [_pos, 0];
  _newWaypoint setWaypointType "SAD";
  };
-/* ----------------------------------------------------------------------------
+/* ---------------------------------------------------------------------------- 
+Function: AK_fnc_dynAdjustVisibility
+ 
+Description: 
+    A function used to adjust visibility based on given FPS.
+    200 is the lowest value for setViewDistance. 
+Parameters: 
+    - FPS    <NUMBER>
+ 
+Optional: 
+    - Adjust setDynamicSimulationDistance    <BOOL>    (Default: false)   
+    - Reference values [critical, low, high]    <ARRAY of NUMBERS>    (Default: [10, 25, 40])  
+
+Example: 
+    (begin example) 
+    [{[{[diag_fps, true] remoteExec ["AK_fnc_dynAdjustVisibility", 2];}] remoteExec ["call", -2];}, 10] call CBA_fnc_addperFrameHandler;
+    (end) 
+ 
+Returns: 
+    Adjustment of visibility in m. (0 if unchanged))
+ 
+Author: 
+    AK
+---------------------------------------------------------------------------- */ 
+AK_fnc_dynAdjustVisibility = {
+    params [
+    ["_fps", 0, [123]],
+    ["_dynSim", false, [false]],
+    ["_referenceValues", [10, 25, 40], [[]]]
+    ];
+    
+    //execute on server only
+    if (isServer == false) exitWith {hint "AK_fnc_dynAdjustVisibility has to run on the server";};
+
+    // check server load    
+    _serverFPS = diag_fps;
+    if (_serverFPS <= _fps) then {_fps = _serverFPS};
+
+   // calculate values 
+    _referenceValues params ["_verylow","_low", "_high"];
+    _newViewDistance = viewDistance;
+    _increment = floor (_newviewDistance / 10);
+    
+    if (_fps < _verylow) then {
+        _newViewDistance = floor (viewDistance / 2);
+    } else {
+        if (_fps < _low) then {
+            _newViewDistance = viewDistance - _increment;
+        } else {
+            if (_fps > _high) then {
+                _newViewDistance = viewDistance + _increment;
+            };
+        };
+    };
+
+    _adjustment = _newViewDistance - viewDistance;
+    
+    // set values
+    _newViewDistance remoteExec ["setviewDistance", 0, "Viewdistance"]; 
+    _newViewDistance remoteExec ["setObjectViewDistance", 0, "Objectdistance"];
+    if (_dynSim == true) then {
+        "Group" setDynamicSimulationDistance _newviewDistance;
+    };
+
+    diag_log format ["AK_fnc_dynAdjustVisibility: FPS: %1. Adjusted visibility: %2 m.", _fps, _newViewDistance];
+    _adjustment    
+};/* ----------------------------------------------------------------------------
 Function: AK_fnc_endlessconvoy
 
 Description:
@@ -652,7 +718,63 @@ AK_fnc_moveRandomPlatoons = {
 		diag_log format ["AK_fnc_moveRandomPlatoons: Hit timeout, %1 units spawned.", _numberOfUnits];
 	};
 	_spawnedgroups
-};/* ----------------------------------------------------------------------------
+};AK_fnc_populateMap = {  
+ /*  
+
+  
+  288 is the group limit for each side  
+  
+  Example:  
+   [[0, 0, 0], worldSize, true, configFile >> "CfgGroups" >> "West" >> "BLU_F" >> "Infantry" >> "BUS_InfSquad", independent, 287] spawn AK_fnc_populateMap;  
+ */  
+  
+ params [  
+  ["_referencePosition", [0,0,0], [[]]],  
+  ["_areaSideLength", worldSize, [0]],  
+  ["_spacing", true],  
+  ["_groupType", configFile >> "CfgGroups" >> "West" >> "BLU_F" >> "Infantry" >> "BUS_InfSquad", [configFile]],  
+  ["_side", east, [east]],   
+  ["_numberOfGroups", 128, [0]], 
+  ["_landOnly", true, [false]], 
+  ["_serverOnly", true, [false]] 
+ ];  
+ 
+ if (_serverOnly == true and isServer == false) exitWith { 
+  hint "AK_fnc_populateMap parameters are set to spawn on server only."; 
+ }; 
+ // auto determine spacing  
+ if (_spacing == true) then {  
+  _spacing = _areaSideLength / (sqrt _numberOfGroups);  
+ };  
+  
+ enableDynamicSimulationSystem true;  
+   
+ private _x = 0;  
+ private _y = 0;  
+ private _groupCounter = 0;   
+ while {_y < _areaSideLength} do {  
+  while {_x < _areaSideLength} do {  
+   if (({side _x == _side} count allGroups) >= 288) exitWith { 
+    [_referencePosition, _areaSideLength, _spacing, _groupType, _side, _numberOfGroups, _groupCounter]; 
+   };  
+   _spawnPosition = _referencePosition vectorAdd [_x, _y, 0]; 
+   if (_landOnly == true and surfaceIsWater _spawnPosition == true) then { 
+        _x = _x + _spacing; 
+        continue; 
+    };          
+   _group = [_spawnPosition, _side, _groupType] call BIS_fnc_spawnGroup;  
+   _group deleteGroupWhenEmpty true;   
+   _group enableDynamicSimulation true;  
+   [_group, _spawnPosition, _spacing * 0.66, 3, 0.1, 0.9] call CBA_fnc_taskDefend;  
+   _groupCounter = _groupCounter + 1;  
+   _x = _x + _spacing;  
+  };  
+ _x = 0;  
+ _y = _y + _spacing;  
+ };  
+ [_referencePosition, _areaSideLength, _spacing, _groupType, _side, _numberOfGroups, _groupCounter]   
+};  
+/* ----------------------------------------------------------------------------
 Function: AK_fnc_spacedvehicles
 
 Description:
