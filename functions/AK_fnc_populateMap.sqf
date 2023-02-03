@@ -15,7 +15,7 @@ AK_fnc_populateMap = {
   ["_spacing", true],    
   ["_groupType", configFile >> "CfgGroups" >> "West" >> "BLU_F" >> "Infantry" >> "BUS_InfSquad", [configFile, ""]],    
   ["_side", east, [east]],     
-  ["_numberOfGroups", 128, [0]],   
+  ["_numberOfGroups", 128, [0]],   //this is just used to calculate the spacing
   ["_landOnly", true, [false]],   
   ["_serverOnly", true, [false]]   
  ];    

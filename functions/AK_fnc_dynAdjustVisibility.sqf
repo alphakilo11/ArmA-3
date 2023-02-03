@@ -60,6 +60,8 @@ AK_fnc_dynAdjustVisibility = {
     _newViewDistance remoteExec ["setObjectViewDistance", 0, "Objectdistance"];
     if (_dynSim == true) then {
         "Group" setDynamicSimulationDistance _newviewDistance;
+        "Vehicle" setDynamicSimulationDistance _newviewDistance;
+        "EmptyVehicle" setDynamicSimulationDistance _newviewDistance;
     };
 
     diag_log format ["AK_fnc_dynAdjustVisibility: FPS: %1. Adjusted visibility: %2 m.", _fps, _newViewDistance];
