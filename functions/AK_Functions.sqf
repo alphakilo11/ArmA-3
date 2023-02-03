@@ -733,7 +733,7 @@ AK_fnc_moveRandomPlatoons = {
   ["_referencePosition", [0,0,0], [[]]],   
   ["_areaSideLength", worldSize, [0]],   
   ["_spacing", true],   
-  ["_groupType", configFile >> "CfgGroups" >> "West" >> "BLU_F" >> "Infantry" >> "BUS_InfSquad", [configFile, ""]],   
+  ["_groupType", configFile >> "CfgGroups" >> "West" >> "BLU_F" >> "Infantry" >> "BUS_InfSquad", [configFile, ""]],   //HEADSUP this will allow any string
   ["_side", east, [east]],    
   ["_numberOfGroups", 128, [0]],  
   ["_landOnly", true, [false]],  
