@@ -49,7 +49,7 @@ AK_fnc_populateMap = {
     [_referencePosition, _areaSideLength, _spacing, _groupType, _side, _numberOfGroups, _groupCounter];   
    };    
    _spawnPosition = _referencePosition vectorAdd [_x, _y, 0];   
-   if (_landOnly == true and surfaceIsWater _spawnPosition == true) then {   
+   if ((_landOnly == true) and {surfaceIsWater _spawnPosition == true}) then {   
         _x = _x + _spacing;   
         continue;   
     };  
