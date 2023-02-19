@@ -1,3 +1,9 @@
+//get extended Info about all clients (has to be executed on the server)
+_foo = [];
+{_foo pushBack (getUserInfo _x);} forEach allUsers;
+_foo;
+
+
 // construction to get values from other machines and process them
 AK_fnc_passValueTest = {
     hint format ["I am the server: %1 and this is my framerate: %2.", _this select 0, _this select 1];

@@ -638,7 +638,18 @@ params ["_position"];
 _shell = "F_40mm_White" createVehicle (_position Vectoradd [0,0,150]);    
 _shell setVelocity [0, 0, -1];
 };
-/* ----------------------------------------------------------------------------
+AK_fnc_listHCs = {
+    _collectedUserInfo = [];
+    {_collectedUserInfo pushBack (getUserInfo _x)} forEach allUsers;
+    
+    _headlessClients = [];
+    {
+        if (_x select 7 == true) then {
+            _headlessClients pushBack (_x select 1);
+        };
+    } forEach _collectedUserInfo;
+    _headlessClients;
+};/* ----------------------------------------------------------------------------
 Function: AK_fnc_moveRandomPlatoons
 
 Description:
@@ -737,7 +748,7 @@ AK_fnc_moveRandomPlatoons = {
   ["_spacing", true],    
   ["_groupType", configFile >> "CfgGroups" >> "West" >> "BLU_F" >> "Infantry" >> "BUS_InfSquad", [configFile, ""]],    
   ["_side", east, [east]],     
-  ["_numberOfGroups", 128, [0]],   
+  ["_numberOfGroups", 128, [0]],   //this is just used to calculate the spacing
   ["_landOnly", true, [false]],   
   ["_serverOnly", true, [false]]   
  ];    
