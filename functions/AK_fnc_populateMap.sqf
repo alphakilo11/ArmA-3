@@ -1,7 +1,5 @@
 AK_fnc_populateMap = {    
  /*    
-  
-    
   288 is the group limit for each side    
     
   Example:    
@@ -54,7 +52,7 @@ AK_fnc_populateMap = {
         continue;   
     };  
    if (_random == true) then {  
-    _groupType = RANDOM_CONFIG_CLASS(RANDOM_CONFIG_CLASS(RANDOM_CONFIG_CLASS(configFile >> "cfgGroups" >> "indep")));  
+    _groupType = RANDOM_CONFIG_CLASS(RANDOM_CONFIG_CLASS(RANDOM_CONFIG_CLASS(configFile >> "cfgGroups" >> "east")));  
    };             
    _group = [_spawnPosition, _side, _groupType] call BIS_fnc_spawnGroup;    
    _group deleteGroupWhenEmpty true;     

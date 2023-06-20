@@ -4,13 +4,13 @@
 #define RANDOM_CONFIG_CLASS(var) selectRandom ("true" configClasses (var))  
 
 AK_var_attackers = []; 
-_distance = 1600; 
-_anchorPosition = [0, 0, 0]; //[random worldSize, random worldSize, 0]; 
-_size = worldSize;
+_distance = 1000; 
+_anchorPosition = [5000, 5000,0]; //[random worldSize, random worldSize, 0]; 
+_size = 1000; //worldSize;
 _center = _anchorPosition vectorAdd [_size / 2, _size / 2, 0]; 
 _ingressPosition = (_center getPos [random (_size * 2), random 359]); 
 _attackerCount = 40; 
-_defenderNumberOfGroups = 128; 
+_defenderNumberOfGroups = 16; 
  
 _distance remoteExec ["setviewDistance", 0, "Viewdistance"];  
 _distance remoteExec ["setObjectViewDistance", 0, "Objectdistance"]; 
@@ -21,19 +21,25 @@ _distance remoteExec ["setObjectViewDistance", 0, "Objectdistance"];
 _headlessClients = [] call AK_fnc_listHCs;
 if (count _headlessClients > 0) then {
     {
-        [_anchorPosition, _size, true, "random", independent, _defenderNumberOfGroups, true, false] remoteExec ["AK_fnc_populateMap", _x];
+        [_anchorPosition, _size, true, "random", east, _defenderNumberOfGroups, true, false] remoteExec ["AK_fnc_populateMap", _x];
     } forEach _headlessClients;
 } else {    
-    [_anchorPosition, _size, true, "random", independent, _defenderNumberOfGroups] call AK_fnc_populateMap;
+    [_anchorPosition, _size, true, "random", east, _defenderNumberOfGroups] call AK_fnc_populateMap;
 };
 // enable dynamic visiblity adjustment
-AK_handle_dynVis = [{[{[diag_fps, true, [10, 15, 25]] remoteExec ["AK_fnc_dynAdjustVisibility", 2];}] remoteExec ["call", -2];}, 10] call CBA_fnc_addperFrameHandler;
+AK_handle_dynVis = [{[{[diag_fps, true, [1, 20, 25]] remoteExec ["AK_fnc_dynAdjustVisibility", 2];}] remoteExec ["call", -2];}, 10] call CBA_fnc_addperFrameHandler;
 
 AK_fnc_countUnits = { 
     params ["_groups"]; 
     _sum = 0; 
     {_sum = _sum + count units _x} forEach _groups; 
     _sum; 
+};
+AK_fnc_terminatePainTrain = { 
+    // execute on same system  
+    [AK_handle_attackers] call CBA_fnc_removePerFrameHandler; 
+    [AK_handle_dynVis] call CBA_fnc_removePerFrameHandler; 
+    ["THE PAIN TRAIN was terminated."] remoteExec ["systemChat", 0]; 
 };
 // check if _ingressPosition is on land
 _counter = 0;
