@@ -17,7 +17,8 @@ Returns:
 	The PFH logic.  <LOCATION>
 
 Example:
-    (begin example) Battle between random tanks
+	Battle between random armored vehicles (defined as 'tank' in the configFile)
+    (begin example)
 		[(("configName _x isKindOf 'tank' and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles")) apply {(configName _x)}), [4000, 7000,0], 60] call AK_fnc_automatedBattleEngine;
     (end)
 
@@ -36,37 +37,38 @@ AK_fnc_automatedBattleEngine = {
 		["_delay", 60, [0]]
 		];
 	AK_var_fnc_automatedBattleEngine_unitTypes = _unitTypes; // store Unittypes for further use (eg AK_fnc_battlelogger)
-	AK_var_fnc_automatedBattleEngine_location = _location; // store location for further use (eg AK_fnc_battlelogger) 
+	AK_var_fnc_automatedBattleEngine_location = _location; // store location for further use (eg AK_fnc_battlelogger)
 
 	AK_ABE = [
-		{
+		{ // The function you wish to execute.  <CODE>
 		private ["_var"];
-
 		_var = missionNamespace getVariable "AK_battlingUnits"; 
 		if (isNil "_var") then { 
 			_AKBL = [] spawn AK_fnc_battlelogger;
 			_round = _round + 1; 
-			diag_log format ["AKBL round %1", _round];
+			diag_log format ["ABE round %1", _round];
 		} else {
 			diag_log "AK Automated Battle Engine already running.";
 		};
 		},
 
-		_delay,
+		_delay, // The amount of time in seconds between executions, 0 for every frame.  (optional, default: 0) <NUMBER>
 
 		[], //Parameters passed to the function executing.  (optional) <ANY>
 
-		{diag_log format ["AKBL Battle Engine starting! %1", _this getVariable "params"];
-		_round = 0;},
+		{ // Function that is executed when the PFH is added.  (optional) <CODE>
+			diag_log format ["ABE Battle Engine starting!"];
+			_round = 0;
+		},
 
-		{
-		 diag_log format ["AKBL stopping Battle Engine! params: %1",   _this getVariable "params"];
-		 },
+		{ // Function that is executed when the PFH is removed.  (optional) <CODE>
+		 	diag_log format ["ABE stopping Battle Engine!"];
+		}, 
 
-		{true},
+		{true}, // Condition that has to return true for the PFH to be executed.  (optional, default {true}) <CODE>
 
-		{false},
+		{false}, //Condition that has to return true to delete the PFH object.  (optional, default {false}) <CODE>
 
-		["_round"]
+		["_round"] // List of local variables that are serialized between executions.  (optional) <CODE>
 	] call CBA_fnc_createPerFrameHandlerObject;
 };

@@ -10,14 +10,16 @@ Description:
 	
 Parameters:
     0: _unitTypes		- Unit Types to choose from (Confignames) <ARRAY> (default: ["B_MBT_01_cannon_F"])
-	1: _location 		- Lower left corner of spawn area <ARRAY> (default: [0,0,0])
+    1: _location 		- Lower left corner of spawn area <ARRAY> (default: [0,0,0])
+    2: _delay			- Delay in seconds between execution of this function <INT> (default: 60)
 
 Returns:
 	The PFH logic.  <LOCATION>
 
 Example:
-    (begin example) Battle between random tanks
-		[(("configName _x isKindOf 'tank' and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles")) apply {(configName _x)}), [4000, 7000,0]] call AK_fnc_automatedBattleEngine;
+	Battle between random armored vehicles (defined as 'tank' in the configFile)
+    (begin example)
+		[(("configName _x isKindOf 'tank' and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles")) apply {(configName _x)}), [4000, 7000,0], 60] call AK_fnc_automatedBattleEngine;
     (end)
 
 Author:
@@ -29,44 +31,46 @@ TODO stop AK_fnc_battlelogger when shutting down ABE (use prototype) ("(_AKBL ge
 */
 AK_fnc_automatedBattleEngine = {
 
-params [
-	["_unitTypes", ["B_MBT_01_cannon_F"], [[]]],
-	["_location", [0,0,0], [[]]]
-	];
-AK_var_fnc_automatedBattleEngine_unitTypes = _unitTypes; // store Unittypes for further use (eg AK_fnc_battlelogger)
-AK_var_fnc_automatedBattleEngine_location = _location; // store location for further use (eg AK_fnc_battlelogger) 
+	params [
+		["_unitTypes", ["B_MBT_01_cannon_F"], [[]]],
+		["_location", [0,0,0], [[]]],
+		["_delay", 60, [0]]
+		];
+	AK_var_fnc_automatedBattleEngine_unitTypes = _unitTypes; // store Unittypes for further use (eg AK_fnc_battlelogger)
+	AK_var_fnc_automatedBattleEngine_location = _location; // store location for further use (eg AK_fnc_battlelogger)
 
-AK_ABE = [
-{
-private ["_var"];
+	AK_ABE = [
+		{ // The function you wish to execute.  <CODE>
+		private ["_var"];
+		_var = missionNamespace getVariable "AK_battlingUnits"; 
+		if (isNil "_var") then { 
+			_AKBL = [] spawn AK_fnc_battlelogger;
+			_round = _round + 1; 
+			diag_log format ["ABE round %1", _round];
+		} else {
+			diag_log "AK Automated Battle Engine already running.";
+		};
+		},
 
-_var = missionNamespace getVariable "AK_battlingUnits"; 
-if (isNil "_var") then { 
-	_AKBL = [] spawn AK_fnc_battlelogger;
-	_round = _round + 1; 
-	diag_log format ["AKBL round %1", _round];
-} else {
-	diag_log "AK Automated Battle Engine already running.";
-};
-},
-	
-60,
-	
-[], //Parameters passed to the function executing.  (optional) <ANY>
+		_delay, // The amount of time in seconds between executions, 0 for every frame.  (optional, default: 0) <NUMBER>
 
-{diag_log format ["AKBL Battle Engine starting! %1", _this getVariable "params"];
-_round = 0;},
+		[], //Parameters passed to the function executing.  (optional) <ANY>
 
-{
- diag_log format ["AKBL stopping Battle Engine! params: %1",   _this getVariable "params"];
- },
+		{ // Function that is executed when the PFH is added.  (optional) <CODE>
+			diag_log format ["ABE Battle Engine starting!"];
+			_round = 0;
+		},
 
-{true},
+		{ // Function that is executed when the PFH is removed.  (optional) <CODE>
+		 	diag_log format ["ABE stopping Battle Engine!"];
+		}, 
 
-{false},
+		{true}, // Condition that has to return true for the PFH to be executed.  (optional, default {true}) <CODE>
 
-["_round"]
-] call CBA_fnc_createPerFrameHandlerObject;
+		{false}, //Condition that has to return true to delete the PFH object.  (optional, default {false}) <CODE>
+
+		["_round"] // List of local variables that are serialized between executions.  (optional) <CODE>
+	] call CBA_fnc_createPerFrameHandlerObject;
 };
 /* ---------------------------------------------------------------------------- 
 Function: AK_fnc_battlelogger 
@@ -87,6 +91,7 @@ Example:
 
 Caveats:
     the code works via Advanced Developer Tools console, but not via ZEN (Execute code) (likely reason: comments)
+    does NOT work in singleplayer (see HEADSUP)
 
 Author: 
     AK 
@@ -100,28 +105,19 @@ AK_fnc_battlelogger = {
     AK_var_fnc_battlelogger_breiteGefStr = 500;
     AK_var_fnc_battlelogger_platoonSize = 1;
     AK_var_fnc_battlelogger_loggerInterval = 10; // s
-    AK_var_fnc_battlelogger_timeout = 600; // s
+    AK_var_fnc_battlelogger_timeout = 140; // s
     [
         { 
             //function 
             _veh = AK_battlingUnits select 0; 
-            _units = AK_battlingUnits select 1; 
-            _groups = AK_battlingUnits select 2; 
-            //determine empty vehicles 
-            _alivevehicles = []; 
-            {if (alive _x) then {_alivevehicles pushBack _x}} forEach _veh;  
-            _alivevehcrews = []; 
-            {_alivevehcrews pushBack crew _x} forEach _alivevehicles; 
-            _number_alive_crews = []; 
-            {_number_alive_crews pushBack (count _x)} forEach _alivevehcrews; 
-            _emptyveh = {_x == 0} count _number_alive_crews; 
-            _timer = _timer +1; 
-            //data format:  units alive;dead;all vehicles alive;dead;empty;all groups all 
-            diag_log ("AKBL " + AK_var_fnc_battlelogger_Version + ":" + str ({alive _x} count _units) + ";" + str ({!alive _x} count _units) + ";" + str (count _units) + ";" + str ({alive _x} count _veh) + ";" + str ({!alive _x} count _veh) + ";" + str _emptyveh + ";" + str (count _veh) + ";" + str (count _groups)); //the number of groups is not updated
+
             //additional exit condition
             // if empty and dead vehicles account for at least half the total vehicles
-            if ((({side _x == east} count (AK_battlingUnits select 0)) + ({side _x == independent} count (AK_battlingUnits select 0))) <= ((count _veh) / 2)) then {
+            if ((({side _x == east} count (AK_battlingUnits select 0)) + ({side _x == independent} count (AK_battlingUnits select 0))) <= AK_var_fnc_battlelogger_numberOfStartingVehicles) then {
                 AK_var_fnc_battlelogger_stopBattle = true;
+            //increment timer
+            //_timer = _timer +1; 
+
             };
         }, 
         
@@ -131,10 +127,15 @@ AK_fnc_battlelogger = {
         
         // start 
         {
+            //avoid impaired visibility
+            0 setFog 0;
+            0 setRain 0;
+            [[2035, 06, 21, 12, 00]] call BIS_fnc_setDate;
             //set variables ENHANCE find another way
             AK_var_fnc_battlelogger_typeEAST = (selectRandom AK_var_fnc_automatedBattleEngine_unitTypes);
             AK_var_fnc_battlelogger_typeINDEP = (selectRandom AK_var_fnc_automatedBattleEngine_unitTypes);
             AK_var_fnc_battlelogger_startTime = systemTime;
+            AK_var_fnc_battlelogger_start_time_float = serverTime; // only for the timeout, new variable iot not break ABE_auswertung.py
             AK_var_fnc_battlelogger_stopBattle = false;
             _PosSide1 = [AK_var_fnc_automatedBattleEngine_location, (AK_var_fnc_automatedBattleEngine_location vectorAdd AK_var_fnc_battlelogger_engagementDistance)];
             _PosSide2 = [(AK_var_fnc_automatedBattleEngine_location vectorAdd AK_var_fnc_battlelogger_engagementDistance), AK_var_fnc_automatedBattleEngine_location];
@@ -150,7 +151,7 @@ AK_fnc_battlelogger = {
             _spawnedgroups1 = [AK_var_fnc_battlelogger_numberOfStartingVehicles, AK_var_fnc_battlelogger_typeEAST, (_PosSide1 select 0), (_PosSide1 select 1), east, AK_var_fnc_battlelogger_vehSpacing, "AWARE", AK_var_fnc_battlelogger_breiteGefStr, AK_var_fnc_battlelogger_platoonSize] call AK_fnc_spacedvehicles; 
             _spawnedgroups2 = [AK_var_fnc_battlelogger_numberOfStartingVehicles, AK_var_fnc_battlelogger_typeINDEP, (_PosSide2 select 0), (_PosSide2 select 1), independent, AK_var_fnc_battlelogger_vehSpacing, "AWARE", AK_var_fnc_battlelogger_breiteGefStr, AK_var_fnc_battlelogger_platoonSize] call AK_fnc_spacedvehicles; 
             AK_battlingUnits = []; //initialize the global variable 
-            _timer = 0; 
+            //_timer = 0; 
             { 
             AK_battlingUnits pushBack ((_spawnedgroups1 select _x) + (_spawnedgroups2 select _x));} forEach [0,1,2]; 
             { 
@@ -163,7 +164,7 @@ AK_fnc_battlelogger = {
             east_veh_survivors = ({side _x == east} count (AK_battlingUnits select 0));
             indep_veh_survivors = ({side _x == independent} count (AK_battlingUnits select 0));
             _summary = [
-                "AKBL Result: ",
+                "AKBL Result: ", // Do not remove 'AKBL Result: ' - see readme.txt for details
                 AK_var_fnc_battlelogger_Version,
                 AK_var_fnc_battlelogger_typeEAST,
                 east_veh_survivors,
@@ -181,7 +182,9 @@ AK_fnc_battlelogger = {
                 sunOrMoon,
                 moonIntensity
             ];
-            diag_log _summary; // Do not remove 'AKBL Result: ' - see readme.txt for details
+            diag_log _summary;
+            
+            //cleanup
             {deleteVehicle _x} forEach (AK_battlingUnits select 0); 
             {deleteVehicle _x} forEach (AK_battlingUnits select 1); 
             {deleteGroup _x} forEach (AK_battlingUnits select 2); 
@@ -191,9 +194,13 @@ AK_fnc_battlelogger = {
         {true}, //Run condition 
         
         //exit Condition 
-        {(({alive _x} count (AK_battlingUnits select 1)) <= (count (AK_battlingUnits select 1)/2)) or _timer >= (AK_var_fnc_battlelogger_timeout / AK_var_fnc_battlelogger_loggerInterval) or AK_var_fnc_battlelogger_stopBattle == true}, 
+        {
+            ((({alive _x} count (AK_battlingUnits select 1)) <= AK_var_fnc_battlelogger_numberOfStartingVehicles) or 
+            (serverTime >= (AK_var_fnc_battlelogger_timeout + AK_var_fnc_battlelogger_start_time_float)) or //HEADSUP doesn't work in Singleplayer
+            (AK_var_fnc_battlelogger_stopBattle == true)) 
+        }, 
         
-        "_timer" //List of local variables that are serialized between executions.  (optional) <CODE>
+        [] //List of local variables that are serialized between executions.  (optional) <CODE>
     ] call CBA_fnc_createPerFrameHandlerObject; 
 };
 /* ----------------------------------------------------------------------------
@@ -451,7 +458,75 @@ _newGroup setFormation 'STAG COLUMN';
 _newWaypoint = _newGroup addWaypoint [_pos, 0];
  _newWaypoint setWaypointType "SAD";
  };
-/* ----------------------------------------------------------------------------
+/* ---------------------------------------------------------------------------- 
+Function: AK_fnc_dynAdjustVisibility
+ 
+Description: 
+    A function used to adjust visibility based on given FPS.
+    200 is the lowest value for setViewDistance. 
+Parameters: 
+    - FPS    <NUMBER>
+ 
+Optional: 
+    - Adjust setDynamicSimulationDistance    <BOOL>    (Default: false)   
+    - Reference values [critical, low, high]    <ARRAY of NUMBERS>    (Default: [10, 25, 40])  
+
+Example: 
+    (begin example) 
+    [{[{[diag_fps, true] remoteExec ["AK_fnc_dynAdjustVisibility", 2];}] remoteExec ["call", -2];}, 10] call CBA_fnc_addperFrameHandler;
+    (end) 
+ 
+Returns: 
+    Adjustment of visibility in m. (0 if unchanged))
+ 
+Author: 
+    AK
+---------------------------------------------------------------------------- */ 
+AK_fnc_dynAdjustVisibility = {
+    params [
+    ["_fps", 0, [123]],
+    ["_dynSim", false, [false]],
+    ["_referenceValues", [10, 25, 40], [[]]]
+    ];
+    
+    //execute on server only
+    if (isServer == false) exitWith {hint "AK_fnc_dynAdjustVisibility has to run on the server";};
+
+    // check server load    
+    _serverFPS = diag_fps;
+    if (_serverFPS <= _fps) then {_fps = _serverFPS};
+
+   // calculate values 
+    _referenceValues params ["_verylow","_low", "_high"];
+    _newViewDistance = viewDistance;
+    _increment = floor (_newviewDistance / 10);
+    
+    if (_fps < _verylow) then {
+        _newViewDistance = floor (viewDistance / 2);
+    } else {
+        if (_fps < _low) then {
+            _newViewDistance = viewDistance - _increment;
+        } else {
+            if (_fps > _high) then {
+                _newViewDistance = viewDistance + _increment;
+            };
+        };
+    };
+
+    _adjustment = _newViewDistance - viewDistance;
+    
+    // set values
+    _newViewDistance remoteExec ["setviewDistance", 0, "Viewdistance"]; 
+    _newViewDistance remoteExec ["setObjectViewDistance", 0, "Objectdistance"];
+    if (_dynSim == true) then {
+        "Group" setDynamicSimulationDistance _newviewDistance;
+        "Vehicle" setDynamicSimulationDistance _newviewDistance;
+        "EmptyVehicle" setDynamicSimulationDistance _newviewDistance;
+    };
+
+    diag_log format ["AK_fnc_dynAdjustVisibility: FPS: %1. Adjusted visibility: %2 m.", _fps, _newViewDistance];
+    _adjustment    
+};/* ----------------------------------------------------------------------------
 Function: AK_fnc_endlessconvoy
 
 Description:
@@ -563,7 +638,18 @@ params ["_position"];
 _shell = "F_40mm_White" createVehicle (_position Vectoradd [0,0,150]);    
 _shell setVelocity [0, 0, -1];
 };
-/* ----------------------------------------------------------------------------
+AK_fnc_listHCs = {
+    _collectedUserInfo = [];
+    {_collectedUserInfo pushBack (getUserInfo _x)} forEach allUsers;
+    
+    _headlessClients = [];
+    {
+        if (_x select 7 == true) then {
+            _headlessClients pushBack (_x select 1);
+        };
+    } forEach _collectedUserInfo;
+    _headlessClients;
+};/* ----------------------------------------------------------------------------
 Function: AK_fnc_moveRandomPlatoons
 
 Description:
@@ -645,7 +731,77 @@ AK_fnc_moveRandomPlatoons = {
 		diag_log format ["AK_fnc_moveRandomPlatoons: Hit timeout, %1 units spawned.", _numberOfUnits];
 	};
 	_spawnedgroups
-};/* ----------------------------------------------------------------------------
+};AK_fnc_populateMap = {    
+ /*    
+  
+    
+  288 is the group limit for each side    
+    
+  Example:    
+   [[0, 0, 0], worldSize, true, configFile >> "CfgGroups" >> "West" >> "BLU_F" >> "Infantry" >> "BUS_InfSquad", independent, 287] spawn AK_fnc_populateMap;    
+ */    
+  #define RANDOM_CONFIG_CLASS(var) selectRandom ("true" configClasses (var))    
+  
+ params [    
+  ["_referencePosition", [0,0,0], [[]]],    
+  ["_areaSideLength", worldSize, [0]],    
+  ["_spacing", true],    
+  ["_groupType", configFile >> "CfgGroups" >> "West" >> "BLU_F" >> "Infantry" >> "BUS_InfSquad", [configFile, ""]],    
+  ["_side", east, [east]],     
+  ["_numberOfGroups", 128, [0]],   //this is just used to calculate the spacing
+  ["_landOnly", true, [false]],   
+  ["_serverOnly", true, [false]]   
+ ];    
+   
+ if (_serverOnly == true and isServer == false) exitWith {   
+  hint "AK_fnc_populateMap parameters are set to spawn on server only.";   
+ };   
+  
+ _random = false;  
+ if ((typeName _groupType == typeName "") and {_groupType == "random"}) then {  
+  _random = true;  
+ } else {
+     if (typeName _groupType == typeName "") exitWith {
+         diag_log format ["AK_fnc_populateMap ERROR: got %1, expected configFile or 'random'.", _groupType];
+     };
+ };
+  
+ // auto determine spacing    
+ if (_spacing == true) then {    
+  _spacing = _areaSideLength / (sqrt _numberOfGroups);    
+ };    
+    
+ enableDynamicSimulationSystem true;    
+     
+ private _x = 0;    
+ private _y = 0;    
+ private _groupCounter = 0;     
+ while {_y < _areaSideLength} do {    
+  while {_x < _areaSideLength} do {    
+   if (({side _x == _side} count allGroups) >= 288) exitWith {   
+    [_referencePosition, _areaSideLength, _spacing, _groupType, _side, _numberOfGroups, _groupCounter];   
+   };    
+   _spawnPosition = _referencePosition vectorAdd [_x, _y, 0];   
+   if ((_landOnly == true) and {surfaceIsWater _spawnPosition == true}) then {   
+        _x = _x + _spacing;   
+        continue;   
+    };  
+   if (_random == true) then {  
+    _groupType = RANDOM_CONFIG_CLASS(RANDOM_CONFIG_CLASS(RANDOM_CONFIG_CLASS(configFile >> "cfgGroups" >> "indep")));  
+   };             
+   _group = [_spawnPosition, _side, _groupType] call BIS_fnc_spawnGroup;    
+   _group deleteGroupWhenEmpty true;     
+   _group enableDynamicSimulation true;    
+   [_group, _spawnPosition, _spacing * 0.66, 3, 0.1, 0.9] call CBA_fnc_taskDefend;    
+   _groupCounter = _groupCounter + 1;    
+   _x = _x + _spacing;    
+  };    
+ _x = 0;    
+ _y = _y + _spacing;    
+ };    
+ [_referencePosition, _areaSideLength, _spacing, _groupType, _side, _numberOfGroups, _groupCounter]     
+};    
+/* ----------------------------------------------------------------------------
 Function: AK_fnc_spacedvehicles
 
 Description:
@@ -657,11 +813,11 @@ Parameters:
     1: _type		- Type of Vehicle <STRING>
 	2: _spawnpos	- Spawn Position <ARRAY>
 	3: _destpos		- Destination. [] to stay at position. <ARRAY>
-	   _side		- <SIDE>
-	4: _spacing		- Spacing <NUMBER> (default: 50 m)
-	5: _behaviour	- Group behaviour [optional] <STRING> (default: "AWARE")
-	6: _breitegefstr- Width of the Area of responsibility <NUMBER> (default: 500 m)
-	7: _platoonsize	- Number of vehicles forming one group <NUMBER> (default: 1)
+	4:   _side		- <SIDE>
+	5: _spacing		- Spacing <NUMBER> (default: 50 m)
+	6: _behaviour	- Group behaviour [optional] <STRING> (default: "AWARE")
+	7: _breitegefstr- Width of the Area of responsibility <NUMBER> (default: 500 m)
+	8: _platoonsize	- Number of vehicles forming one group <NUMBER> (default: 1)
 
 Returns:
 	[spawned crews, spawned vehicles, _spawnedgroups]
@@ -782,7 +938,9 @@ Author:
 ---------------------------------------------------------------------------- */
 AK_fnc_storeFPS = {
 	_fps = diag_fps;
-	if !({isNil "AK_var_MinFPS"} or _fps < AK_var_MinFPS) exitWith {}; //skip if fps are higher than current value
+	private ["_var"];
+	_var = missionNamespace getVariable "AK_var_MinFPS"; 
+	if !((isNil _var) or (_fps < _var)) exitWith {}; //skip if fps are higher than current value
 	AK_var_MinFPS = _fps;
 	publicVariable "AK_var_MinFPS";
 };

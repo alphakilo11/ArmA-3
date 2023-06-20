@@ -1,3 +1,8 @@
+// gets list of all vehicles
+_spam = [];
+{_spam pushBack typeOf _x} forEach allMissionObjects "land";
+_spam;
+
 //use on a vehicle to make it respawn
 [_this select 1] call BIS_fnc_moduleRespawnVehicle;
 
