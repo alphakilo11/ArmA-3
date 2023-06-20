@@ -112,7 +112,10 @@ _spacing = _spacing * _platoonsize;
 	_x setBehaviour _behaviour;  
 	_x deleteGroupWhenEmpty true;
 	if !(count _destpos == 0) then {
-		_x addWaypoint [_destpos VectorAdd [_xPos,_yPos,0],10];  
+		_x addWaypoint [_destpos VectorAdd [_xPos,_yPos,0],10];
+		_x addWaypoint [getPos leader _x,10];
+		_waypoint = _x addWaypoint [_destpos VectorAdd [_xPos,_yPos,0],10];
+		_waypoint setWaypointType "CYCLE";  
 		_yPos = _yPos + _spacing;  
 		if (_yPos > _breitegefstr) then {   
 			_yPos = 0;   
