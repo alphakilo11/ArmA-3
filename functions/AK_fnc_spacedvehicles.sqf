@@ -7,7 +7,7 @@ Description:
 	
 Parameters:
     0: _number		- Number of Vehicles <NUMBER> (default: 1)
-    1: _type		- Type of Vehicle <STRING>
+    1: _type		- Type of Vehicle <STRING/ARRAY> (providing an array will override _number)
 	2: _spawnpos	- Spawn Position <ARRAY>
 	3: _destpos		- Destination. [] to stay at position. <ARRAY>
 	4:   _side		- <SIDE>
@@ -48,7 +48,7 @@ Author:
 AK_fnc_spacedvehicles = {  
 params [
 ["_number", 1, [0]],
-["_type", "B_MBT_01_cannon_F", [""]],
+["_type", "B_MBT_01_cannon_F"],
 ["_spawnpos", [], [[]]],
 ["_destpos", [], [[]]],
 ["_side", west],
@@ -58,17 +58,28 @@ params [
 ["_platoonsize", 1, [0]]
 ];  
   
-private ["_xPos", "_yPos", "_spawnedvehicles", "_spawnedunits", "_spawnedgroups"];   
+private ["_xPos", "_yPos", "_spawnedvehicles", "_spawnedunits", "_spawnedgroups", "_typeList"];   
    
 _xPos = 0;   
 _yPos = 0;
 _spawnedunits = [];
 _spawnedvehicles = [];  
 _spawnedgroups = [];
-  
+
+// check for an array of types
+if (_type isEqualType []) then {
+	_typeList = _type;
+} else {
+	_typeList = [];
+	for "_i" from 1 to _number do {
+		_typeList pushBack _type;
+	}
+};
+
+
 //spawn  
-for "_i" from 1 to _number do {
-	_spawned = ([(_spawnpos vectorAdd [_xPos, _yPos, 0]), (_spawnpos getDir _destpos/* This fails when the _destpos is no coordinate*/), _type, _side] call BIS_fnc_spawnVehicle);
+{
+	_spawned = ([(_spawnpos vectorAdd [_xPos, _yPos, 0]), (_spawnpos getDir _destpos/* This fails when the _destpos is no coordinate*/), _x, _side] call BIS_fnc_spawnVehicle);
 	_spawnedvehicles pushBack (_spawned select 0);
 	{_spawnedunits pushBack _x} forEach (_spawned select 1); 
 	_spawnedgroups pushBack (_spawned select 2); 
@@ -78,7 +89,7 @@ for "_i" from 1 to _number do {
         _yPos = 0;   
         _xPos = _xPos + _spacing;   
     };  
-};  
+} forEach _typeList;  
   
 //group into platoons if requested  
 if (_platoonsize > 1) then {   
