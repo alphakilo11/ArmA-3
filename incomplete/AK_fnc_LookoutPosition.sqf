@@ -1,13 +1,15 @@
 AK_fnc_LookoutPosition = {
   params [
     ["_candidatePos", [0, 0, 0]],
-	["_targetHeight", 3],
-    ["_radius", 100],
+    ["_targetHeight", 3],
+    ["_radius", viewDistance],
+    ["_left_boundary", 1],
+    ["_right_boundary", 360],
     ["_visualize", false]
   ];
 
   _visibilitySum = 0;
-  for "_i" from 330 to 360 do {
+  for "_i" from _left_boundary to _right_boundary do {
     _destination = (AGLToASL (_candidatePos getPos [_radius, _i])) vectorAdd [0, 0, _targetHeight];
     _visibilityValue = [objNull, "VIEW"] checkVisibility [_candidatePos, _destination];
     _visibilitySum = _visibilitySum + _visibilityValue;
@@ -20,7 +22,8 @@ AK_fnc_LookoutPosition = {
       };
     };
   };
+
   _visibilitySum;
 };
 
-[eyePos player, 3, 800, true] call AK_fnc_LookoutPosition;
+[eyePos player, 3, viewDistance, false, true] call AK_fnc_LookoutPosition;
