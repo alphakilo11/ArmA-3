@@ -81,4 +81,4 @@ sleep 10;
 
 deleteMarker _marker;
 */
-[eyePos player, 3, viewDistance, false, true] call AK_fnc_LookoutPosition;
+[eyePos player, 3, viewDistance, 1, 360, true] call AK_fnc_LookoutPosition;
