@@ -1,3 +1,26 @@
+/* ----------------------------------------------------------------------------
+Function: AK_fnc_LookoutPosition
+
+Description:
+    Create ground and maritime vehicles, space them and let them move to a certain position.
+	Also works with Helicopters as long as _spawnpos is over ground.
+	
+Parameters:
+    0: _candidatePos		- The position which is to be evaluated <COORDINATES> (default: [0, 0, 0])
+
+
+Returns:
+	A number indicating how good the position is. The higher the better.
+
+Example:
+    (begin example)
+		[eyePos player, 3, viewDistance, false, true] call AK_fnc_LookoutPosition;
+    (end)
+
+Author:
+    AK
+
+---------------------------------------------------------------------------- */
 AK_fnc_LookoutPosition = { 
   params [ 
 	["_candidatePos", [0, 0, 0]], 
