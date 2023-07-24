@@ -1,10 +1,33 @@
+/* ----------------------------------------------------------------------------
+Function: AK_fnc_populateMap
+
+Description:
+    Create ground and maritime vehicles, space them and let them move to a certain position.
+	Also works with Helicopters as long as _spawnpos is over ground.
+	
+Parameters:
+    ["_referencePosition", [0,0,0], [[]]],    
+    ["_areaSideLength", worldSize, [0]],    
+    ["_spacing", true],    
+    ["_groupType", configFile >> "CfgGroups" >> "West" >> "BLU_F" >> "Infantry" >> "BUS_InfSquad", [configFile, ""]],    
+    ["_side", east, [east]],     
+    ["_numberOfGroups", 128, [0]],   //this is just used to calculate the spacing
+    ["_landOnly", true, [false]],   
+    ["_serverOnly", true, [false]]   
+Returns:
+	[_referencePosition, _areaSideLength, _spacing, _groupType, _side, _numberOfGroups, _groupCounter]
+
+Example:
+    (begin example)
+        [[0, 0, 0], worldSize, true, configFile >> "CfgGroups" >> "West" >> "BLU_F" >> "Infantry" >> "BUS_InfSquad", independent, 287] spawn AK_fnc_populateMap;    
+    (end)
+
+Author:
+    AK
+
+---------------------------------------------------------------------------- */
 AK_fnc_populateMap = {    
- /*    
-  288 is the group limit for each side    
-    
-  Example:    
-   [[0, 0, 0], worldSize, true, configFile >> "CfgGroups" >> "West" >> "BLU_F" >> "Infantry" >> "BUS_InfSquad", independent, 287] spawn AK_fnc_populateMap;    
- */    
+
   #define RANDOM_CONFIG_CLASS(var) selectRandom ("true" configClasses (var))    
   
  params [    
