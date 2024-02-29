@@ -27,11 +27,12 @@ AK_fnc_battlelogger = {
     AK_var_fnc_battlelogger_Version = '1.01';
     AK_var_fnc_battlelogger_numberOfStartingVehicles = 10; // how many vehicles are spawned on each side
     AK_var_fnc_battlelogger_engagementDistance = [1000, 0, 0]; // how is the away teams spawn location displaced from AK_var_fnc_automatedBattleEngine_location
-    AK_var_fnc_battlelogger_vehSpacing = 85;
+    AK_var_fnc_battlelogger_vehSpacing = 25;
     AK_var_fnc_battlelogger_breiteGefStr = 500;
     AK_var_fnc_battlelogger_platoonSize = 1;
     AK_var_fnc_battlelogger_loggerInterval = 10; // s
     AK_var_fnc_battlelogger_timeout = 140; // s
+    AK_var_fnc_battlelogger_noFuel = true;
     [
         { 
             //function 
@@ -79,10 +80,20 @@ AK_fnc_battlelogger = {
             AK_battlingUnits = []; //initialize the global variable 
             //_timer = 0; 
             { 
-            AK_battlingUnits pushBack ((_spawnedgroups1 select _x) + (_spawnedgroups2 select _x));} forEach [0,1,2]; 
-            { 
-            _wp = _x addWaypoint [[0,0,0], 0]; 
-            _wp setWaypointType "CYCLE";} forEach (AK_battlingUnits select 2); 
+            AK_battlingUnits pushBack ((_spawnedgroups1 select _x) + (_spawnedgroups2 select _x));} forEach [0,1,2];
+
+            {_x allowCrewInImmobile true} forEach (AK_battlingUnits select 0);
+
+            if (AK_var_fnc_battlelogger_noFuel == true) then {
+                { // set fuel
+                    _x setFuel 0;
+                } forEach (AK_battlingUnits select 0);
+            } else {
+                { // let the vehicles move back and forth
+                _wp = _x addWaypoint [[0,0,0], 0]; 
+                _wp setWaypointType "CYCLE";} forEach (AK_battlingUnits select 2);
+            };
+
         }, 
         
         //end 
