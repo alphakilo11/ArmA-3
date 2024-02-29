@@ -27,7 +27,7 @@ Example:
 	(begin advanced example)
 
 	//spawn units
-	neuegruppen = [14, "B_MBT_01_cannon_F", [23000,18000,0], [15000,17000,0], 50, "COMBAT"] call AK_fnc_spacedvehicles;
+	neuegruppen = [4, "B_MBT_01_cannon_F", [23000, 18000 ,0], [22000, 18000, 0], west, 85, "SAFE", 500, 1] spawn AK_fnc_spacedvehicles;
 	neuegruppen;
 
 	//add additional Waypoint
