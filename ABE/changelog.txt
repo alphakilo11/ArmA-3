@@ -1,3 +1,8 @@
+20240301  Changelog V1.1
+  Enabled running multiple engagements paralell by cutting global variables (AK_fnc_battlelogger_standalone now only needs AK_var_fnc_automatedBattleEngine_unitTypes). 
+  Added _avgFPS
+  Changed vehicles to stationary, front arc (setFuel 0)
+  enabled allowCrewInImmobile for all vehicles
 20230121 Removed Operation Trebuchet from the Modlist, as nobody including me knows these vehicles
 20221220 Changelog V1.01
   Added systemTime and Versionnumber to "Battlelogger starting" message.
