@@ -23,10 +23,17 @@ AK_fnc_delay = {
 	if (canSuspend == False) exitWith {
 		diag_log "ERROR AK_fnc_delay: Scope is not suspendable";
 	};
+	_initialFPS = diag_frameNo;
+	_initialTime = diag_tickTime;
 	sleep _delayInS;
-	while {diag_fps < 40} do {
-		diag_log format ["AK_fnc_delay: Suspending due to low FPS. %1 groups, %2 units", (count allGroups), (count allUnits)];
+	_longFpsAvg = (diag_frameNo - _initialFPS) / (diag_tickTime - _initialTime);
+
+	while {_longFpsAvg < 40} do {
+		diag_log format ["AK_fnc_delay: Suspending due to low FPS. %1 groups, %2 units, %3 FPS (long average.)", (count allGroups), (count allUnits), _longFpsAvg];
+		_initialFPS = diag_frameNo;
+		_initialTime = diag_tickTime;		
 		sleep 60;
+		_longFpsAvg = (diag_frameNo - _initialFPS) / (diag_tickTime - _initialTime);
 	};
 	[_location] call AK_fnc_battlelogger_standalone;
 };
