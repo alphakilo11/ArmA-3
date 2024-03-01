@@ -119,7 +119,8 @@ AK_fnc_battlelogger_standalone = {
             {deleteVehicle _x} forEach (_AK_battlingUnits select 1); 
             {deleteGroup _x} forEach (_AK_battlingUnits select 2); 
             _AK_battlingUnits = nil;
-            [_location] call AK_fnc_battlelogger_standalone;
+
+            [_location, 5] spawn AK_fnc_delay;
         }, 
         
         {true}, //Run condition 

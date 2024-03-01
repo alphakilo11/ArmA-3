@@ -109,9 +109,18 @@ _non_contenders = ['CUP_I_BMP2_AMB_NAPA',
  'CUP_B_M113A3_HQ_GER']; 
 _randomTanks = (("configName _x isKindOf 'tank' and getNumber (_x >> 'scope') == 2" configClasses (configFile >> "CfgVehicles")) apply {(configName _x)}); 
 _contenders = _randomTanks - _non_contenders; 
-AK_var_fnc_automatedBattleEngine_unitTypes = _contenders; // store Unittypes for further use (eg AK_fnc_battlelogger) 
- AK_var_fnc_automatedBattleEngine_location = [0, 0,0];
-[[0, 0, 0]] call AK_fnc_battlelogger_standalone; 
-setviewDistance 1200;  
-setObjectViewDistance 1200;  
-setTerrainGrid 3.125; //50 removes grass, but the heightmap is very crude
+AK_var_fnc_automatedBattleEngine_unitTypes = _contenders; // store Unittypes for further use (eg AK_fnc_battlelogger)
+
+[] spawn {
+	setviewDistance 1200;  
+	setObjectViewDistance 1200;  
+	setTerrainGrid 3.125; //50 removes grass, but the heightmap is very crude
+
+	_instances = floor (255 / 10);
+	_xSpacing = 3000;
+	_ySpacing = 2000;
+	for "_i" from 0 to (_instances -1 ) do {
+		[[_xSpacing * _i, _ySpacing * _i, 0], 5] spawn AK_fnc_delay;
+		sleep 30;
+	};
+};
