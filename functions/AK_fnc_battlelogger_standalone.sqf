@@ -1,21 +1,22 @@
 /* ---------------------------------------------------------------------------- 
-Function: AK_fnc_battlelogger 
+Function: AK_fnc_battlelogger_standalone 
  
 Description: 
     End and restart an automated battle and log events for later analysis. 
   
 Parameters: 
-    NIL
+    0: _location	- Starting Location <ARRAY>
  
 Returns: 
     ?
  
 Example: 
     (begin example) 
-    [] call AK_fnc_battlelogger
+    [[0,0,0]] call AK_fnc_battlelogger_standalone
     (end) 
 
 Caveats:
+    needs AK_var_fnc_automatedBattleEngine_unitTypes
     the code works via Advanced Developer Tools console, but not via ZEN (Execute code) (likely reason: comments)
     does NOT work in singleplayer (see HEADSUP)
 
@@ -23,22 +24,14 @@ Author:
     AK 
  
 ---------------------------------------------------------------------------- */ 
-AK_fnc_battlelogger = {
+AK_fnc_battlelogger_standalone = {
+    _location = _this select 0;
     [
-        { 
-            //function 
-            _veh = AK_battlingUnits select 0; 
-
-            //additional exit condition
-            // if empty and dead vehicles account for at least half the total vehicles
-            if ((({side _x == east} count (AK_battlingUnits select 0)) + ({side _x == independent} count (AK_battlingUnits select 0))) <= _AK_var_fnc_battlelogger_numberOfStartingVehicles) then {
-                _AK_var_fnc_battlelogger_stopBattle = true;
-            };
-        }, 
+        {}, // code
         
         10, //delay in s 
         
-        [], //parameters 
+        [_location], //parameters 
         
         // start 
         {
@@ -51,6 +44,7 @@ AK_fnc_battlelogger = {
             _AK_var_fnc_battlelogger_timeout = 140; // seconds
             _AK_var_fnc_battlelogger_noFuel = true;
             _startFrameNo = diag_frameNo;
+            _location = (_this getVariable "params") select 0;
             //avoid impaired visibility
             0 setFog 0;
             0 setRain 0;
@@ -60,9 +54,8 @@ AK_fnc_battlelogger = {
             _AK_var_fnc_battlelogger_typeINDEP = (selectRandom AK_var_fnc_automatedBattleEngine_unitTypes);
             _AK_var_fnc_battlelogger_startTime = systemTime;
             _AK_var_fnc_battlelogger_start_time_float = serverTime; // only for the timeout, new variable iot not break ABE_auswertung.py
-            _AK_var_fnc_battlelogger_stopBattle = false;
-            _PosSide1 = [AK_var_fnc_automatedBattleEngine_location, (AK_var_fnc_automatedBattleEngine_location vectorAdd _AK_var_fnc_battlelogger_engagementDistance)];
-            _PosSide2 = [(AK_var_fnc_automatedBattleEngine_location vectorAdd _AK_var_fnc_battlelogger_engagementDistance), AK_var_fnc_automatedBattleEngine_location];
+            _PosSide1 = [_location, (_location vectorAdd _AK_var_fnc_battlelogger_engagementDistance)];
+            _PosSide2 = [(_location vectorAdd _AK_var_fnc_battlelogger_engagementDistance), _location];
 
             diag_log format ["AKBL %1 Battlelogger starting! %2 vs. %3", _AK_var_fnc_battlelogger_Version, _AK_var_fnc_battlelogger_typeEAST, _AK_var_fnc_battlelogger_typeINDEP];
             //alternate locations
@@ -74,28 +67,28 @@ AK_fnc_battlelogger = {
 
             _spawnedgroups1 = [_AK_var_fnc_battlelogger_numberOfStartingVehicles, _AK_var_fnc_battlelogger_typeEAST, (_PosSide1 select 0), (_PosSide1 select 1), east, _AK_var_fnc_battlelogger_vehSpacing, "AWARE", _AK_var_fnc_battlelogger_breiteGefStr, _AK_var_fnc_battlelogger_platoonSize] call AK_fnc_spacedvehicles; 
             _spawnedgroups2 = [_AK_var_fnc_battlelogger_numberOfStartingVehicles, _AK_var_fnc_battlelogger_typeINDEP, (_PosSide2 select 0), (_PosSide2 select 1), independent, _AK_var_fnc_battlelogger_vehSpacing, "AWARE", _AK_var_fnc_battlelogger_breiteGefStr, _AK_var_fnc_battlelogger_platoonSize] call AK_fnc_spacedvehicles; 
-            AK_battlingUnits = []; //initialize the global variable 
+            _AK_battlingUnits = [];
             { 
-            AK_battlingUnits pushBack ((_spawnedgroups1 select _x) + (_spawnedgroups2 select _x));} forEach [0,1,2];
+            _AK_battlingUnits pushBack ((_spawnedgroups1 select _x) + (_spawnedgroups2 select _x));} forEach [0,1,2];
 
-            {_x allowCrewInImmobile true} forEach (AK_battlingUnits select 0);
+            {_x allowCrewInImmobile true} forEach (_AK_battlingUnits select 0);
 
             if (_AK_var_fnc_battlelogger_noFuel == true) then {
                 { // set fuel
                     _x setFuel 0;
-                } forEach (AK_battlingUnits select 0);
+                } forEach (_AK_battlingUnits select 0);
             } else {
                 { // let the vehicles move back and forth
                 _wp = _x addWaypoint [[0,0,0], 0]; 
-                _wp setWaypointType "CYCLE";} forEach (AK_battlingUnits select 2);
+                _wp setWaypointType "CYCLE";} forEach (_AK_battlingUnits select 2);
             };
 
         }, 
         
         //end 
         { 
-            _east_veh_survivors = ({side _x == east} count (AK_battlingUnits select 0));
-            _indep_veh_survivors = ({side _x == independent} count (AK_battlingUnits select 0));
+            _east_veh_survivors = ({side _x == east} count (_AK_battlingUnits select 0));
+            _indep_veh_survivors = ({side _x == independent} count (_AK_battlingUnits select 0));
             _duration = serverTime - _AK_var_fnc_battlelogger_start_time_float;
             _avgFps = (diag_frameNo - _startFrameNo) / _duration;
             _summary = [
@@ -107,7 +100,7 @@ AK_fnc_battlelogger = {
                 _indep_veh_survivors,
                 _AK_var_fnc_battlelogger_numberOfStartingVehicles,
                 worldName,
-                AK_var_fnc_automatedBattleEngine_location,
+                _location,
                 _AK_var_fnc_battlelogger_engagementDistance,
                 _AK_var_fnc_battlelogger_vehSpacing,
                 _AK_var_fnc_battlelogger_breiteGefStr,
@@ -122,19 +115,20 @@ AK_fnc_battlelogger = {
             diag_log _summary;
             
             //cleanup
-            {deleteVehicle _x} forEach (AK_battlingUnits select 0); 
-            {deleteVehicle _x} forEach (AK_battlingUnits select 1); 
-            {deleteGroup _x} forEach (AK_battlingUnits select 2); 
-            AK_battlingUnits = nil;
+            {deleteVehicle _x} forEach (_AK_battlingUnits select 0); 
+            {deleteVehicle _x} forEach (_AK_battlingUnits select 1); 
+            {deleteGroup _x} forEach (_AK_battlingUnits select 2); 
+            _AK_battlingUnits = nil;
+            [_location] call AK_fnc_battlelogger_standalone;
         }, 
         
         {true}, //Run condition 
         
         //exit Condition 
         {
-            ((({alive _x} count (AK_battlingUnits select 1)) <= _AK_var_fnc_battlelogger_numberOfStartingVehicles) or 
-            (serverTime >= (_AK_var_fnc_battlelogger_timeout + _AK_var_fnc_battlelogger_start_time_float)) or //HEADSUP doesn't work in Singleplayer
-            (_AK_var_fnc_battlelogger_stopBattle == true)) 
+            ((({alive _x} count (_AK_battlingUnits select 1)) <= _AK_var_fnc_battlelogger_numberOfStartingVehicles) or 
+            (serverTime >= (_AK_var_fnc_battlelogger_timeout + _AK_var_fnc_battlelogger_start_time_float)) or
+            ((({side _x == east} count (_AK_battlingUnits select 0)) + ({side _x == independent} count (_AK_battlingUnits select 0))) <= _AK_var_fnc_battlelogger_numberOfStartingVehicles))
         }, 
         
         [
@@ -150,8 +144,9 @@ AK_fnc_battlelogger = {
             "_AK_var_fnc_battlelogger_typeINDEP",
             "_AK_var_fnc_battlelogger_startTime",
             "_AK_var_fnc_battlelogger_start_time_float",
-            "_AK_var_fnc_battlelogger_stopBattle",
-            "_startFrameNo"
+            "_startFrameNo",
+            "_AK_battlingUnits",
+            "_location"
         ] //List of local variables that are serialized between executions.  (optional) <CODE>
     ] call CBA_fnc_createPerFrameHandlerObject; 
 };
