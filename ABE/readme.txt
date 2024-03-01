@@ -1,3 +1,5 @@
+
+20240301 First run AK_functions.sqf and then use launch_ABE.sqf.
 20221220 Don't remove 'AKBL Result: ' from the result line of the Battlelogger. (ABE_Auswertung.py uses it to identify the lines)
 20221220 Don't use 'Survivors: ' in the battlelogger result message, because this is used by ABE_Auswertung.py to identify the vanilla version.
 20221220 Don't use Advanced Garbage Collector (It's unnessecary and might cause problems)
