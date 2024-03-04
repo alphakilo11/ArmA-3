@@ -116,7 +116,7 @@ AK_var_fnc_automatedBattleEngine_unitTypes = _contenders; // store Unittypes for
 	setObjectViewDistance 1200;  
 	setTerrainGrid 3.125; //50 removes grass, but the heightmap is very crude
 
-	_instances = floor (255 / 10);
+	_instances = 8; // floor (255 / 10);
 	_xSpacing = 3000;
 	_ySpacing = 2000;
 	for "_i" from 0 to (_instances -1 ) do {
