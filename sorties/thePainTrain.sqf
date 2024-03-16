@@ -1,11 +1,16 @@
 // THE PAIN TRAIN 
 // requires AK_fnc_populateMap and AK_fnc_dynAdjustVisibility 
 // ENHANCE check if center is water
+
+if ((isNil "AK_fnc_dynAdjustVisibility") or (isNil "AK_fnc_populateMap")) exitWith {
+    diag_log "ERROR: The Pain Train requires AK_fnc_populateMap and AK_fnc_dynAdjustVisibility";    
+};
+
 #define RANDOM_CONFIG_CLASS(var) selectRandom ("true" configClasses (var))  
 
 AK_var_attackers = []; 
 _distance = 1000; 
-_anchorPosition = [5000, 5000,0]; //[random worldSize, random worldSize, 0]; 
+_anchorPosition = [10650, 8150,0]; //[random worldSize, random worldSize, 0]; 
 _size = 1000; //worldSize;
 _center = _anchorPosition vectorAdd [_size / 2, _size / 2, 0]; 
 _ingressPosition = (_center getPos [random (_size * 2), random 359]); 
@@ -27,7 +32,7 @@ if (count _headlessClients > 0) then {
     [_anchorPosition, _size, true, "random", east, _defenderNumberOfGroups] call AK_fnc_populateMap;
 };
 // enable dynamic visiblity adjustment
-AK_handle_dynVis = [{[{[diag_fps, true, [1, 20, 25]] remoteExec ["AK_fnc_dynAdjustVisibility", 2];}] remoteExec ["call", -2];}, 10] call CBA_fnc_addperFrameHandler;
+AK_handle_dynVis = [{[{[diag_fps, true, [10, 30, 40]] remoteExec ["AK_fnc_dynAdjustVisibility", 2];}] remoteExec ["call", -2];}, 10] call CBA_fnc_addperFrameHandler;
 
 AK_fnc_countUnits = { 
     params ["_groups"]; 

@@ -456,7 +456,8 @@ Parameters:
  
 Optional: 
     - Adjust setDynamicSimulationDistance    <BOOL>    (Default: false)   
-    - Reference values [critical, low, high]    <ARRAY of NUMBERS>    (Default: [10, 25, 40])  
+    - Reference values [critical, low, high]    <ARRAY of NUMBERS>    (Default: [10, 25, 40])
+    - Maximum View Distance in m   <NUMBER>    (Default: 7000)  
 
 Example: 
     (begin example) 
@@ -473,7 +474,8 @@ AK_fnc_dynAdjustVisibility = {
     params [
     ["_fps", 0, [123]],
     ["_dynSim", false, [false]],
-    ["_referenceValues", [10, 25, 40], [[]]]
+    ["_referenceValues", [10, 25, 40], [[]]],
+    ["_maxViewDistance", 7000, [123]]
     ];
     
     //execute on server only
@@ -494,7 +496,7 @@ AK_fnc_dynAdjustVisibility = {
         if (_fps < _low) then {
             _newViewDistance = viewDistance - _increment;
         } else {
-            if (_fps > _high) then {
+            if ((_fps > _high) and ((viewDistance + _increment) < _maxViewDistance)) then {
                 _newViewDistance = viewDistance + _increment;
             };
         };
