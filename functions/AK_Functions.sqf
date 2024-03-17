@@ -348,6 +348,34 @@ _deletedindex sort false;
 {_groups deleteAt _x} forEach _deletedindex;
 _groups;
 };
+//creates a number of groups at _AZ which will defend an area (size of which is based on taktik Handakt OPFOR values) . 
+//Works local and on DS 
+//REQUIRED: CBA 
+//Params _AZ 3D position 
+/* 
+example: 
+[getPos player, 5, side player, "I_MBT_03_cannon_F"] call AK_fnc_defend;  
+*/ 
+ 
+AK_fnc_defend = { 
+	if (isNil "AK_fnc_differentiateClass") exitWith {diag_log "AK_fnc_defend ERROR: AK_fnc_differentiateClass required"}; 
+
+	params ["_AZ", "_numberofgroups", "_side", "_grouptype"]; 
+	for "_i" from 1 to _numberofgroups step 1 do { 
+		private _radius = (_numberofgroups * 77); 
+		private _vfgrm = [_AZ, 0, _radius] call BIS_fnc_findSafePos; 
+		private _gruppe = nil; 
+		if ((_grouptype call AK_fnc_differentiateClass) == "Group") then { 
+			_gruppe = [_vfgrm, _side, _grouptype] call BIS_fnc_spawnGroup; 
+		}; 
+		if ((_grouptype call AK_fnc_differentiateClass) == "Vehicle") then { 
+			_gruppe = ([_vfgrm, 0, _grouptype, _side] call BIS_fnc_spawnVehicle) select 2; 
+		}; 
+		if (isNull _gruppe) exitWith {diag_log "AK_fnc_defend ERROR: no groups spawned"}; 
+		_gruppe deleteGroupWhenEmpty true; 
+		[_gruppe, _AZ, _radius] call CBA_fnc_taskDefend; 
+	}; 
+}; 
 /*
 The Achilles Execute Code Module doesn't like double-slashes, therefore I have to put all comments in here and the code has to be copy-pasted without this block.
 
@@ -445,7 +473,23 @@ AK_fnc_delay = {
 	};
 	[_location] call AK_fnc_battlelogger_standalone;
 };
-/* ---------------------------------------------------------------------------- 
+// Function to differentiate config entries between vehicles and groups
+// Returns: "Vehicle" if the class is found in CfgVehicles, "Group" if found in CfgGroups, "Unknown" otherwise 
+// Example usage 
+//_fullPath = configFile >> "CfgGroups" >> "Indep" >> "SPE_US_ARMY" >> "Armored" >> "SPE_M4A1_75_Platoon"; // Example full path 
+//_result = [_fullPath] call AK_fnc_differentiateClass; 
+// hint format ["%1 is a %2", _fullPath, _result]; 
+AK_fnc_differentiateClass = { 
+	params ["_candidate"];
+	if ((_candidate call BIS_fnc_getCfgIsClass) == true) then {
+		if ("CfgGroups" in str _candidate) exitWith { "Group" };
+		"Vehicle";
+	} else {
+		if ((isClass (configFile >> "CfgVehicles" >> _candidate)) == true) exitWith { "Vehicle" };
+		"Unkown"	
+	};
+}; 
+ /* ---------------------------------------------------------------------------- 
 Function: AK_fnc_dynAdjustVisibility
  
 Description: 
@@ -1040,26 +1084,3 @@ while {count _res < _numberOfUnits} do {
 };  
 _res  
 }; 
-//creates a number of groups at _AZ which will defend an area (size of which is based on taktik Handakt OPFOR values) .
-//Works local and on DS
-//REQUIRED: CBA
-//Params _AZ 3D position
-/*
-example:
-[[21100, 7400, 0], 12] call AK_fnc_defend;
-*/
-
-AK_fnc_defend ={
-	params ["_AZ", "_numberofgroups"];
-	
-	
-	for "_i" from 1 to _numberofgroups step 1 do {
-		private _side = West;
-		private _grouptype = configFile >> "CfgGroups" >> "West" >> "BLU_F" >> "Mechanized" >> "BUS_MechInfSquad";
-		private _radius = (_numberofgroups * 77);
-		private _vfgrm = [_AZ, 0, _radius] call BIS_fnc_findSafePos;
-		private _gruppe = [_vfgrm, _side, _grouptype] call BIS_fnc_spawnGroup;
-		_gruppe deleteGroupWhenEmpty true;
-		[_gruppe, _AZ, _radius] call CBA_fnc_taskDefend;
-	};
-};
