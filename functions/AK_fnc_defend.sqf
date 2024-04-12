@@ -1,5 +1,6 @@
 //creates a number of groups at _refPos which will defend an area (size of which is based on taktik Handakt OPFOR values) . 
-//Works local and on DS 
+//Works local and on DS
+//BUG Vehicles will not move (try delay between spawns)
 //REQUIRED: CBA 
 //Params _refPos 3D position 
 /* 
