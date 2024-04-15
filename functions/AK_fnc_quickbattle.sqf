@@ -1,13 +1,12 @@
 AK_fnc_quickBattle = {
     //HEADSUP if you select vehicles on the map you get the groups, if you select them in 3D than you get all units (including each crewmember)
     //ENHANCE how to determine attacker side? currently I use an empty vehicle
+    //ENHANCE defaults for params
     // assumes that all attackers and defenders each share the same side 
-    params ["_selection", "_debug", "_angreiferAnzahl", "_verteidigerAnzahl"]; // pass two arrays of vehicles seperated in space (eg by curatorSelected)
+    params ["_selection", "_debug", "_angreiferAnzahl", "_verteidigerAnzahl","_angreiferGefechtsstreifenBreite", "_verteidigerGefechtsstreifenBreite"]; // pass two arrays of vehicles seperated in space (eg by curatorSelected)
     _angreiferFahrzeugAbstand = 100;
-    _angreiferGefechtsstreifenBreite = 650;
 
     _verteidigerFahrzeugAbstand = 100;
-    _verteidigerGefechtsstreifenBreite = 650;
      
     _SelectedEntities = _selection select 0; 
     _SelectedGroups = _selection select 1; 
