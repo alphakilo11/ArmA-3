@@ -1,3 +1,37 @@
+AK_fnc_attack = {    
+//ENHANCE reorder params and add defaults
+//ENHANCE Anmarsch zur Sturmausgangsline 
+//ENHANCE Verteidiger mit Stellungen versehen _mainDirection = 90;_trench = [[300,0,0], _mainDirection, "Land_WW2_TrenchTank", west] call BIS_fnc_spawnVehicle select 0;;_group = [(_trench getRelPos [2, 180]), _mainDirection, "B_MBT_01_cannon_F", west] call BIS_fnc_spawnVehicle select 2;_group deleteGroupWhenEmpty true; 
+
+    params ["_spawnPosAnchor", "_mainDirectionVector", "_mainDirection", "_typleListAttackers", "_side", "_angreiferAnzahl", "_angriffsDistanz", "_fahrzeugAbstand", "_gefechtsstreifenBreite", "_linieSturmAngriff", "_angriffsZiel", "_moveOut"];
+    _positions = ([_spawnPosAnchor, _angreiferAnzahl, _fahrzeugAbstand, _mainDirectionVector, _gefechtsstreifenBreite] call AK_fnc_gefechtsform);
+//            _sturmAusgangsstellungPositions = ([_spawnPosAnchor vectorAdd ((_mainDirectionVector) vectorMultiply _linieSturmAngriff), _angreiferAnzahl, _fahrzeugAbstand,_mainDirectionVector, _gefechtsstreifenBreite] call AK_fnc_gefechtsform);
+    _angriffszielPositions = [];
+    if (_moveOut) then {
+        _angriffszielPositions = ([_spawnPosAnchor vectorAdd ((_mainDirectionVector) vectorMultiply _angriffsDistanz), _angreiferAnzahl, _fahrzeugAbstand,_mainDirectionVector, _gefechtsstreifenBreite] call AK_fnc_gefechtsform);
+    };
+    _spawnedGroups = [];
+    
+    for "_i" from 0 to (count _positions) do {
+        _group = [_positions select _i, _mainDirection, _typleListAttackers select _i, _side, false] call BIS_fnc_spawnVehicle select 2;
+        _group deleteGroupWhenEmpty true;
+        _spawnedGroups pushBack _group;
+        
+        if (_moveOut) then {
+            _destination = _angriffszielPositions select _i;
+            _lastWaypoint = [_group, 100, _destination] call AK_fnc_spacedMovement;
+            _group setVariable ["AK_attack_data", [_group, _angriffsZiel, _gefechtsstreifenBreite]];
+            _lastWaypoint setWaypointStatements ["true", "
+                _attackData = (group this) getVariable 'AK_attack_data';
+                _group = _attackData select 0;
+                _angriffsZiel = _attackData select 1;
+                _gefechtsstreifenBreite = _attackData select 2;
+                [_group, _angriffsZiel, _gefechtsstreifenBreite] call CBA_fnc_taskPatrol;"
+            ];
+        };
+        };
+    _spawnedGroups
+};
 /* ---------------------------------------------------------------------------- 
 Function: AK_fnc_battlelogger_standalone 
  
@@ -348,10 +382,11 @@ _deletedindex sort false;
 {_groups deleteAt _x} forEach _deletedindex;
 _groups;
 };
-//creates a number of groups at _AZ which will defend an area (size of which is based on taktik Handakt OPFOR values) . 
-//Works local and on DS 
+//creates a number of groups at _refPos which will defend an area (size of which is based on taktik Handakt OPFOR values) . 
+//Works local and on DS
+//BUG Vehicles will not move (try delay between spawns)
 //REQUIRED: CBA 
-//Params _AZ 3D position 
+//Params _refPos 3D position 
 /* 
 example: 
 [getPos player, 5, side player, "I_MBT_03_cannon_F"] call AK_fnc_defend;  
@@ -360,10 +395,11 @@ example:
 AK_fnc_defend = { 
 	if (isNil "AK_fnc_differentiateClass") exitWith {diag_log "AK_fnc_defend ERROR: AK_fnc_differentiateClass required"}; 
 
-	params ["_AZ", "_numberofgroups", "_side", "_grouptype"]; 
+	params ["_refPos", "_numberofgroups", "_side", "_grouptype"];
+	private _area = _numberofgroups / 3.42;
+	private _radius = sqrt(_area / 3.14) * 1000;
 	for "_i" from 1 to _numberofgroups step 1 do { 
-		private _radius = (_numberofgroups * 77); 
-		private _vfgrm = [_AZ, 0, _radius] call BIS_fnc_findSafePos; 
+		private _vfgrm = [_refPos, 0, _radius] call BIS_fnc_findSafePos; 
 		private _gruppe = nil; 
 		if ((_grouptype call AK_fnc_differentiateClass) == "Group") then { 
 			_gruppe = [_vfgrm, _side, _grouptype] call BIS_fnc_spawnGroup; 
@@ -373,7 +409,7 @@ AK_fnc_defend = {
 		}; 
 		if (isNull _gruppe) exitWith {diag_log "AK_fnc_defend ERROR: no groups spawned"}; 
 		_gruppe deleteGroupWhenEmpty true; 
-		[_gruppe, _AZ, _radius] call CBA_fnc_taskDefend; 
+		[_gruppe, _refPos, _radius] call CBA_fnc_taskDefend; 
 	}; 
 }; 
 /*
@@ -678,6 +714,42 @@ AK_fnc_flare = {
     _shell = createVehicle [("F_40mm_" + _color), (_position vectorAdd [0, 0, _height]), [], 0, "NONE"]; 
     _shell setVelocity [0, 0, _sinkrate]; 
 }; 
+AK_fnc_gefechtsform = {
+    // returns a grid of positions on the surface with battle formations of tank companies in mind
+
+    params [
+        ["_anchorPos", [0,0,0], [[]]], 
+        ["_number", 14, [0]],
+        ["_spacing", 75, [0]], 
+        ["_orientationVector", [0,1,0], [[]]], 
+        ["_maxWidth", 650, [0]] 
+    ];
+    if (_number < 1) exitWith {diag_log "WARNING AK_fnc_gefechtsform: less then 1 positions have been requested"};
+    private _positions = [];
+    private _yOrientationVector = [_orientationVector, 90] call BIS_fnc_rotateVector2D;
+    private _xOrientationVector = [_orientationVector, 180] call BIS_fnc_rotateVector2D;
+    private _posPerLine = floor (_maxWidth / (_spacing));
+    private _lines = floor (_number / _posPerLine);
+    for "_line" from 0 to _lines do {
+        if ((count _positions) >= _number) exitWith {_positions};
+        private _rowPosition = (_anchorPos vectorAdd (_xOrientationVector vectorMultiply (_line * _spacing)));
+        //add first position
+        _positions pushBack [_rowPosition select 0, _rowPosition select 1, 0]; // set z to 0 to avoid getting positions below the surface
+        for "_y" from 1 to (ceil (_posPerLine / 2)) do {
+            //position to the right
+            if ((count _positions) >= _number) exitWith {_positions};
+            private _finalPosition = (_rowPosition vectorAdd (_yOrientationVector vectorMultiply (_y * _spacing)));
+            _positions pushBack [_finalPosition select 0, _finalPosition select 1, 0]; // set z to 0 to avoid getting positions below the surface
+            if ((count _positions) >= _number) exitWith {_positions};
+            _yOrientationVector = [_yOrientationVector, 180] call BIS_fnc_rotateVector2D; //reverse the vector
+            //position to the left
+            private _finalPosition = (_rowPosition vectorAdd (_yOrientationVector vectorMultiply (_y * _spacing)));
+            _positions pushBack [_finalPosition select 0, _finalPosition select 1, 0]; // set z to 0 to avoid getting positions below the surface
+                         
+        };
+    };
+_positions
+};
 /* Identifies 2 Groups which are separated by distance */
 AK_fnc_GroupbyDistance = {
 	params ["_unsortedObjects"];
@@ -882,7 +954,85 @@ AK_fnc_populateMap = {
  };    
  [_referencePosition, _areaSideLength, _spacing, _groupType, _side, _numberOfGroups, _groupCounter]     
 };    
-/* Sets random weather */
+AK_fnc_quickBattle = {
+    //HEADSUP if you select vehicles on the map you get the groups, if you select them in 3D than you get all units (including each crewmember)
+    //ENHANCE how to determine attacker side? currently I use an empty vehicle
+    // assumes that all attackers and defenders each share the same side 
+    params ["_selection", "_debug", "_angreiferAnzahl", "_verteidigerAnzahl"]; // pass two arrays of vehicles seperated in space (eg by curatorSelected)
+    _angreiferFahrzeugAbstand = 100;
+    _angreiferGefechtsstreifenBreite = 650;
+
+    _verteidigerFahrzeugAbstand = 100;
+    _verteidigerGefechtsstreifenBreite = 650;
+     
+    _SelectedEntities = _selection select 0; 
+    _SelectedGroups = _selection select 1; 
+    _parties = [_SelectedEntities] call AK_fnc_GroupbyDistance; 
+    _initialPartyA = (_parties select 0); 
+    _initialPartyB = (_parties select 1);
+    
+    // determine type of battle
+    _battleType = "eil_bez_Verteidigung";
+    _rawAttackers = false;
+    _rawDefenders = false;
+    _civInA = civilian in (_initialPartyA apply {side _x});
+    _civInB = civilian in (_initialPartyB apply {side _x});
+    if (!_civInA and !_civInB) then {_battleType = "Begegnungsgefecht";}
+    else {
+        if (_civInA) then {_rawAttackers = _initialPartyA; _rawDefenders = _initialPartyB}
+        else {_rawAttackers = _initialPartyB; _rawDefenders = _initialPartyA};
+        _rawAttackers deleteAt ((_rawAttackers apply {side _x}) find civilian); // remove the attacker "marker"
+    };
+    if (_battleType == "Begegnungsgefecht") exitWith {diag_log "ERROR AK_fnc_quickBattle: Begegnungsgefecht not yet implemented."};      
+    if (_debug) then {diag_log format ['Type of battle determined. %1', [_battleType, _rawAttackers, _rawDefenders]]};
+    
+    referenceAttacker = _rawAttackers select 0;
+    referenceDefender =  _rawDefenders select 0;
+    _angreiferSpawnPosAnchor = getPos referenceAttacker; 
+    _angriffsZiel = getPos referenceDefender; 
+    _typleListAttackers = [_rawAttackers apply {typeOf _x}, _angreiferAnzahl] call AK_fnc_TypeRatio; 
+    _typleListDefenders = [_rawDefenders apply {typeOf _x}, _verteidigerAnzahl] call AK_fnc_TypeRatio;
+    _angreiferSide = side referenceAttacker;
+    _verteidigerSide = side referenceDefender; 
+    // delete the placeholders 
+    [_SelectedEntities, _SelectedGroups] call CBA_fnc_deleteEntity; // remove the "parameters" intentionally not deleting waypoints and markers
+    
+    // mark Positions 
+    "SmokeShellBlue" createVehicle _angreiferSpawnPosAnchor; 
+    "SmokeShellRed" createVehicle _angriffsZiel;
+     
+    //general parameters derived from "parameter" units
+    _angriffsRichtung = _angreiferSpawnPosAnchor getDir _angriffsZiel;
+    _wrongVector = [[0, 1, 0], _angriffsRichtung] call BIS_fnc_rotateVector2D;
+    _angriffsRichtungVector = [(_wrongVector select 0) * -1, _wrongVector select 1, 0]; 
+    _angriffsDistanz = (_angreiferSpawnPosAnchor distance _angriffsZiel) + 1000; // Naechste Aufgabe Kompanie
+    _linieSturmAngriff = _angriffsDistanz - 2000; // 500 bis 1500 m
+    _verteidigerRichtung = _angriffsZiel getDir _angreiferSpawnPosAnchor;
+    _verteidigerRichtungVector = [_angriffsRichtungVector, 180] call BIS_fnc_rotateVector2D;
+    
+    //spawn attackers
+    [
+        {isNull referenceAttacker},
+        {
+            referenceAttacker = nil;
+            _this call AK_fnc_attack;
+        },
+        [_angreiferSpawnPosAnchor, _angriffsRichtungVector, _angriffsRichtung, _typleListAttackers, _angreiferSide, _angreiferAnzahl, _angriffsDistanz, _angreiferFahrzeugAbstand, _angreiferGefechtsstreifenBreite, _linieSturmAngriff, _angriffsZiel, true]
+    ] call CBA_fnc_waitUntilAndExecute;     
+    
+    //spawn defenders
+    
+    [
+        {isNull referenceDefender},
+        {
+            referenceDefender = nil;
+            _this call AK_fnc_attack;  
+        },
+        [_angriffsZiel, _verteidigerRichtungVector, _verteidigerRichtung, _typleListDefenders, _verteidigerSide, _verteidigerAnzahl, _angriffsDistanz, _verteidigerFahrzeugAbstand, _verteidigerGefechtsstreifenBreite, _linieSturmAngriff, _angriffsZiel, false]
+    ] call CBA_fnc_waitUntilAndExecute;
+     
+};
+    /* Sets random weather */
 AK_fnc_randomWeather = {
     if (!isServer) exitWith {systemChat "ERROR: has to be executed on the server."};
     0 setOvercast random 1; 
@@ -891,6 +1041,42 @@ AK_fnc_randomWeather = {
     setWind [random [0, 3, 100], random [0, 3, 100], true];
     forceWeatherChange;
 };
+// Function to assign waypoints spaced by distance towards destination 
+// Remark: using vectors is faster than getDir
+// Parameters: 
+//   group: The group to assign waypoints to 
+//   distance: The desired spacing between waypoints 
+//   destination: The final destination position
+// Return: Last issued waypoint 
+// Example usage: {[_x, 100, [7020.41,11380.3,0]] call AK_fnc_spacedMovement} forEach (allGroups select {side _x == west}); 
+AK_fnc_spacedMovement = { 
+    private ["_group", "_distance", "_destination", "_currentPos", "_waypointPos"]; 
+    _group = _this select 0; 
+    _distance = _this select 1; 
+    _destination = _this select 2; 
+ 
+    // Get the current position of the group 
+    _currentPos = getPos (leader _group); 
+ 
+    // Calculate the direction towards the destination 
+    _dir = _currentPos vectorFromTo _destination; 
+    _dir = vectorNormalized _dir; 
+ 
+    // Calculate the number of waypoints needed 
+    _numWaypoints = floor((_currentPos distance _destination) / _distance); 
+ 
+    // Assign waypoints 
+    for "_i" from 1 to _numWaypoints do { 
+        _waypointPos = _currentPos vectorAdd (_dir vectorMultiply (_i * _distance)); 
+        _waypoint = _group addWaypoint [_waypointPos, 0];
+        _waypoint setWaypointCompletionRadius 10;
+    };
+ 
+    // Assign the final destination waypoint 
+    _lastwaypoint = _group addWaypoint [_destination, 0];
+    
+    _lastwaypoint 
+}; 
 /* ----------------------------------------------------------------------------
 Function: AK_fnc_spacedvehicles
 
