@@ -1,6 +1,7 @@
 AK_fnc_attack = {    
 //ENHANCE reorder params and add defaults
 //ENHANCE Anmarsch zur Sturmausgangsline 
+//ENHANCE Wegpunkt Zug um Zug festlegen?
 //ENHANCE Verteidiger mit Stellungen versehen _mainDirection = 90;_trench = [[300,0,0], _mainDirection, "Land_WW2_TrenchTank", west] call BIS_fnc_spawnVehicle select 0;;_group = [(_trench getRelPos [2, 180]), _mainDirection, "B_MBT_01_cannon_F", west] call BIS_fnc_spawnVehicle select 2;_group deleteGroupWhenEmpty true; 
 
     params ["_spawnPosAnchor", "_mainDirectionVector", "_mainDirection", "_typleListAttackers", "_side", "_angreiferAnzahl", "_angriffsDistanz", "_fahrzeugAbstand", "_gefechtsstreifenBreite", "_linieSturmAngriff", "_angriffsZiel", "_moveOut"];
