@@ -1,39 +1,55 @@
+ 
+/* BENCHMARK 
+A Benchmark to determine how well a system can handle lots of units 
+1. Place an Ammo Bearer somewhere on Altis 
+2. Run Multiplayer 
+3. Make sure that the video settings are comparable 
+4. Run the code 
+RESULTS 
+import statistics
+results = {
+"PC": [47.7612,42.7808,43.5967,42.328,41.9948,39.4089,35.3201,30.0188,30.2457,25.7649,26.8007,25.0391,23.7741,24.024,21.6509,20.5656,19.4411,19.7287,17.9977,18.3486,19.5838,18.9573,18.0995,18.2232,19.2771,20.5128,20.6186,19.9501,20.8062,21.2202,20.0501,20.2532,21.3618,21.6216,20.5656,21.9178,22.2222,22.567,23.1548,21.8878,24.8447,23.9163,27.4443,28.3186,28.4698,26.4026,27.9232,28.5714,28.777,30.0188,28.7253,29.7398,31.8725,33.1263,32.6531,33.3333,37.5587,40.6091,38.5542,36.9515,39.312],
+"Shadow_PC_20230711": [26.936,31.0078,31.9361,31.6832,32.3887,31.1284,29.7398,24.1692,23.0548,20.3304,19.8265,19.2308,19.0024,19.1388,18.018,16.3265,17.1858,16.8776,18.2648,13.9373,14.1844,13.901,15.5642,14.8837,16.178,16.632,18.0587,17.8174,16.2437,18.2232,18.1406,18.1406,18.2648,19.0476,19.5599,19.3705,19.8511,19.6078,19.4647,20.1765,21.025,20.8333,21.978,20.9424,22.4719,24.2057,24.1327,24.5023,27.1647,28.9855,30.6513,30.1318,32.0641,31.3725,28.6225,32,34.4086,36.1174,39.1198,39.7022,45.3258],
+"PC_7800X3D_20240805": [38.1862,34.4086,34.5572,34.7072,35.0109,31.8725,29.9625,29.5203,25.1572,20.6452,20.5392,19.9005,19.347,19.2771,15.7171,17.8372,16.8776,17.2786,18.8902,19.656,18.648,19.8265,19.802,19.347,19.1617,19.4647,18.9573,16.5119,15.625,9.58084,9.15332,8.47907,8.78156,11.5108,11.713,12.4031,13.9983,14.2602,15.0235,16.4948,20.2276,21.3904,16.016,17.4292,16.9133,14.6386,18.2025,19.2539,16.8955,16.3099,18.3908,18.7134,20.3822,16.8955,19.6802,20.6186,20.2788,25.6,29.1971,28.6738,32.5866] ,
+"PC_7800X3D(Dedicated_Server)_20240805": [40.9207,53.1561,54.6075,53.6913,47.3373,46.5116,41.8848,42.4403,40.8163,35.1648,36.4465,11.7734,12.1396,9.96264,8.89878,24.0964,23.3236,23.4261,23.4949,24.1327,25,24.4275,23.988,23.1214,12.9032,13.3891,12.1029,11.7388,23.4261,23.3577,22.9555,22.9885,22.3464,22.8245,22.3464,19.6802,20.6718,19.8511,20.2788,22.409,22.792,22.4719,18.8902,18.5615,16.0321,17.1858,20.4082,16.1616,17.7976,17.9775,18.8014,23.2897,14.9673,16.2602,13.8289,11.7561,25.6822,25.4777,27.3504,25.4372,26.8456]
+}
+for system, fps in results.items():
+  print(f'{"="*10 + system + "=" * 10}')  
+  print(statistics.mean(fps))
+  print(statistics.stdev(fps))
+*/ 
 
-/* BENCHMARK
-A Benchmark to determine how well a system can handle lots of units
-1. Place an Ammo Bearer somewhere on Altis
-2. Run Multiplayer
-3. Make sure that the video settings are comparable
-4. Run the code
-RESULTS
-PC [47.7612,42.7808,43.5967,42.328,41.9948,39.4089,35.3201,30.0188,30.2457,25.7649,26.8007,25.0391,23.7741,24.024,21.6509,20.5656,19.4411,19.7287,17.9977,18.3486,19.5838,18.9573,18.0995,18.2232,19.2771,20.5128,20.6186,19.9501,20.8062,21.2202,20.0501,20.2532,21.3618,21.6216,20.5656,21.9178,22.2222,22.567,23.1548,21.8878,24.8447,23.9163,27.4443,28.3186,28.4698,26.4026,27.9232,28.5714,28.777,30.0188,28.7253,29.7398,31.8725,33.1263,32.6531,33.3333,37.5587,40.6091,38.5542,36.9515,39.312]
-Shadow_PC_20230711 = [26.936,31.0078,31.9361,31.6832,32.3887,31.1284,29.7398,24.1692,23.0548,20.3304,19.8265,19.2308,19.0024,19.1388,18.018,16.3265,17.1858,16.8776,18.2648,13.9373,14.1844,13.901,15.5642,14.8837,16.178,16.632,18.0587,17.8174,16.2437,18.2232,18.1406,18.1406,18.2648,19.0476,19.5599,19.3705,19.8511,19.6078,19.4647,20.1765,21.025,20.8333,21.978,20.9424,22.4719,24.2057,24.1327,24.5023,27.1647,28.9855,30.6513,30.1318,32.0641,31.3725,28.6225,32,34.4086,36.1174,39.1198,39.7022,45.3258]
-GeForceNow 20230710 
-*/
-_number_of_groups = 12;
-_BLUFORSpawnPos = [12884.9,16775.1];
-_OPFORSpawnPos = _BLUFORspawnPos getPos [300, 0];
-_contestedArea = _BLUFORspawnPos getPos [150, 0];
-player setPos _BLUFORSpawnPos;
-setViewDistance 2000;
-setObjectViewDistance 2000;
+AK_var_BLUFORSpawnPos = [12884.9,16775.1];
+publicVariable "AK_var_BLUFORSpawnPos"; 
+player setPos AK_var_BLUFORSpawnPos;
+[{ 
+setViewDistance 2000; 
+setObjectViewDistance 2000; 
 setTerrainGrid 1;
-
-for "_i" from 0 to _number_of_groups do {
-	_grp = [_BLUFORSpawnPos, west, 8] call BIS_fnc_spawnGroup;
-	[_grp , _contestedArea] call CBA_fnc_taskAttack;
-};
-for "_i" from 0 to _number_of_groups do {
-	_grp = [_OPFORSpawnPos, east, 8] call BIS_fnc_spawnGroup;
-	[_grp , _contestedArea] call CBA_fnc_taskAttack;
-};
-[] spawn {
-	AK_var_FPS = [];
-	for "_i" from 0 to 60 do {
-		sleep 5;
-		_fps = diag_fps;
-		AK_var_FPS pushBack _fps;
-		systemChat format ["%1", _fps];
-	};
-};
-player allowDamage false;
+hint 'Benchmark launched.'; 
+}] remoteExec ["call", 0]; 
+[{
+    _OPFORSpawnPos = AK_var_BLUFORSpawnPos getPos [300, 0]; 
+    _contestedArea = AK_var_BLUFORSpawnPos getPos [150, 0]; 
+    _number_of_groups = 12; 
+    
+    for "_i" from 0 to _number_of_groups do { 
+     _grp = [AK_var_BLUFORSpawnPos, west, 8] call BIS_fnc_spawnGroup; 
+     [_grp , _contestedArea] call CBA_fnc_taskAttack; 
+    }; 
+    for "_i" from 0 to _number_of_groups do { 
+     _grp = [_OPFORSpawnPos, east, 8] call BIS_fnc_spawnGroup; 
+     [_grp , _contestedArea] call CBA_fnc_taskAttack; 
+    };
+}] remoteExec ["call", 2];
+[] spawn { 
+ AK_var_FPS = []; 
+ for "_i" from 0 to 60 do { 
+  sleep 5; 
+  _fps = diag_fps; 
+  AK_var_FPS pushBack _fps; 
+  systemChat format ["%1 FPS. Remaining time; %2 s", _fps, (60 - _i) * 5]; 
+ }; 
+ hint "Benchmark finished. Results stored in AK_var_FPS" 
+}; 
+player allowDamage false; 
