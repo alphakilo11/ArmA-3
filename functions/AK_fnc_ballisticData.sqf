@@ -9,8 +9,11 @@ BUGS _shotDistance is unreliable, due to ricochets and the projectile beeing del
   (_this select 0) params ["_unit", "_weapon", "_muzzle", "_mode", "_ammo", "_magazine", "_projectile", "_gunner"];
   
     _projectile addEventHandler ["HitPart", {
-        AK_var_testData = _this + AK_var_testData;
-        (_this select 0) removeEventHandler ["HitPart", 0];
+      if (isNil "AK_var_testData") then {
+          AK_var_testData = [];
+        };
+        AK_var_testData pushBack _this;
+        //(_this select 0) removeEventHandler ["HitPart", 0]; //remove after first hit to avoid logging multiple hits
     }];
 
   
