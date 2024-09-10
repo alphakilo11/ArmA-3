@@ -9,15 +9,15 @@ BUGS
 	_shotDistance is unreliable, due to ricochets and the projectile beeing deleted 
 	left right calculation doesn't work properly (didn't work when shooting at a heading of 066Â°)
 	_firerPos is not consistant with where the bullet actually starts
-REQUIRES
-  (vehicle player) addEventHandler ["Fired", { 
-	[_this, 
-		[
-			diag_tickTime, // shotTime
-			getPosASL (_this select 6), // shooter position
-			velocity (_this select 6) // V0
-		]
-	] spawn AK_fnc_ballisticData;
+REQUIRES 
+  (vehicle player) addEventHandler ["Fired", {  
+ [_this,  
+  [ 
+   diag_tickTime, // shotTime 
+   getPosASL (_this select 6), // shooter position 
+   velocity (_this select 6) // V0 
+  ] 
+ ] spawn AK_fnc_ballisticData; 
  }];
 */ 
 	_dataLogResolution = 0.0055; // s of delay between data points  HEADSUP values below ~ 0.005 will cause a very high number of duplicates
@@ -34,10 +34,12 @@ REQUIRES
 	  1, 
 	  "GEOM", 
 	  "NONE" 
-	 ]; 
-	
-	_initialTarget = _ins select 0 select 2; // does NOT work when not aiming directly at the target  
-	hintSilent format ['%1 is the Initial Target', _initialTarget];  
+	 ];
+	 _initialTarget = objNull; 
+	if (count _ins != 0) then {
+		_initialTarget = _ins select 0 select 2; // does NOT work when not aiming directly at the target  
+		hintSilent format ['%1 is the Initial Target', _initialTarget];  
+	};
    /* WIP
 	_projectile addEventHandler ["HitPart", { 
 	  if (isNil "AK_var_testData") then { 
@@ -70,24 +72,32 @@ REQUIRES
 	  _velocityData pushBack _bulletVelocity;
 	  //hintSilent str (_bulletVelocity call CBA_fnc_vectMagn); 
 	  uisleep _dataLogResolution; 
-	}; 
-  _shotDistance = _firerPos distance (_posData select (count _posData - 1)); 
-  _offTarget = _ins select 0 select 0 distance  (_posData select (count _posData - 1));
-  _rightLeftOffTarget = [_ins select 0 select 0, (_posData select (count _posData - 1))] call BIS_fnc_distance2D;
-  _aimPos = _ins select 0 select 2;
-  _ShooterAimAngle = _firerPos getDir _aimPos;
-  _normalizedShooterImpactAngle = (_firerPos getDir (_posData select (count _posData - 1))) - _ShooterAimAngle;
-  if (_normalizedShooterImpactAngle < 0) then {
-	  _normalizedShooterImpactAngle = _normalizedShooterImpactAngle + 360;
-  };
-  if (_normalizedShooterImpactAngle > 180) then {
-	  _rightLeftOffTarget = _rightLeftOffTarget * -1; // right are positive values, left negative
-  };
-  _bulletTravelTime =  diag_tickTime - _shotTime;
-  systemChat format ['%1 s, %2 m, %3 m off target %4, %5 m off side', _bulletTravelTime, _shotDistance, _offTarget, _initialTarget, _rightLeftOffTarget];
-  systemChat format ["%1Â° _normalizedShooterImpactAngle. %2Â° _ShooterAimAngle. %3 ShooterImpactAngle. %4 distance _firerPos pos player", _normalizedShooterImpactAngle, _ShooterAimAngle,
-   (_firerPos getDir (_posData select (count _posData - 1))), vectorMagnitude (getPosASL player vectorDiff _firerPos)];
-   _impactData = [_bulletTravelTime, _shotDistance, _offTarget, _rightLeftOffTarget];
+	};
+	_bulletTravelTime =  (_timeStamps select (count _timeStamps - 1)); 
+  _shotDistance = _firerPos distance (_posData select (count _posData - 1));
+  _impactPos = _posData select (count _posData - 1);
+	_offTarget = 'no data';
+  _rightLeftOffTarget = 'no data';
+  if (count _ins > 0) then {
+	  _offTarget = _ins select 0 select 0 distance  _impactPos;
+	  _rightLeftOffTarget = [_ins select 0 select 0, _impactPos] call BIS_fnc_distance2D;
+	  _aimPos = _ins select 0 select 2;
+	  _ShooterAimAngle = _firerPos getDir _aimPos;
+	  _normalizedShooterImpactAngle = (_firerPos getDir _impactPos) - _ShooterAimAngle;
+	  if (_normalizedShooterImpactAngle < 0) then {
+		  _normalizedShooterImpactAngle = _normalizedShooterImpactAngle + 360;
+	  };
+	  if (_normalizedShooterImpactAngle > 180) then {
+		  _rightLeftOffTarget = _rightLeftOffTarget * -1; // right are positive values, left negative
+	  };
+	  systemChat format ['%1 s, %2 m, %3 m off target %4, %5 m off side', _bulletTravelTime, _shotDistance, _offTarget, _initialTarget, _rightLeftOffTarget];
+	  systemChat format ["%1Â° _normalizedShooterImpactAngle. %2Â° _ShooterAimAngle. %3 ShooterImpactAngle. %4 distance _firerPos pos player", _normalizedShooterImpactAngle, _ShooterAimAngle,
+	   (_firerPos getDir (_posData select (count _posData - 1))), vectorMagnitude (getPosASL player vectorDiff _firerPos)];
+	};
+	_marker = "Sign_Sphere10cm_F" createVehicle [0,0,0]; //"Sign_Sphere10cm_F" 
+	_marker setPos ASLtoAGL _impactPos;
+	_marker setVectorUp (_velocityData select (count _velocityData - 1));
+	_impactData = [_bulletTravelTime, _shotDistance, _offTarget, _rightLeftOffTarget];
 	
   if (isNil "AK_var_BallisticData") then { 
 	  AK_var_BallisticData = []; 

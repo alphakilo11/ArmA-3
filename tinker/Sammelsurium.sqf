@@ -1,3 +1,42 @@
+// switch through and fire all available weapons
+[] spawn {
+	_weaponsArray = 'getNumber (_x >> "ACE_barrelLength") > 0' configClasses (configFile >> "CfgWeapons");
+	_testWeapons = [];
+	for "_i" from 0 to 9 do {
+		_candidate = selectRandom _weaponsArray;
+		_mags =  (_candidate >> "magazines") call BIS_fnc_getCfgDataArray;
+		if (count _mags > 0) then {
+			_testWeapons pushBack _candidate;
+		};
+	};
+	_testWeapons = _weaponsArray;
+	_counter = 0;
+	{ 
+		// Select a random weapon and its magazine from the array 
+		_candidateWeapon = _x;  
+		_magazine = ((_candidateWeapon >> "magazines") call BIS_fnc_getCfgDataArray) select 0;
+		_fireMode = (getArray (_candidateWeapon >> "modes")) select 0; 
+		 
+		// Assign the random weapon and magazine to the player
+		_candidateWeapon = configName _candidateWeapon; 
+		player addMagazine _magazine; 
+		player addWeapon _candidateWeapon; 
+		 
+		// Wait for a short moment to ensure the weapon is equipped 
+		sleep 2; 
+		 
+		// Force the player to fire the weapon 
+		player selectWeapon _candidateWeapon; 
+		player forceWeaponFire [_candidateWeapon, _fireMode];
+		
+		_counter = _counter + 1;
+		systemChat format ["%1 weapons fired. %2 to go.", _counter, count _testWeapons - _counter]; 
+	} forEach _testWeapons;
+	systemChat str count _testWeapons; 
+};
+
+
+
 // creating multiple groups 
 _spacing = 316;
 _anchorPoint = [10200, 18900, 0];
