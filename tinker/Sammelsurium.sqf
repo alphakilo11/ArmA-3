@@ -5,8 +5,7 @@ _vehicleTypes;
 
 
 /* a function that spawns random vehicles from  given array of types and let's them patrol an area
-BUGS
-	
+
 Area Array Format: [centre, a, b, angle, isRectangle, c]
 	centre: Array format Position2D or PositionAGL, Object or Group 
 	a: Number - x axis (x / 2) 
