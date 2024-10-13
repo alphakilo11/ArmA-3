@@ -92,7 +92,7 @@ AK_fnc_traceProjectile = {
    _rightLeftOffTarget = _rightLeftOffTarget * -1; // right are positive values, left negative 
   }; 
   if (AK_switch_traceProjectileDebug == true) then {systemChat format ['%1 s, %2 m, %3 m off target %4, %5 m off side', _bulletTravelTime, _shotDistance, _offTarget, _initialTarget, _rightLeftOffTarget];};
-  //systemChat format ["%1° _normalizedShooterImpactAngle. %2° _ShooterAimAngle. %3 ShooterImpactAngle. %4 distance _firerPos pos player", _normalizedShooterImpactAngle, _ShooterAimAngle, 
+  //systemChat format ["%1Â° _normalizedShooterImpactAngle. %2Â° _ShooterAimAngle. %3 ShooterImpactAngle. %4 distance _firerPos pos player", _normalizedShooterImpactAngle, _ShooterAimAngle, 
   // (_firerPos getDir (_posData select (count _posData - 1))), vectorMagnitude (getPosASL player vectorDiff _firerPos)]; 
    } else { 
 	systemChat format ["%1 s, %2 m", _bulletTravelTime, _shotDistance]; 

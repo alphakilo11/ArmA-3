@@ -4,37 +4,37 @@ _vehicleTypes = [];
 _vehicleTypes;
 
 
-/* a function that spawns random vehicles from  given array of types and let's them patrol an area
+/* a function that spawns random vehicles from  given array of types and let's them patrol an area 
+ 
+Area Array Format: [centre, a, b, angle, isRectangle, c] 
+ centre: Array format Position2D or PositionAGL, Object or Group  
+ a: Number - x axis (x / 2)  
+ b: Number - y axis (y / 2)  
+ angle: Number - (Optional, default 0) rotation angle  
+ isRectangle: Boolean - (Optional, default false) true if rectangle, false if ellipse  
+ c: Number - (Optional, default -1: unlimited) z axis (z / 2) 
+*/ 
+AK_fnc_VehiclesPatrolArea = { 
+ params ["_centerpoint", "_radius", "_vehicleNumber", "_vehicleTypes", "_side", "_searchRadius"]; 
+ for "_i" from 1 to _vehicleNumber do { 
+  _spawnPos = _centerpoint getPos [_radius * sqrt random 1, random 360]; 
+  _spawned = [_spawnPos, random 360, selectRandom _vehicleTypes, _side] call BIS_fnc_spawnVehicle; 
+  (_spawned select 2) deleteGroupWhenEmpty true; 
+  (_spawned select 0) allowCrewInImmobile true;
+  [(_spawned select 2), [_spawnPos, _searchRadius, _searchRadius, 0, true], 'Relaxed'] call CBA_fnc_taskSearchArea; // [[1000, 1000, 0], 1000, 1000, 0, true] 
+  }; 
+}; 
+ 
+//_vehicleTypes = ["rhs_t14_tv","rhs_t72ba_tv","rhs_t72bb_tv","rhs_t72bc_tv","rhs_t72bd_tv","rhs_t72be_tv","rhs_t80","rhs_t80a","rhs_t80b","rhs_t80bk","rhs_t80bv","rhs_t80u","rhs_t80u45m","rhs_t80ue1","rhs_t80uk","rhs_t80um","rhs_t90_tv","rhs_t90a_tv","rhs_t90am_tv","rhs_t90saa_tv","rhs_t90sab_tv","rhs_t90sm_tv","rhs_bmp1_tv","rhs_bmp1d_tv","rhs_bmp1k_tv","rhs_bmp1p_tv","rhs_bmp2e_tv","rhs_bmp2_tv","rhs_bmp2d_tv","rhs_bmp2k_tv","rhs_brm1k_tv","rhs_prp3_tv","rhs_t15_tv","rhs_2s1_at_tv","rhs_2s3_at_tv","rhs_btr80a_msv","rhs_btr80_msv","rhs_btr70_msv","rhs_btr60_msv","RHS_BM21_MSV_01","rhs_bmp3_msv","rhs_bmp3_late_msv","rhs_bmp3m_msv","rhs_bmp3mera_msv","rhs_Ob_681_2","RHS_ZU23_MSV","rhs_SPG9M_MSV","rhs_Kornet_9M133_2_msv","rhs_Metis_9k115_2_msv","rhs_9k79","rhs_9k79_K","rhs_9k79_B","rhs_bmd1","rhs_bmd1k","rhs_bmd1p","rhs_bmd1pk","rhs_bmd1r","rhs_bmd2","rhs_bmd2k","rhs_bmd2m","rhs_bmd4_vdv","rhs_bmd4m_vdv","rhs_bmd4ma_vdv","rhs_sprut_vdv","rhs_gaz66_zu23_vdv","RHS_Ural_Zu23_VDV_01","rhs_pts_vmf","rhs_zsu234_aa"]; 
+_vehicleTypes = []; 
+{  
+ if ((configName _x) isKindOf "Tank" && {getNumber (_x >> "scope") == 2}) then {  
+  _vehicleTypes pushBack configName _x;  
+ };  
+} forEach ("true" configClasses (configFile >> "CfgVehicles"));  
+[[15000, 20000, 0], 1000, 31, _vehicleTypes, east, 200] spawn AK_fnc_VehiclesPatrolArea;
+//[[13000, 20000, 0], 1000, 31, _vehicleTypes, west, 200] spawn AK_fnc_VehiclesPatrolArea;
 
-Area Array Format: [centre, a, b, angle, isRectangle, c]
-	centre: Array format Position2D or PositionAGL, Object or Group 
-	a: Number - x axis (x / 2) 
-	b: Number - y axis (y / 2) 
-	angle: Number - (Optional, default 0) rotation angle 
-	isRectangle: Boolean - (Optional, default false) true if rectangle, false if ellipse 
-	c: Number - (Optional, default -1: unlimited) z axis (z / 2)
-*/
-AK_fnc_VehiclesPatrolArea = {
-	params ["_centerpoint", "_radius", "_vehicleNumber", "_vehicleTypes", "_side", "_searchRadius"];
-	for "_i" from 1 to _vehicleNumber do {
-		_spawnPos = _centerpoint getPos [_radius * sqrt random 1, random 360];
-		_spawned = [_spawnPos, random 360, selectRandom _vehicleTypes, _side] call BIS_fnc_spawnVehicle;
-		(_spawned select 2) deleteGroupWhenEmpty true;
-		(_spawned select 0) allowCrewInImmobile true; 
-		[(_spawned select 2), [_spawnPos, _searchRadius, _searchRadius, 0, true], 'Relaxed'] call CBA_fnc_taskSearchArea; // [[1000, 1000, 0], 1000, 1000, 0, true]
-		//sleep 0.5;
-		};
-};
-
-//_vehicleTypes = ["rhs_t14_tv","rhs_t72ba_tv","rhs_t72bb_tv","rhs_t72bc_tv","rhs_t72bd_tv","rhs_t72be_tv","rhs_t80","rhs_t80a","rhs_t80b","rhs_t80bk","rhs_t80bv","rhs_t80u","rhs_t80u45m","rhs_t80ue1","rhs_t80uk","rhs_t80um","rhs_t90_tv","rhs_t90a_tv","rhs_t90am_tv","rhs_t90saa_tv","rhs_t90sab_tv","rhs_t90sm_tv","rhs_bmp1_tv","rhs_bmp1d_tv","rhs_bmp1k_tv","rhs_bmp1p_tv","rhs_bmp2e_tv","rhs_bmp2_tv","rhs_bmp2d_tv","rhs_bmp2k_tv","rhs_brm1k_tv","rhs_prp3_tv","rhs_t15_tv","rhs_2s1_at_tv","rhs_2s3_at_tv","rhs_btr80a_msv","rhs_btr80_msv","rhs_btr70_msv","rhs_btr60_msv","RHS_BM21_MSV_01","rhs_bmp3_msv","rhs_bmp3_late_msv","rhs_bmp3m_msv","rhs_bmp3mera_msv","rhs_Ob_681_2","RHS_ZU23_MSV","rhs_SPG9M_MSV","rhs_Kornet_9M133_2_msv","rhs_Metis_9k115_2_msv","rhs_9k79","rhs_9k79_K","rhs_9k79_B","rhs_bmd1","rhs_bmd1k","rhs_bmd1p","rhs_bmd1pk","rhs_bmd1r","rhs_bmd2","rhs_bmd2k","rhs_bmd2m","rhs_bmd4_vdv","rhs_bmd4m_vdv","rhs_bmd4ma_vdv","rhs_sprut_vdv","rhs_gaz66_zu23_vdv","RHS_Ural_Zu23_VDV_01","rhs_pts_vmf","rhs_zsu234_aa"];
-_vehicleTypes = [];
-{ 
-	if ((configName _x) isKindOf "Tank" && {getNumber (_x >> "scope") == 2}) then { 
-		_vehicleTypes pushBack configName _x; 
-	}; 
-} forEach ("true" configClasses (configFile >> "CfgVehicles")); 
-
-[[8000, 22000, 0], 1000, 31, _vehicleTypes, east, 200] spawn AK_fnc_VehiclesPatrolArea;
 
 
 
