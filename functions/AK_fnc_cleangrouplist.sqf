@@ -12,7 +12,7 @@ Returns:
 
 Example:
     (begin example)
-		[list_of_groups] call AK_fnc_delete;
+		[list_of_groups] call AK_fnc_cleangrouplist;
     (end)
 
 Author:
@@ -20,10 +20,16 @@ Author:
 
 ---------------------------------------------------------------------------- */
 AK_fnc_cleangrouplist = {
-params ["_groups"];
-_deletedindex = [];
-{if (isNull _x) then {_deletedindex pushBack _forEachIndex}} forEach _groups;
-_deletedindex sort false;
-{_groups deleteAt _x} forEach _deletedindex;
-_groups;
+	params ["_groups"];
+	_deletedindex = [];
+	{
+		if (isNull _x) then {
+			_deletedindex pushBack _forEachIndex
+		}
+	} forEach _groups;
+	_deletedindex sort false;
+	{
+		_groups deleteAt _x
+	} forEach _deletedindex;
+	_groups;
 };

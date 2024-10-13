@@ -11,13 +11,13 @@
  */
 AK_fnc_removeTrees = {
 	params [
-	["_hideThreshold", 10, [0]],
-	["_cutThreshold", 90, [0]]
+		["_hideThreshold", 10, [0]],
+		["_cutThreshold", 90, [0]]
 	];
 	_startTime = diag_tickTime;
 	_cutCounter = 0;
 	_trees = nearestTerrainObjects [[worldSize / 2, worldSize / 2, 0], ["Tree"], worldSize, false];
-	
+
 	[format ["%1 s: %2 trees found", diag_tickTime - _startTime, count _trees]] remoteExec ["systemChat", 0];
 	{
 		if (_forEachIndex random 100 > _hidethreshold) then {
@@ -29,5 +29,5 @@ AK_fnc_removeTrees = {
 			};
 		};
 	} forEach _trees;
-	[format ["%1 s: Finished processing %2 trees. %3 have been cut.", diag_tickTime - _startTime, count _trees, _cutCounter]] remoteExec ["systemChat", 0];	
+	[format ["%1 s: Finished processing %2 trees. %3 have been cut.", diag_tickTime - _startTime, count _trees, _cutCounter]] remoteExec ["systemChat", 0];
 };

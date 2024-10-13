@@ -24,13 +24,13 @@ Author:
 
 ---------------------------------------------------------------------------- */
 AK_fnc_createDictionary = {
-    params [
-        ["_keys"],
-        ["_values"]
-    ];
-    step1 = []
-    for "_i" from 0 to (count _keys) do {
-        step1 pushBack (_keys select _i);
-        step1 pushBack (_values select _i);
-    }
+	params [
+		["_keys"],
+		["_values"]
+	];
+	step1 = []
+	for "_i" from 0 to (count _keys) do {
+		step1 pushBack (_keys select _i);
+		step1 pushBack (_values select _i);
+	}
 }

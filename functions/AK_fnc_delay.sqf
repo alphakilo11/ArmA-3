@@ -20,7 +20,7 @@ Author:
 ---------------------------------------------------------------------------- */
 AK_fnc_delay = {
 	params ["_location", "_delayInS"];
-	if (canSuspend == False) exitWith {
+	if (canSuspend == false) exitWith {
 		diag_log "ERROR AK_fnc_delay: Scope is not suspendable";
 	};
 	_initialFPS = diag_frameNo;
@@ -28,10 +28,10 @@ AK_fnc_delay = {
 	sleep _delayInS;
 	_longFpsAvg = (diag_frameNo - _initialFPS) / (diag_tickTime - _initialTime);
 
-	while {(_longFpsAvg < 40) or (diag_fpsMin < 40)} do {
+	while { (_longFpsAvg < 40) or (diag_fpsMin < 40) } do {
 		diag_log format ["AK_fnc_delay: Suspending due to low FPS. %1 groups, %2 units, %3 FPS (long average.)", (count allGroups), (count allUnits), _longFpsAvg];
 		_initialFPS = diag_frameNo;
-		_initialTime = diag_tickTime;		
+		_initialTime = diag_tickTime;
 		sleep 60;
 		_longFpsAvg = (diag_frameNo - _initialFPS) / (diag_tickTime - _initialTime);
 	};

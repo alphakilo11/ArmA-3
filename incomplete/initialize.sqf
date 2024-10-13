@@ -1,4 +1,4 @@
-//Initialize basic ToE Data
+// Initialize basic ToE Data
 
 OPFOR_Kampfpanzer = "rhs_t72bc_tv"
 // OPFOR_IFV = "

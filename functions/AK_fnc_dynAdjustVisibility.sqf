@@ -24,48 +24,52 @@ Author:
     AK
 ---------------------------------------------------------------------------- */ 
 AK_fnc_dynAdjustVisibility = {
-    params [
-    ["_fps", 0, [123]],
-    ["_dynSim", false, [false]],
-    ["_referenceValues", [10, 25, 40], [[]]],
-    ["_maxViewDistance", 7000, [123]]
-    ];
-    
-    //execute on server only
-    if (isServer == false) exitWith {hint "AK_fnc_dynAdjustVisibility has to run on the server";};
+	params [
+		["_fps", 0, [123]],
+		["_dynSim", false, [false]],
+		["_referenceValues", [10, 25, 40], [[]]],
+		["_maxViewDistance", 7000, [123]]
+	];
 
-    // check server load    
-    _serverFPS = diag_fps;
-    if (_serverFPS <= _fps) then {_fps = _serverFPS};
+	   // execute on server only
+	if (isServer == false) exitWith {
+		hint "AK_fnc_dynAdjustVisibility has to run on the server";
+	};
 
-   // calculate values 
-    _referenceValues params ["_verylow","_low", "_high"];
-    _newViewDistance = viewDistance;
-    _increment = floor (_newviewDistance / 10);
-    
-    if (_fps < _verylow) then {
-        _newViewDistance = floor (viewDistance / 2);
-    } else {
-        if (_fps < _low) then {
-            _newViewDistance = viewDistance - _increment;
-        } else {
-            if ((_fps > _high) and ((viewDistance + _increment) < _maxViewDistance)) then {
-                _newViewDistance = viewDistance + _increment;
-            };
-        };
-    };
+	    // check server load    
+	_serverFPS = diag_fps;
+	if (_serverFPS <= _fps) then {
+		_fps = _serverFPS
+	};
 
-    _adjustment = _newViewDistance - viewDistance;
-    
-    // set values
-    _newViewDistance remoteExec ["setviewDistance", 0, "Viewdistance"]; 
-    _newViewDistance remoteExec ["setObjectViewDistance", 0, "Objectdistance"];
-    if (_dynSim == true) then {
-        "Group" setDynamicSimulationDistance _newviewDistance;
-        "Vehicle" setDynamicSimulationDistance _newviewDistance;
-        "EmptyVehicle" setDynamicSimulationDistance _newviewDistance;
-    };
+	   // calculate values 
+	_referenceValues params ["_verylow", "_low", "_high"];
+	_newViewDistance = viewDistance;
+	_increment = floor (_newviewDistance / 10);
 
-    diag_log format ["AK_fnc_dynAdjustVisibility: FPS: %1. Adjusted visibility: %2 m.", _fps, _newViewDistance];
-    _adjustment    
+	if (_fps < _verylow) then {
+		_newViewDistance = floor (viewDistance / 2);
+	} else {
+		if (_fps < _low) then {
+			_newViewDistance = viewDistance - _increment;
+		} else {
+			if ((_fps > _high) and ((viewDistance + _increment) < _maxViewDistance)) then {
+				_newViewDistance = viewDistance + _increment;
+			};
+		};
+	};
+
+	_adjustment = _newViewDistance - viewDistance;
+
+	    // set values
+	_newViewDistance remoteExec ["setviewDistance", 0, "Viewdistance"];
+	_newViewDistance remoteExec ["setObjectViewDistance", 0, "Objectdistance"];
+	if (_dynSim == true) then {
+		"Group" setDynamicSimulationDistance _newviewDistance;
+		"Vehicle" setDynamicSimulationDistance _newviewDistance;
+		"EmptyVehicle" setDynamicSimulationDistance _newviewDistance;
+	};
+
+	diag_log format ["AK_fnc_dynAdjustVisibility: FPS: %1. Adjusted visibility: %2 m.", _fps, _newViewDistance];
+	_adjustment
 };

@@ -1,43 +1,46 @@
-//get extended Info about all clients (has to be executed on the server)
+// get extended Info about all clients (has to be executed on the server)
 _foo = [];
-{_foo pushBack (getUserInfo _x);} forEach allUsers;
+{
+	_foo pushBack (getUserInfo _x);
+} forEach allUsers;
 _foo;
-
 
 // construction to get values from other machines and process them
 AK_fnc_passValueTest = {
-    hint format ["I am the server: %1 and this is my framerate: %2.", _this select 0, _this select 1];
+	hint format ["I am the server: %1 and this is my framerate: %2.", _this select 0, _this select 1];
 };
-[{[isServer, diag_fps] remoteExec ["AK_fnc_passValueTest", -2];}] remoteExec ["call", 2];
+[{
+	[isServer, diag_fps] remoteExec ["AK_fnc_passValueTest", -2];
+}] remoteExec ["call", 2];
 
-//Return all clients Machine network ID, if they are Headless Clients and their FPS once a minute.
-fps1 = [{{ 
- [ 
-  [clientOwner,(!hasInterface && !isDedicated), diag_fps],  
-  { 
-   systemChat format 
-   [ 
-    "ClientOwner: %1. HC: %2. Min FPS: %3", 
-    _this select 0, _this select 1, _this select 2 
-   ]; 
-  } 
- ] 
- remoteExec ["call", remoteExecutedOwner];  
-}  
-remoteExec ["call", 0];}, 60, []] call CBA_fnc_addPerFrameHandler; 
+// Return all clients Machine network ID, if they are Headless Clients and their FPS once a minute.
+fps1 = [{
+	{
+		[
+			[clientOwner, (!hasInterface && !isDedicated), diag_fps],
+			{
+				systemChat format
+				[
+					"ClientOwner: %1. HC: %2. Min FPS: %3",
+					_this select 0, _this select 1, _this select 2
+				];
+			}
+		]
+		remoteExec ["call", remoteExecutedOwner];
+	}
+	remoteExec ["call", 0];
+}, 60, []] call CBA_fnc_addPerFrameHandler;
 
-
-//logs the network ID of the selected unit when executed on the server (use Development Tools->Execute Code)
+// logs the network ID of the selected unit when executed on the server (use Development Tools->Execute Code)
 _str = owner (_this select 1);
 diag_log _str;
 
-//transfers the group ownership (=locality) (has to be executed on the server)
+// transfers the group ownership (=locality) (has to be executed on the server)
 group (_this select 1) setGroupOwner 7;
 
-
-//checks if players are present on the server (eg suspend repeated spawning of units until players are present)
-private _allHCs = entities "HeadlessClient_F";  
-private _humanPlayers = allPlayers - _allHCs;    
-if ((count _humanPlayers) > 0) then {} else {  
-diag_log "No players present - ";  
-};    
+// checks if players are present on the server (eg suspend repeated spawning of units until players are present)
+private _allHCs = entities "HeadlessClient_F";
+private _humanPlayers = allPlayers - _allHCs;
+if ((count _humanPlayers) > 0) then {} else {
+	diag_log "No players present - ";
+};

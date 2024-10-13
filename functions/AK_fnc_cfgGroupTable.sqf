@@ -21,18 +21,24 @@ Author:
 ---------------------------------------------------------------------------- */
 
 AK_fnc_cfgGroupTable = {
-params [
-    ["_cfgfaction","BLU_F", []]
-];
-private ["_cfgSide", "_newCfgEntry", "_arm", "_groups"];
+	params [
+		["_cfgfaction", "BLU_F", []]
+	];
+	private ["_cfgSide", "_newCfgEntry", "_arm", "_groups"];
 
-//get side of _cfgfaction
-_cfgSide = getNumber (configFile >> "CfgFactionClasses" >> _cfgfaction >> "side"); 
-_newCfgEntry = ("getNumber (_x >> 'side') == _cfgSide" configClasses (configFile >> "CfgGroups") apply {configName _x}) select 0; 
-_newCfgEntry = configFile >> "CfgGroups" >> _newCfgEntry;
-//iterate through arms and get all groups that have matching sides
-_arm = "true" configClasses (_newCfgEntry >> _cfgfaction) apply {configName _x}; 
-_groups = []; 
-{_groups pushBack ("getNumber (_x >> 'side') == _cfgSide" configClasses (_newCfgEntry >> _cfgfaction >> _x));} forEach _arm; 
-flatten _groups; 
+	// get side of _cfgfaction
+	_cfgSide = getNumber (configFile >> "CfgFactionClasses" >> _cfgfaction >> "side");
+	_newCfgEntry = ("getNumber (_x >> 'side') == _cfgSide" configClasses (configFile >> "CfgGroups") apply {
+		configName _x
+	}) select 0;
+	_newCfgEntry = configFile >> "CfgGroups" >> _newCfgEntry;
+	// iterate through arms and get all groups that have matching sides
+	_arm = "true" configClasses (_newCfgEntry >> _cfgfaction) apply {
+		configName _x
+	};
+	_groups = [];
+	{
+		_groups pushBack ("getNumber (_x >> 'side') == _cfgSide" configClasses (_newCfgEntry >> _cfgfaction >> _x));
+	} forEach _arm;
+	flatten _groups;
 };

@@ -21,11 +21,12 @@ Author:
 
 ---------------------------------------------------------------------------- */
 AK_fnc_findString = {
-params ["_string", "_array"];
-private _hitArray = [];
-{ 
-if ([_string, _x] call BIS_fnc_inString) then {
-_hitArray pushBack _x;}
-} forEach _array;
-_hitArray
+	params ["_string", "_array"];
+	private _hitArray = [];
+	{
+		if ([_string, _x] call BIS_fnc_inString) then {
+			_hitArray pushBack _x;
+		}
+	} forEach _array;
+	_hitArray
 };

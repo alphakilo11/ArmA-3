@@ -35,21 +35,23 @@ Author:
     AK
 
 ---------------------------------------------------------------------------- */
-
-//1.initiate function
 AK_fnc_endlessconvoy = {
-params [
-    "_verhicletype", 
-    "_startloc", 
-    "_endloc", 
-    ["_speedlimit", -1]
-];
-private _vehicle = _verhicletype createVehicle _startloc;
-_vehicle setDir (_startloc getDir _endloc);
-createVehicleCrew _vehicle;
-_vehicle limitSpeed _speedlimit;
-private _grp = group _vehicle;
-_grp setBehaviour "SAFE";
-private _wp = _grp addWaypoint [_endloc, 50];  
-_wp setWaypointStatements ["true", "_vehicleleader = vehicle leader this; {deleteVehicle _x} forEach crew _vehicleleader + [_vehicleleader]; deleteGroup (group this);"] ;
+	params [
+		"_verhicletype",
+		"_startloc",
+		"_endloc",
+		["_speedlimit", -1]
+	];
+	private _vehicle = _verhicletype createVehicle _startloc;
+	_vehicle setDir (_startloc getDir _endloc);
+	createVehicleCrew _vehicle;
+	_vehicle limitSpeed _speedlimit;
+	private _grp = group _vehicle;
+	_grp setBehaviour "SAFE";
+	private _wp = _grp addWaypoint [_endloc, 50];
+	_wp setWaypointStatements ["true", "_vehicleleader = vehicle leader this;
+		{
+			deleteVehicle _x
+		} forEach crew _vehicleleader + [_vehicleleader];
+	deleteGroup (group this);"];
 };

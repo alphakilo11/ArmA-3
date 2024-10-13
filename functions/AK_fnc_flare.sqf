@@ -14,21 +14,21 @@ Returns:
  
 Example: 
     (begin example) 
-  [player modelToWorld [0, 100, 0], "RED"] call AK_fnc_flare; 
+        [player modelToWorld [0, 100, 0], "RED"] call AK_fnc_flare; 
     (end) 
  
 Author: 
     AK 
  
 ---------------------------------------------------------------------------- */ 
-AK_fnc_flare = { 
-    params [ 
-        ["_position", [0, 0, 0]], // Default position is [0, 0, 0] 
-        ["_color", "WHITE"], // Default color is "WHITE" 
-        ["_height", 120],
-        ["_sinkrate", -2]
-    ]; 
- 
-    _shell = createVehicle [("F_40mm_" + _color), (_position vectorAdd [0, 0, _height]), [], 0, "NONE"]; 
-    _shell setVelocity [0, 0, _sinkrate]; 
-}; 
+AK_fnc_flare = {
+	params [
+		["_position", [0, 0, 0]],
+		["_color", "WHITE"],
+		["_height", 120],
+		["_sinkrate", -2]
+	];
+
+	_shell = createVehicle [("F_40mm_" + _color), (_position vectorAdd [0, 0, _height]), [], 0, "NONE"];
+	_shell setVelocity [0, 0, _sinkrate];
+};
