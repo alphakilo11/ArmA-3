@@ -100,13 +100,16 @@ _spacing = 316;
 _anchorPoint = [10200, 18900, 0];
 _groupType = configFile >> "CfgGroups" >> "Indep" >> "LIB_US_ARMY" >> "Armored" >> "LIB_M4A3_75_Platoon"; // configFile >> "CfgGroups" >> "Indep" >> "SPE_US_ARMY" >> "Armored" >> "SPE_M4A1_75_Platoon";
 _side = independent;
+_groupList = [];
 for "_x" from 0 to 1 do { 
     for "_y" from 0 to 1 do { 
         _group = [[(_anchorPoint select 0) + _x * _spacing,(_anchorPoint select 1) + _y * _spacing, 0], _side, _groupType] call BIS_fnc_spawnGroup; 
         _group deleteGroupWhenEmpty true;
-        [_group] call CBA_fnc_taskPatrol; 
+        [_group] call CBA_fnc_taskPatrol;
+		_groupList pushBack _group; 
     }; 
 };
+_groupList
 
 
 // Versuch objecte im Visier des Spieler zu identifizieren
