@@ -32,7 +32,7 @@ AK_fnc_ballisticData = {
 			_hitMessage = ["Function", "Event Handler", "Projectile", "Impact Position", "Impact Velocity", "Target Designation", "Target Type", "Target Position", "Target Heading", "Target Velocity", "Target Side", "TickTime", "Components", "NormalAngle", "Surface"] createHashMapFromArray ["AK_fnc_ballisticData", "HitPart", _projectile, _pos, _velocity, _hitEntity, typeOf _hitEntity, getPosASL _hitEntity, direction _hitEntity, velocity _hitEntity, side _hitEntity, diag_tickTime, _components, _normal, _surfaceType];
 			diag_log (toJSON _hitMessage);
 			if (AK_switch_ballisticDataDebug == true) then {
-				systemChat _hitMessage;
+				systemChat str _hitMessage;
 			};
 
 			if ((_components select 0) == "head") then {
