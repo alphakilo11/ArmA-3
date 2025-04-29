@@ -2,7 +2,7 @@
 Function: AK_fnc_delay
  
 Description: 
-    Special tool for ABE to allow a delay between calls of the battlelogger.
+    Special function for ABE to allow a delay between calls of the battlelogger.
 Parameters: 
 	0: _location	- <ARRAY>
 	1: _delayInS	- <NUMBER>

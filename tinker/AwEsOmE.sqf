@@ -33,3 +33,12 @@ _unit = vehicle player;
 _unit call BIS_fnc_diagBulletCam;
 // bulletCamIndex = _unit getVariable "BIS_fnc_diagBulletCam_fired"; 
 // _unit removeEventHandler ["fired", bulletCamIndex];
+
+// Kill messages with distances (at time of kill)
+{
+	_x addMPEventHandler ["MPKilled", {
+		params ["_unit", "_killer", "_instigator", "_useEffects"]; 
+		diag_log format ["%1, %2", diag_tickTime, _this];
+		systemChat format ["%1 killed %2 at %3 m", _killer, _unit, _unit distance _killer];
+	}];
+} forEach allUnits;
