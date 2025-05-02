@@ -27,15 +27,4 @@ AK_fnc_getAA = {
 	_clockwiseAngle = (_bearing + 360 - _tgtHDG) % 360;
 	_Aangle = _clockwiseAngle - 180;
 	_Aangle
-	/*
-	_angle1 = abs (_bearing - _tgtHDG);
-	_angle2 = 360 - (_angle1);
-	_angleoff = _angle1 min _angle2;
-	_Aangle = 180 - _angleoff;
-	
-	if (((_bearing + 360 - _tgtHDG) % 360) > 180) then {
-		_Aangle = -_Aangle;
-	};
-	_Aangle
-	*/
 };
