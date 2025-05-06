@@ -1,10 +1,11 @@
 AK_fnc_attack = {
+	// Made for AK_fnc_quickbattle
 	// ENHANCE reorder params and add defaults
 	// ENHANCE Anmarsch zur Sturmausgangsline 
 	// ENHANCE Wegpunkt Zug um Zug festlegen?
 	// ENHANCE Verteidiger mit Stellungen versehen _mainDirection = 90;_trench = [[300, 0, 0], _mainDirection, "Land_WW2_TrenchTank", west] call BIS_fnc_spawnVehicle select 0;_group = [(_trench getRelPos [2, 180]), _mainDirection, "B_MBT_01_cannon_F", west] call BIS_fnc_spawnVehicle select 2;_group deleteGroupWhenEmpty true; 
 
-	params ["_spawnPosAnchor", "_mainDirectionVector", "_mainDirection", "_typleListAttackers", "_side", "_angreiferAnzahl", "_angriffsDistanz", "_fahrzeugAbstand", "_gefechtsstreifenBreite", "_linieSturmAngriff", "_angriffsZiel", "_moveOut"];
+	params ["_spawnPosAnchor", "_mainDirectionVector", "_mainDirection", "_typleListAttackers", "_side", "_angreiferAnzahl", "_angriffsDistanz", "_fahrzeugAbstand", "_gefechtsstreifenBreite", "_linieSturmAngriff", "_angriffsZiel", "_moveOut", "_crewInImmobile"];
 	_positions = ([_spawnPosAnchor, _angreiferAnzahl, _fahrzeugAbstand, _mainDirectionVector, _gefechtsstreifenBreite] call AK_fnc_gefechtsform);
 	//            _sturmAusgangsstellungPositions = ([_spawnPosAnchor vectorAdd ((_mainDirectionVector) vectorMultiply _linieSturmAngriff), _angreiferAnzahl, _fahrzeugAbstand, _mainDirectionVector, _gefechtsstreifenBreite] call AK_fnc_gefechtsform);
 	_angriffszielPositions = [];
@@ -14,7 +15,8 @@ AK_fnc_attack = {
 	_spawnedGroups = [];
 
 	for "_i" from 0 to (count _positions) do {
-		_group = [_positions select _i, _mainDirection, _typleListAttackers select _i, _side, false] call BIS_fnc_spawnVehicle select 2;
+		_spawndata = [_positions select _i, _mainDirection, _typleListAttackers select _i, _side, false] call BIS_fnc_spawnVehicle;
+		_group = _spawndata select 2;
 		_group deleteGroupWhenEmpty true;
 		_spawnedGroups pushBack _group;
 
@@ -30,6 +32,9 @@ AK_fnc_attack = {
 				[_group, _angriffsZiel, _gefechtsstreifenBreite] call CBA_fnc_taskPatrol;
 				"
 			];
+		};
+		if (_crewInImmobile) then {
+			(_spawndata select 0) allowCrewInImmobile true;
 		};
 	};
 	_spawnedGroups
@@ -1298,6 +1303,26 @@ AK_fnc_populateMap = {
 	[_referencePosition, _areaSideLength, _spacing, _groupType, _side, _numberOfGroups, _groupCounter]
 };
 AK_fnc_quickBattle = {
+	/* ----------------------------------------------------------------------------
+	Function: AK_fnc_quickBattle
+
+	Description:
+		Quickly set-up a large battle
+		
+	Parameters:
+		["_selection", "_debug", "_angreiferAnzahl", "_verteidigerAnzahl", "_angreiferGefechtsstreifenBreite", "_verteidigerGefechtsstreifenBreite"]
+	Returns:
+		NIL
+
+	Example:
+		(begin example)
+			[curatorSelected, true, 44, 10, 1000, 1000] spawn AK_fnc_quickBattle;    
+		(end)
+
+	Author:
+		AK
+
+---------------------------------------------------------------------------- */
 	// HEADSUP if you select vehicles on the map you get the groups, if you select them in 3D than you get all units (including each crewmember)
 	   // ENHANCE how to determine attacker side? currently I use an empty vehicle
 	   // ENHANCE defaults for params
@@ -1381,7 +1406,7 @@ AK_fnc_quickBattle = {
 			referenceAttacker = nil;
 			_this call AK_fnc_attack;
 		},
-		[_angreiferSpawnPosAnchor, _angriffsRichtungVector, _angriffsRichtung, _typleListAttackers, _angreiferSide, _angreiferAnzahl, _angriffsDistanz, _angreiferFahrzeugAbstand, _angreiferGefechtsstreifenBreite, _linieSturmAngriff, _angriffsZiel, true]
+		[_angreiferSpawnPosAnchor, _angriffsRichtungVector, _angriffsRichtung, _typleListAttackers, _angreiferSide, _angreiferAnzahl, _angriffsDistanz, _angreiferFahrzeugAbstand, _angreiferGefechtsstreifenBreite, _linieSturmAngriff, _angriffsZiel, true, true]
 	] call CBA_fnc_waitUntilAndExecute;
 
 	   // spawn defenders
@@ -1394,7 +1419,7 @@ AK_fnc_quickBattle = {
 			referenceDefender = nil;
 			_this call AK_fnc_attack;
 		},
-		[_angriffsZiel, _verteidigerRichtungVector, _verteidigerRichtung, _typleListDefenders, _verteidigerSide, _verteidigerAnzahl, _angriffsDistanz, _verteidigerFahrzeugAbstand, _verteidigerGefechtsstreifenBreite, _linieSturmAngriff, _angriffsZiel, false]
+		[_angriffsZiel, _verteidigerRichtungVector, _verteidigerRichtung, _typleListDefenders, _verteidigerSide, _verteidigerAnzahl, _angriffsDistanz, _verteidigerFahrzeugAbstand, _verteidigerGefechtsstreifenBreite, _linieSturmAngriff, _angriffsZiel, false, true]
 	] call CBA_fnc_waitUntilAndExecute;
 };/* Sets random weather */
 AK_fnc_randomWeather = {

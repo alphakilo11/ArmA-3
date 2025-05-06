@@ -1,4 +1,24 @@
 AK_fnc_quickBattle = {
+	/* ----------------------------------------------------------------------------
+	Function: AK_fnc_quickBattle
+
+	Description:
+		Quickly set-up a large battle
+		
+	Parameters:
+		["_selection", "_debug", "_angreiferAnzahl", "_verteidigerAnzahl", "_angreiferGefechtsstreifenBreite", "_verteidigerGefechtsstreifenBreite"]
+	Returns:
+		NIL
+
+	Example:
+		(begin example)
+			[curatorSelected, true, 44, 10, 1000, 1000] spawn AK_fnc_quickBattle;    
+		(end)
+
+	Author:
+		AK
+
+---------------------------------------------------------------------------- */
 	// HEADSUP if you select vehicles on the map you get the groups, if you select them in 3D than you get all units (including each crewmember)
 	   // ENHANCE how to determine attacker side? currently I use an empty vehicle
 	   // ENHANCE defaults for params
@@ -82,7 +102,7 @@ AK_fnc_quickBattle = {
 			referenceAttacker = nil;
 			_this call AK_fnc_attack;
 		},
-		[_angreiferSpawnPosAnchor, _angriffsRichtungVector, _angriffsRichtung, _typleListAttackers, _angreiferSide, _angreiferAnzahl, _angriffsDistanz, _angreiferFahrzeugAbstand, _angreiferGefechtsstreifenBreite, _linieSturmAngriff, _angriffsZiel, true]
+		[_angreiferSpawnPosAnchor, _angriffsRichtungVector, _angriffsRichtung, _typleListAttackers, _angreiferSide, _angreiferAnzahl, _angriffsDistanz, _angreiferFahrzeugAbstand, _angreiferGefechtsstreifenBreite, _linieSturmAngriff, _angriffsZiel, true, true]
 	] call CBA_fnc_waitUntilAndExecute;
 
 	   // spawn defenders
@@ -95,6 +115,6 @@ AK_fnc_quickBattle = {
 			referenceDefender = nil;
 			_this call AK_fnc_attack;
 		},
-		[_angriffsZiel, _verteidigerRichtungVector, _verteidigerRichtung, _typleListDefenders, _verteidigerSide, _verteidigerAnzahl, _angriffsDistanz, _verteidigerFahrzeugAbstand, _verteidigerGefechtsstreifenBreite, _linieSturmAngriff, _angriffsZiel, false]
+		[_angriffsZiel, _verteidigerRichtungVector, _verteidigerRichtung, _typleListDefenders, _verteidigerSide, _verteidigerAnzahl, _angriffsDistanz, _verteidigerFahrzeugAbstand, _verteidigerGefechtsstreifenBreite, _linieSturmAngriff, _angriffsZiel, false, true]
 	] call CBA_fnc_waitUntilAndExecute;
 };
