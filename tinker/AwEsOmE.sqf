@@ -42,3 +42,33 @@ _unit call BIS_fnc_diagBulletCam;
 		systemChat format ["%1 killed %2 at %3 m", _killer, _unit, _unit distance _killer];
 	}];
 } forEach allUnits;
+
+
+// Create matching smoke at the position of each group leader
+private _smokeColors = [
+	[west, "SmokeShellBlue"],
+	[east, "SmokeShellRed"],
+	[resistance, "SmokeShellGreen"],
+	[civilian, "SmokeShellWhite"]
+];
+// Function to get the smoke color based on the side
+private _getSmokeColor = {
+	params ["_side"];
+	private _color = "SmokeShell";
+	{
+		if (_side isEqualTo (_x select 0)) exitWith {
+			_color = _x select 1;
+		};
+	} forEach _smokeColors;
+	_color
+};
+// Get all group leaders
+private _groupLeaders = [];
+{_groupLeaders pushBack leader _x} forEach allGroups;
+// Loop through each group leader and spawn a smoke grenade
+{
+	private _leader = _x;
+	private _side = side _leader;
+	private _smokeType = _side call _getSmokeColor;
+	_smokeType createVehicle (getPos _leader);
+} forEach _groupLeaders;
