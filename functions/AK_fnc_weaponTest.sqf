@@ -138,7 +138,7 @@ AK_fnc_weaponTest = {
 		[str (toJSON _resultCache), "AK_fnc_weaponTest trial summary"] call CBA_fnc_debug;
 		
 	} else {diag_log "WARNING AK_fnc_weaponTest: target or shooter count missmatch. Check if all targets and shooters have been created properly."};
-				//cleanup
+	//cleanup
 	{deleteVehicle _x} forEach allUnits;
 	{deleteVehicle _x} forEach allDead;
 	{deleteVehicle _x} forEach vehicles;

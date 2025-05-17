@@ -197,3 +197,28 @@ onEachFrame {
 			systemChat str cursorObject
 		};
 	};
+
+
+// Get all magazines in the vehicle
+private _vehicle = vehicle player;
+private _magazines = magazines _vehicle;
+
+// Remove all magazines except smoke shells
+{
+    private _magazineClass = _x;
+    private _isSmokeShell = {
+        params ["_magazineClass"];
+        private _config = configFile >> "CfgMagazines" >> _magazineClass;
+        private _displayName = getText (_config >> "displayName");
+        private _description = getText (_config >> "descriptionShort");
+        
+        // Check if magazine contains "smoke" in either display name or description
+        ("SMOKE" in toUpper _displayName) || 
+        ("SMOKE" in toUpper _description) ||
+        ("smoke_" in toLower _magazineClass)
+    };
+
+    if !(_magazineClass call _isSmokeShell) then {
+        _vehicle removeMagazine _x;
+    };
+} forEach _magazines;
