@@ -8,16 +8,7 @@ HEADSUP
 BUGS 
  SPE vehicles that are gradually destroyed by ammo fires may not be detected. 
  _firerPos is not consistant with where the bullet actually starts 
-REQUIRES  
-  (vehicle player) addEventHandler ["Fired", {   
- [_this,   
-  [  
-   diag_tickTime, // shotTime  
-   getPosASL (_this select 6), // shooter position  
-   velocity (_this select 6) // V0  
-  ]  
- ] call AK_fnc_ballisticData;  
- }]; 
+
 EXAMPLE 1
 {
 (_x) addEventHandler ["Fired", { 
