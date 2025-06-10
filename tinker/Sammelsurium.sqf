@@ -5,6 +5,7 @@ _vehicleTypes = [];
 } forEach (curatorSelected select 0);
 _vehicleTypes;
 
+
 /* a function that spawns random vehicles from  given array of types and let's them patrol an area 
 	 
 	Area Array format: [centre, a, b, angle, isRectangle, c] 
@@ -25,7 +26,6 @@ AK_fnc_VehiclesPatrolArea = {
 		  [(_spawned select 2), [_spawnPos, _searchRadius, _searchRadius, 0, true], 'Relaxed'] call CBA_fnc_taskSearchArea; // [[1000, 1000, 0], 1000, 1000, 0, true]
 	};
 };
-
 // _vehicleTypes = ["rhs_t14_tv", "rhs_t72ba_tv", "rhs_t72bb_tv", "rhs_t72bc_tv", "rhs_t72bd_tv", "rhs_t72be_tv", "rhs_t80", "rhs_t80a", "rhs_t80b", "rhs_t80bk", "rhs_t80bv", "rhs_t80u", "rhs_t80u45m", "rhs_t80ue1", "rhs_t80uk", "rhs_t80um", "rhs_t90_tv", "rhs_t90a_tv", "rhs_t90am_tv", "rhs_t90saa_tv", "rhs_t90sab_tv", "rhs_t90sm_tv", "rhs_bmp1_tv", "rhs_bmp1d_tv", "rhs_bmp1k_tv", "rhs_bmp1p_tv", "rhs_bmp2e_tv", "rhs_bmp2_tv", "rhs_bmp2d_tv", "rhs_bmp2k_tv", "rhs_brm1k_tv", "rhs_prp3_tv", "rhs_t15_tv", "rhs_2s1_at_tv", "rhs_2s3_at_tv", "rhs_btr80a_msv", "rhs_btr80_msv", "rhs_btr70_msv", "rhs_btr60_msv", "RHS_BM21_MSV_01", "rhs_bmp3_msv", "rhs_bmp3_late_msv", "rhs_bmp3m_msv", "rhs_bmp3mera_msv", "rhs_Ob_681_2", "RHS_ZU23_MSV", "rhs_SPG9M_MSV", "rhs_Kornet_9M133_2_msv", "rhs_Metis_9k115_2_msv", "rhs_9k79", "rhs_9k79_K", "rhs_9k79_B", "rhs_bmd1", "rhs_bmd1k", "rhs_bmd1p", "rhs_bmd1pk", "rhs_bmd1r", "rhs_bmd2", "rhs_bmd2k", "rhs_bmd2m", "rhs_bmd4_vdv", "rhs_bmd4m_vdv", "rhs_bmd4ma_vdv", "rhs_sprut_vdv", "rhs_gaz66_zu23_vdv", "RHS_Ural_Zu23_VDV_01", "rhs_pts_vmf", "rhs_zsu234_aa"]; 
 _vehicleTypes = [];
 {
@@ -37,6 +37,7 @@ _vehicleTypes = [];
 } forEach ("true" configClasses (configFile >> "CfgVehicles"));
 [[15000, 20000, 0], 1000, 31, _vehicleTypes, east, 200] spawn AK_fnc_VehiclesPatrolArea;
 // [[13000, 20000, 0], 1000, 31, _vehicleTypes, west, 200] spawn AK_fnc_VehiclesPatrolArea;
+
 
 // equipping the player with a random primary weapon
 [] spawn {
@@ -54,42 +55,47 @@ _vehicleTypes = [];
 	player addWeapon _candidateWeapon;
 };
 
+
 // switch through and fire all available weapons
 [] spawn {
+	_subject = unlucky;
+	_target = target;
+	group _subject setBehaviour "AWARE"; // AI will not fire when "SAFE"
 	_weaponsArray = 'getNumber (_x >> "ACE_barrelLength") > 0' configClasses (configFile >> "CfgWeapons");
 	_testWeapons = [];
-	for "_i" from 0 to 9 do {
+	for "_i" from 1 to 10 do {
 		_candidate = selectRandom _weaponsArray;
 		_mags = (_candidate >> "magazines") call BIS_fnc_getCfgDataArray;
 		if (count _mags > 0) then {
 			_testWeapons pushBack _candidate;
 		};
 	};
-	_testWeapons = _weaponsArray;
+	//_testWeapons = _weaponsArray;
 	_counter = 0;
 	{
 		// select a random weapon and its magazine from the array 
 		_candidateWeapon = _x;
-		_magazine = ((_candidateWeapon >> "magazines") call BIS_fnc_getCfgDataArray) select 0;
+		_magazine = [configName _candidateWeapon] call bis_fnc_compatibleMagazines select 0;
 		_fireMode = (getArray (_candidateWeapon >> "modes")) select 0;
 
-		// Assign the random weapon and magazine to the player
+		// Assign the random weapon and magazine to the subject
 		_candidateWeapon = configName _candidateWeapon;
-		player addMagazine _magazine;
-		player addWeapon _candidateWeapon;
-
+		_subject addWeapon _candidateWeapon;
+		_subject addPrimaryWeaponItem _magazine; // Load mag into weapon
 		// Wait for a short moment to ensure the weapon is equipped 
+		
+		_subject selectWeapon _candidateWeapon;
+		_subject doTarget _target;
 		sleep 2;
-
-		// Force the player to fire the weapon 
-		player selectWeapon _candidateWeapon;
-		player forceWeaponFire [_candidateWeapon, _fireMode];
+		_subject forceWeaponFire [_candidateWeapon, _fireMode];
 
 		_counter = _counter + 1;
 		systemChat format ["%1 weapons fired. %2 to go.", _counter, count _testWeapons - _counter];
 	} forEach _testWeapons;
 	systemChat str count _testWeapons;
 };
+
+
 
 // creating multiple groups 
 _spacing = 316;
@@ -107,6 +113,7 @@ for "_x" from 0 to 1 do {
 };
 _groupList
 
+
 // Versuch objecte im Visier des Spieler zu identifizieren
 onEachFrame {
 	_facingPosition = screenToWorld [0.5, 0.5];
@@ -116,6 +123,7 @@ onEachFrame {
 	};
 	hintSilent format ["%1 %2", _relevantObjects, _facingPosition];
 };
+
 
 // drawLine3D experiment
 AK_var_drawline = true;
@@ -131,78 +139,84 @@ onEachFrame {
 			       // drawLine3D [_startPoint, _endPoint, [1, 0, 0, 1]];
 		};
 	};
+};
 
-	// Hashmap experiment
-	private _myHashMap = createHashMap;
 
-	_myHashMap set ["key1", []];
-	player setVariable ["testhashmap", _myHashMap];
+// Hashmap experiment
+private _myHashMap = createHashMap;
 
-	_retrievedMap = player getVariable ["testhashmap", ""];
-	_retrievedArray = _retrievedMap get "key1";
-	_retrievedArray pushBack 42;
-	_retrievedMap set ["key1", _retrievedArray];
-	player setVariable ["testhashmap", _retrievedMap];
+_myHashMap set ["key1", []];
+player setVariable ["testhashmap", _myHashMap];
 
-	_jodesisdiemap = player getVariable ["testhashmap", ""];
-	_jodesisdiemap get "key1"
+_retrievedMap = player getVariable ["testhashmap", ""];
+_retrievedArray = _retrievedMap get "key1";
+_retrievedArray pushBack 42;
+_retrievedMap set ["key1", _retrievedArray];
+player setVariable ["testhashmap", _retrievedMap];
 
-	// creating a target and experimenting with "Dammaged" EventHandler
-	_target = 'C_man_p_beggar_F' createVehicle (player getPos [500, direction player]);
+_jodesisdiemap = player getVariable ["testhashmap", ""];
+_jodesisdiemap get "key1"
 
-	_target addEventHandler ["Dammaged", {
-		params ["_unit", "_selection", "_damage", "_hitIndex", "_hitPoint", "_shooter", "_projectile"];
-		AK_var_testData pushBack _this;
-	}];
 
-	// FPS aufzeichnen
-	AK_fnc_recordFPS = {
-		[{
-			if (isNil "AK_object_dataVAult") then {
-				[] call AK_fnc_dataVaultInitialize;
-			};
-		}] remoteExec ["call", 2];
-	};
+// creating a target and experimenting with "Dammaged" EventHandler
+_target = 'C_man_p_beggar_F' createVehicle (player getPos [500, direction player]);
 
-	(allVariables AK_object_dataVAult) select {
-		"datavaultofnetid" in _x
-	};
+_target addEventHandler ["Dammaged", {
+	params ["_unit", "_selection", "_damage", "_hitIndex", "_hitPoint", "_shooter", "_projectile"];
+	AK_var_testData pushBack _this;
+}];
 
-	// creating a grid of groups
-	for "_x" from 0 to 14 do {
-		for "_y" from 0 to 7 do {
-			_group = [[_x * 1000, _y * 1000, 0], west, 8] call BIS_fnc_spawnGroup;
-			_group deleteGroupWhenEmpty true;
-			[_group] call CBA_fnc_taskPatrol;
+
+// FPS aufzeichnen
+AK_fnc_recordFPS = {
+	[{
+		if (isNil "AK_object_dataVAult") then {
+			[] call AK_fnc_dataVaultInitialize;
 		};
+	}] remoteExec ["call", 2];
+};
+
+(allVariables AK_object_dataVAult) select {
+	"datavaultofnetid" in _x
+};
+
+
+// creating a grid of groups
+for "_x" from 0 to 14 do {
+	for "_y" from 0 to 7 do {
+		_group = [[_x * 1000, _y * 1000, 0], west, 8] call BIS_fnc_spawnGroup;
+		_group deleteGroupWhenEmpty true;
+		[_group] call CBA_fnc_taskPatrol;
 	};
+};
 
-	onEachFrame {
-		hintSilent str (round diag_fps)
-	}
+onEachFrame {
+	hintSilent str (round diag_fps)
+}
 
-	// delete dead vehicles
-	{
-		deleteVehicle _x;
-	} forEach allDeadMen;
 
-	// drawing 3D lines and different methods to get what the player is looking at
-	AK_var_drawline = true;
-	onEachFrame {
-		if (AK_var_drawline == true) then {
-			// drawLine3D [ASLToAGL eyePos player, ASLToAGL eyePos unlucky, [1, 0, 0, 1]];
-			       // drawLine3D [getPos player, getPos cursorTarget, [1, 1, 1, 1]];
-			_endPoint = screenToWorld [0.5, 0.5];
-			drawLine3D [ASLToAGL eyePos player, _endPoint, [1, 0, 0, 1]];
-			systemChat str cursorObject
-		};
+// delete dead vehicles
+{
+	deleteVehicle _x;
+} forEach allDeadMen;
+
+
+// drawing 3D lines and different methods to get what the player is looking at
+AK_var_drawline = true;
+onEachFrame {
+	if (AK_var_drawline == true) then {
+		// drawLine3D [ASLToAGL eyePos player, ASLToAGL eyePos unlucky, [1, 0, 0, 1]];
+				// drawLine3D [getPos player, getPos cursorTarget, [1, 1, 1, 1]];
+		_endPoint = screenToWorld [0.5, 0.5];
+		drawLine3D [ASLToAGL eyePos player, _endPoint, [1, 0, 0, 1]];
+		systemChat str cursorObject
 	};
+};
 
 
 // Get all magazines in the vehicle
 private _vehicle = vehicle player;
 private _magazines = magazines _vehicle;
-
 // Remove all magazines except smoke shells
 {
     private _magazineClass = _x;
@@ -222,3 +236,39 @@ private _magazines = magazines _vehicle;
         _vehicle removeMagazine _x;
     };
 } forEach _magazines;
+
+
+// shows gun elevation relative to world in mil
+onEachFrame {
+	_vehicle = vehicle player;
+	private _weaponDir = _vehicle vectorModelToWorld (_vehicle weaponDirection (currentWeapon _vehicle)); 
+	private _elevationAngle = asin (_weaponDir select 2);
+	hintSilent str round (_elevationAngle / 360 * 6400); 
+};
+
+
+// player stats
+((getPlayerScores player) select 0); // Infantry kills
+AK_testEventHandler = (vehicle player) addEventHandler ["Fired", { 
+	params ["_unit", "_weapon", "_muzzle", "_mode", "_ammo", "_magazine", "_projectile", "_gunner"];
+	//diag_log str (_unit getVariable "AK")
+	_unitStats = _unit getVariable ["AK_unitStats", 0];
+	if ((typeName _unitStats) != "HASHMAP") then {
+		_unitStats = createHashMap;
+	};
+	_keyString = str (_weapon + ', ' + _ammo);
+	_shotCount = _unitStats getOrDefault [_keyString, 0];
+	_shotCount = _shotCount + 1;
+	_unitStats set [_keyString, _shotCount];
+	_unit setVariable ["AK_unitStats", _unitStats];
+	systemChat str this;
+	systemChat str [_weapon,_ammo, _shotCount];
+	_projectile addEventHandler ["HitPart", { 
+		 params ["_projectile", "_hitEntity", "_projectileOwner", "_pos", "_velocity", "_normal", "_components", "_radius" ,"_surfaceType", "_instigator"];
+		 [str _this] call CBA_fnc_log; 
+	}];
+	AK_var_trackedProjectile = _projectile;
+	onEachFrame {hintSilent str [round vectorMagnitude velocity AK_var_trackedProjectile, round (getPosASL AK_var_trackedProjectile select 2)]};
+}]; 
+
+
