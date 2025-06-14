@@ -272,3 +272,74 @@ AK_testEventHandler = (vehicle player) addEventHandler ["Fired", {
 }]; 
 
 
+// BULLETCAM
+//(vehicle player) call BIS_fnc_diagBulletCam; 
+//[vehicle player] call CBA_fnc_addUnitTrackProjectiles;
+(vehicle player) addEventHandler ["Fired", {
+	_null = _this spawn {
+		_missile = _this select 6;
+		_cam = "camera" camCreate (position player);
+		_cam cameraEffect ["External", "Back"];
+		// Launch sequence
+		_cam camSetTarget _missile;
+		_cam camSetRelPos [-10,-10 - 10 * (vectorMagnitude velocity _missile / 150),5];// artillery [-20, -50, 20]; // missiles [-10, -25, 10]
+		_cam camCommit 0;
+		systemChat str (vectorMagnitude velocity _missile);
+		sleep 3.5;
+		if (vectorMagnitude velocity (_this select 6) > 333) exitWith {
+			systemChat "The camera is not suited for projectiles faster than 333 m/s";
+			_cam cameraEffect ["Terminate", "Back"];
+			camDestroy _cam;
+		};
+		while {true} do {
+			if (isNull _missile) exitWith {};
+			// inflight
+			_cam camSetTarget _missile;
+			_cam camSetRelPos [-100 * (vectorMagnitude velocity _missile / 330),300 * (vectorMagnitude velocity _missile / 330),0];// artillery [-20, -50, 20]; // missiles [-10, -25, 10]
+			_cam camCommit 0;
+			sleep (900 / ((vectorMagnitude velocity _missile) + 1));
+		};
+		sleep 7;
+		_cam cameraEffect ["Terminate", "Back"];
+		camDestroy _cam;
+		};
+}];
+
+
+// provide basic info about MPKilled events
+// if remote controlling a unit, the controller will be the instigator
+// will not work for explosives
+//HEADSUP this function uses allDead. As soon es corpses are deleted, the data will be incorrect.
+//HEADSUP Scores are wiped, as soon as the function is called.
+AK_var_killdistances = [];
+AK_hitcounter = 0;
+AK_StatsIteration = 1;
+{
+	if (_x getVariable ["AK_var_StatsActive", 0] != AK_StatsIteration) then {
+		_x setVariable ["AK_var_StatsActive", AK_StatsIteration];
+		_x addMPEventHandler ["MPKilled", {
+			params ["_unit", "_killer", "_instigator", "_useEffects"];
+			private _ammoType = currentMagazine _killer;
+			private _actualKiller = _instigator;
+			if (_killer isKindOf "CAManBase") then {_actualKiller = _killer};
+			private _tatWaffe = currentMuzzle _actualKiller;
+			if (_actualKiller isKindOf "UAV") then {_tatWaffe = currentMuzzle _killer}; // HEADSUP will not work for all UAVs (UGV, Falcon)
+			private _distance = _unit distance _actualKiller;
+			if (_distance < 1) exitWith {}; // killed by vehicle explosion 
+			diag_log format ["%1, %2", diag_tickTime, _this];
+			//systemChat format ["%1, %2, %3", _unit, _killer, _instigator];
+			systemChat format ["%1 killed %2 at %3 m using %4 with %5", _actualKiller, _unit, _distance, _tatWaffe, _ammoType]; // distances and the weapon are just approximations (a soldier might fire an ATGM and switch back to his rifle before it hits the target)
+			AK_var_killdistances pushBack _distance;
+		}];
+		/* DISABLED
+		_x addMPEventHandler ["MPHit", { 
+			params ["_unit", "_causedBy", "_damage", "_instigator"]; // soldier: _instigator will be "zeus" if a unit is remote controlled
+			systemChat format ["%2 or %4 hit %1 using %5 with %6 causing %3 damage.", _unit, _causedBy, _damage, _instigator, currentMuzzle _causedBy, currentMagazine _causedBy];
+			AK_hitcounter = AK_hitcounter + 1;
+			hintSilent format ["%1 hits, %2 kills, %3 average hits/kill", AK_hitcounter, count allDead,  AK_hitcounter / count allDead];
+		}];
+		*/
+	};
+} forEach allUnits;
+
+
