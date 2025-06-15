@@ -9,14 +9,14 @@
 // Hints: Flagpoles might be teleporters, Look for (ACE)Arsenals in ammo vehicles/crates 
 
 // set Global&JIP viewDistance (0.0142 ms)
-5500 remoteExec ["setviewDistance", -2, "Viewdistance"];
-5500 remoteExec ["setObjectViewDistance", -2, "Objectdistance"];
-2 remoteExec ["setTerrainGrid", -2, "Terraingrid"];
+[{
+	_distance =  4000;
+	setViewDistance _distance;
+	setObjectViewDistance _distance;
+	setTerrainGrid  (5000^2 / (5000/_distance * _distance^2));
+	setDate [systemTime select 0, systemTime select 1, systemTime select 2, (systemTime select 3), systemTime select 4];
+}] remoteExec ["call", 0, "timeandViewDistance"];
 
-// set real time (0.0789 ms)
-{
-	[[(missionStart select [0, 5]), time] call BIS_fnc_calculateDateTime, true, true] call BIS_fnc_setDate;
-} remoteExec ["call", 2];
 
 // get IDs and check FPS once a minute
 AK_handle_fps = [{

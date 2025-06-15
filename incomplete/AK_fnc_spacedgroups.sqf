@@ -29,7 +29,15 @@
 // TODO setSkill
 
 AK_fnc_spacedgroups = {
-	params [["_side", west], ["_number", 1, [0]], ["_type", (configFile >> "CfgGroups" >> "East" >> "OPF_F" >> "Infantry" >> "OIA_InfSquad")], ["_spawnpos", [], [[]]], ["_destpos", [], [[]]], ["_spacing", 50, [0]], ["_behaviour", "SAFE", [""]]];
+	params [
+		["_side", west], 
+		["_number", 1, [0]], 
+		["_type", (configFile >> "CfgGroups" >> "East" >> "OPF_F" >> "Infantry" >> "OIA_InfSquad")], 
+		["_spawnpos", [], [[]]], 
+		["_destpos", [], [[]]], 
+		["_spacing", 50, [0]], 
+		["_behaviour", "SAFE", [""]]
+	];
 
 	private ["_xPos", "_yPos", "_spawnedgroups"];
 
