@@ -1,3 +1,4 @@
+AK_fnc_ballisticData = {
 /*
 Collect ballistic data.
 The data is saved to localNamespace as variable named str _projectile. It includes following data:
