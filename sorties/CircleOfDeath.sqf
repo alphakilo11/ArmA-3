@@ -80,7 +80,14 @@ for "_i" from 1 to (round diag_fps) do {
 	private _waypoint = _group addWaypoint [getPos leader _group, 0]; 
 	_waypoint setWaypointType "CYCLE"; 
 	*/  
-}; 
+};
+/* use this?
+{
+  {
+    if (waypointPosition _x isEqualTo [0,0,0]) then { deleteWaypoint _x };
+  } forEachReversed waypoints _x;
+} forEach allGroups;
+*/
 /* DISABLED 
 [_spawnCenter, _spawnRadius] spawn { 
 	params ["_spawnCenter", "_spawnRadius"]; 
