@@ -10,5 +10,6 @@ AK_fnc_transferAItoServer = {
 			!isPlayer (leader _x)
 		});
 		[format ["%1 groups have been transfered to the server.", _transferCounter]] remoteExec ['hint', 0];
+	_transferCounter
 	}] remoteExec ['call', 2];
 };
