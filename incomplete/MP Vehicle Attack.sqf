@@ -35,7 +35,7 @@
 			[_position, (_position getDir _marschziel), _type, _gruppe] call BIS_fnc_spawnVehicle;
 		};
 
-		_gruppe addWaypoint [_marschziel, 500];
+		_gruppe addWaypoint [_marschziel, _radius];
 
 		_gruppe setSpeedMode "FULL"
 	};
