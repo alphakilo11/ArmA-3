@@ -94,7 +94,8 @@ def fetch_current_worldName(folderpath):
 
 def request_current_weather(lat, lon):
     import requests
-    API_key = "ed0f151785048a373d1cc3ab880c9b2a"
+    with open(r"C:\Users\krend\Downloads\Openweathermap_API_Key.txt") as file:
+        API_key = file.read()
     url = f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_key}"
     response = requests.get(url)
     if response.status_code == 200:
