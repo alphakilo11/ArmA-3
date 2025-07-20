@@ -94,7 +94,7 @@ def fetch_current_worldName(folderpath):
 
 def request_current_weather(lat, lon):
     import requests
-    with open(r"C:\Users\krend\Downloads\Openweathermap_API_Key.txt") as file:
+    with open(r"C:\Users\krend\OneDrive\Openweathermap_API_Key.txt") as file:
         API_key = file.read()
     url = f"https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&appid={API_key}"
     response = requests.get(url)
@@ -111,7 +111,7 @@ def main():
     #ENHANCE add forecast
 
     LOGFILE_FOLDER = r"C:\Users\krend\AppData\Local\Arma 3"
-    OUTPUT_FILEPATH = r"C:\Spiele\Steam\steamapps\common\Arma 3\AK_weatherdata3.sqf"
+    OUTPUT_FILEPATH = r"C:\Spiele\Steam\steamapps\common\Arma 3\AK_weatherdata2.sqf"
     MAP_DATA_FILEPATH = r"C:\Repositories\ArmA-3\data\A3_worldnames.csv"
 
     import math
