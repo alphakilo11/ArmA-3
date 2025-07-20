@@ -4,7 +4,7 @@ AK_fnc_updateWeatherfromFile = {
     Prerequisites
         CBA
         ZEN
-    *\
+    */
     private _path = "Arma 3\userconfig\myweather\weather.sqf";
     private _forced = true;
     if (fileExists _path) then {private _weatherdata = preprocessFileLineNumbers _path } else exitWith { diag_log format ["File (%1) does not exist!", _path] };
