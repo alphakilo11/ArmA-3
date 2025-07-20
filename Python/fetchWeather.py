@@ -110,7 +110,7 @@ def main():
     #ENHANCE add forecast
 
     LOGFILE_FOLDER = r"C:\Users\krend\AppData\Local\Arma 3"
-    OUTPUT_FILEPATH = r"C:\Users\krend\Documents\Arma 3\mpmissions\Zeus.IvanivkovaSummer\weatherdata.sqf"
+    OUTPUT_FILEPATH = r"C:\Spiele\Steam\steamapps\common\Arma 3\AK_weatherdata3.sqf"
     MAP_DATA_FILEPATH = r"C:\Repositories\ArmA-3\data\A3_worldnames.csv"
 
     import math
