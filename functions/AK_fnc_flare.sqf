@@ -7,14 +7,15 @@ Description:
 Parameters: 
     0: _position    - Position of flare <ARRAY>  (Default:[0, 0, 0]))
     1: _color       - Color of flare <STRING> (default: "WHITE")("WHITE", "RED", "GREEN", "YELLOW", "IR")
-    2: _height      - Height AGL <NUMBER> (default: 120) 
+    2: _height      - Height AGL <NUMBER> (default: 120)
+	3: _sinkrate	- Sinkrate <NUMBER> (default: -2)
  
 Returns: 
  NIL 
  
 Example: 
     (begin example) 
-        [player modelToWorld [0, 100, 0], "RED"] call AK_fnc_flare; 
+        [player modelToWorld [0, 100, 0], "RED", 120, -2] call AK_fnc_flare; 
     (end) 
  
 Author: 

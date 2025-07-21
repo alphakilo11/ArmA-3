@@ -343,4 +343,33 @@ AK_StatsIteration = 1;
 } forEach allUnits;
 
 
+//checks if files are accessible
+_collector = [];
+{
+    private _filepath = _x;
+    private _weatherdata = [];
+    if (fileExists _filepath) then {
+        _weatherdata = call ([preprocessFile _filepath] call CBA_fnc_convertStringCode);
+    } else {
+        _weatherdata ="File does not exist";
+    };
+    _collector pushBack _weatherdata;
+} forEach ["\@AK_weatherdata\AK_weatherdata.sqf","AK_weatherdata.sqf", "\MPMissions\AK_weatherdata_steamapps.sqf","AK_weatherdata_steamapps.sqf", "\mpmissions\AK_weatherdata_Documents.sqf", "\mpmissions\AK_weatherdata_Saved.sqf", "\mpmissions\AK_weatherdata_UserSaved.sqf"];
+_collector
 
+
+// provides data about CfgAmmo entries
+private _ammoList = ("getNumber (_x >> 'ace_rearm_caliber') >= 75" configClasses (configFile >> "CfgAmmo"));//["rhs_ammo_3of11", "rhs_ammo_3of26", "rhs_ammo_3of56", "rhs_ammo_3of69m"];
+_ammoList = _ammoList apply {configName _x};
+systemChat str (_ammoList select 5);
+private _parameters = ["ace_frag_charge", "caliber", "dangerRadiusHit", "explosionForceCoef", "explosive", "ace_rearm_caliber", "hit", "indirectHit", "suppressionRadiusHit"];
+private _collected_results = [];
+{
+    private _ammoCandidate = _x;
+    private _results = [];
+    {
+        _results pushBack (getNumber (configFile >> "CfgAmmo" >> _ammoCandidate >> _x));
+    } forEach _parameters;
+    _collected_results pushBack (_parameters createHashMapFromArray _results);
+} forEach _ammoList;
+_ammoList createHashMapFromArray _collected_results;

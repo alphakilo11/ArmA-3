@@ -1,3 +1,5 @@
+import datetime
+import logging
 from typing import Dict, List
 
 def read_csv_to_dict(file_path: str, delimiter: str = ',') -> Dict[str, List[str]]:
@@ -74,8 +76,7 @@ def find_world_name_from_bottom(file_path):
     raise ValueError("'worldName=' not found in the file.")
 
 def fetch_current_worldName(folderpath):
-    import logging
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s")
 
     try:
         latest_rpt = find_latest_rpt_file(folderpath)
@@ -103,30 +104,45 @@ def request_current_weather(lat, lon):
     else:
         print(f"Error: {response.status_code}")
         return None
+def createOuputFileName(worldName, ending):
+    current_UTC_time = datetime.datetime.now(datetime.UTC)
+    filename = f'{datetime.datetime.strftime(current_UTC_time, "%Y%m%d%H")}{"30" if current_UTC_time.minute >=30 else "00"}_{worldName.lower()}{ending}'
+    return filename
 
-def main():
+def updateWeather():
     #BUG wind probably needs 180° correction
     #MISSING fog
     #MISSING rain
     #ENHANCE add forecast
 
     LOGFILE_FOLDER = r"C:\Users\krend\AppData\Local\Arma 3"
-    OUTPUT_FILEPATH = r"C:\Spiele\Steam\steamapps\common\Arma 3\AK_weatherdata2.sqf"
+    OUTPUT_FOLDER = r"C:\Spiele\Steam\steamapps\common\Arma 3\@AK_weatherdata"
     MAP_DATA_FILEPATH = r"C:\Repositories\ArmA-3\data\A3_worldnames.csv"
+    logging.basicConfig(level=logging.CRITICAL, format="%(asctime)s - %(levelname)s - %(message)s")
+
 
     import math
+    from pathlib import Path
     from timeit import default_timer as timer
-
     start_time = timer()
-    print(f"Fetching the worldName of the running Arma 3 session...")
+    logging.info(f"Fetching the worldName of the running Arma 3 session...")
     worldName = fetch_current_worldName(LOGFILE_FOLDER)
-    print(f"{timer() - start_time} s.", end = " ")
-    print(f"worldName={worldName}.")
-    print(f"Reading map data from {MAP_DATA_FILEPATH}...")
+    logging.info(f"{timer() - start_time} s.", end = " ")
+    logging.info(f"worldName={worldName}.")
+    logging.info(f"Reading map data from {MAP_DATA_FILEPATH}...")
     map_data = read_csv_to_dict(MAP_DATA_FILEPATH, delimiter=';')
-    print(f"{timer() - start_time} s.", end = " ")
+    logging.info(f"{timer() - start_time} s.", end = " ")
+    output_filepath = rf"{OUTPUT_FOLDER}\{createOuputFileName(worldName, r"_weatherdata.sqf")}"
+    file_path = Path(output_filepath)
+    if file_path.exists() and file_path.is_file():
+        logging.warning(f"File {file_path} already exists. Skipping...")
+        return None
     print(f"Requesting current weather at {map_data[worldName]} from Openweathermap.org...")
-    current_weather = request_current_weather(*map_data[worldName][1:3])
+
+    print("HEADSUP LOCATION OVERRIDE ACTIVE")
+    current_weather = request_current_weather(47.347532, 13.209203)#(*map_data[worldName][1:3])
+
+
     print(f"{timer() - start_time} s.", end = " ")
     print(f"{current_weather['current']}")
     print(f"Extracting and converting weather data for Arma 3 use...")
@@ -134,17 +150,31 @@ def main():
     windY = current_weather['current']["wind_speed"] * math.cos(current_weather['current']["wind_deg"])
     gustX = windX if "wind_gust" not in current_weather['current'].keys() else current_weather['current']["wind_gust"] * math.sin(current_weather['current']["wind_deg"])
     gustY = windY if "wind_gust" not in current_weather['current'].keys() else current_weather['current']["wind_gust"] * math.cos(current_weather['current']["wind_deg"])
-    visibility = current_weather['current']["visibility"] #OPTIONAL  if current_weather['current']["visibility"] < 7000 else 7000 # set FFT3 view range limit for performance
+    visibility = (current_weather['current']["visibility"] if current_weather['current']["visibility"] < 7000 else 7000) # set FFT3 view range limit for performance
     clouds = current_weather['current']['clouds'] / 100
     fog = 0
     rain = 0 / 100
     precipitationType = 0 #rain
     final_string = f"['{worldName}', {windX}, {windY}, {gustX}, {gustY}, {visibility}, {clouds}, {fog}, {rain}, {precipitationType}]"
     print(f"{timer() - start_time} s.", end = " ")
-    print(f"Writing {final_string} to {OUTPUT_FILEPATH}...")
-    with open(OUTPUT_FILEPATH, 'w') as file:
-        file.write(final_string)
+    print(f"Writing {final_string} to {output_filepath}...")
+    try:
+        with open(output_filepath, 'w') as file:
+            file.write(final_string)
+    except:
+        print("WARNING: Could not write file.")
     print(f"{timer() - start_time} s.", end = " ")
     print(f'DONE!')
+    return None
+
+def main():
+    import time
+    updateWeather()
+    while True:
+        time.sleep(15)
+        updateWeather()
+        print('.', end='', flush=True) # to see that the script is still awake
+        
+
 if __name__ == '__main__':
     main()
