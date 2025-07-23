@@ -16,6 +16,7 @@ CAVEATS
 #MISSING rain
 #MISSING process METAR data
 #ENHANCE add forecast
+#ENHANCE cleanup logging
 
 AIRPORT_DATA_FILEPATH = r"C:\Repositories\ArmA-3\data\airports.csv"
 LOGFILE_FOLDER = r"C:\Users\krend\AppData\Local\Arma 3"
@@ -175,7 +176,6 @@ def haversine(lat1, lon1, lat2, lon2):
 def get_nearest_metar_free(lat: float, lon: float, icao_list):
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     best = {"dist": float("inf"), "station": None}
-    print(f"Searching {len(icao_list)} airports for the closest one.")
     logging.info(f"Searching {len(icao_list)} airports for the closest one.")
     for icao in icao_list.keys():
         
@@ -207,7 +207,7 @@ def fetch_METAR(airport_list: list) -> str:
     response.raise_for_status()
     return response.text
 
-def updateWeather(ICAO_station_data):
+def updateWeather(ICAO_station_data, map_data):
     logging.basicConfig(level=logging.CRITICAL, format="%(asctime)s - %(levelname)s - %(message)s")
 
     from pathlib import Path
@@ -216,11 +216,9 @@ def updateWeather(ICAO_station_data):
     start_time = timer()
     logging.info(f"Fetching the worldName of the running Arma 3 session...")
     worldName = fetch_current_worldName(LOGFILE_FOLDER)
-    logging.info(f"{timer() - start_time} s.", end = " ")
+    logging.info(f"{timer() - start_time} s.")
     logging.info(f"worldName={worldName}.")
-    logging.info(f"Reading map data from {MAP_DATA_FILEPATH}...")
-    map_data = read_csv_to_dict(MAP_DATA_FILEPATH, delimiter=';')
-    logging.info(f"{timer() - start_time} s.", end = " ")
+    logging.info(f"{timer() - start_time} s.")
     output_filepath = rf"{OUTPUT_FOLDER}\{createOuputFileName(worldName, r"_weatherdata.sqf")}"
     file_path = Path(output_filepath)
     if file_path.exists() and file_path.is_file():
@@ -263,14 +261,19 @@ def updateWeather(ICAO_station_data):
 
 
 def main():
+    logging.basicConfig(level=logging.CRITICAL, format="%(asctime)s - %(levelname)s - %(message)s")
+    
     import time
 
     print("AK's updateWeather Companion for Arma 3 is running.")
+    logging.info(f"Reading airport data from {AIRPORT_DATA_FILEPATH}...")
     ICAO_station_data = load_icao_latlon_from_file(AIRPORT_DATA_FILEPATH)
-    updateWeather(ICAO_station_data)
+    logging.info(f"Reading map data from {MAP_DATA_FILEPATH}...")
+    map_data = read_csv_to_dict(MAP_DATA_FILEPATH, delimiter=';')
+    updateWeather(ICAO_station_data, map_data)
     while True:
         time.sleep(15)
-        updateWeather(ICAO_station_data)
+        updateWeather(ICAO_station_data, map_data)
         print('.', end='', flush=True) # to see that the script is still awake
      
 
