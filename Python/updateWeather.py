@@ -28,6 +28,9 @@ import logging
 import math
 from typing import Dict, List
 
+def bearing_reverse(bearing):
+    return (bearing - 180) % 360
+
 def read_csv_to_dict(file_path: str, delimiter: str = ',') -> Dict[str, List[str]]:
     """
     Reads a CSV file and returns a dictionary with the first column as keys
@@ -238,10 +241,10 @@ def updateWeather(ICAO_station_data, map_data):
     # METAR is fetched but not used
     print(timer() - start_time)   
     print(f"Extracting and converting weather data for Arma 3 use...")
-    windX = -1 * (current_weather['current']["wind_speed"] * math.sin(current_weather['current']["wind_deg"]))
-    windY = -1 *(current_weather['current']["wind_speed"] * math.cos(current_weather['current']["wind_deg"]))
-    gustX = windX if "wind_gust" not in current_weather['current'].keys() else -1 * (current_weather['current']["wind_gust"] * math.sin(current_weather['current']["wind_deg"]))
-    gustY = windY if "wind_gust" not in current_weather['current'].keys() else -1 * (current_weather['current']["wind_gust"] * math.cos(current_weather['current']["wind_deg"]))
+    windX = current_weather['current']["wind_speed"] * math.sin(bearing_reverse(current_weather['current']["wind_deg"]))
+    windY = current_weather['current']["wind_speed"] * math.cos(bearing_reverse(current_weather['current']["wind_deg"]))
+    gustX = windX if "wind_gust" not in current_weather['current'].keys() else current_weather['current']["wind_gust"] * math.sin(bearing_reverse(current_weather['current']["wind_deg"]))
+    gustY = windY if "wind_gust" not in current_weather['current'].keys() else current_weather['current']["wind_gust"] * math.cos(bearing_reverse(current_weather['current']["wind_deg"]))
     visibility = (current_weather['current']["visibility"] if current_weather['current']["visibility"] < 7000 else 7000) # set FFT3 view range limit for performance
     clouds = current_weather['current']['clouds'] / 100
     fog = 0
