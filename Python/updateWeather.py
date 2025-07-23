@@ -173,19 +173,23 @@ def haversine(lat1, lon1, lat2, lon2):
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
 
 def get_nearest_metar_free(lat: float, lon: float, icao_list):
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     best = {"dist": float("inf"), "station": None}
-    for icao in icao_list:
-        try:
-            d = haversine(lat, lon, 
-                        float(icao_list[icao]["lat"]),
-                        float(icao_list[icao]["lon"]))
-            if d < best["dist"]:
-                #info = fetch(icao)
-                best = {"dist": d, "station": icao}
-        except Exception:
-            continue
+    print(f"Searching {len(icao_list)} airports for the closest one.")
+    logging.info(f"Searching {len(icao_list)} airports for the closest one.")
+    for icao in icao_list.keys():
+        
+        logging.info(f"Checking {icao}...")
+        d = haversine(lat, lon, 
+                    float(icao_list[icao]["lat"]),
+                    float(icao_list[icao]["lon"]))
+        if d < best["dist"]:
+            #info = fetch(icao)
+            best = {"dist": d, "station": icao}
+        #except Exception:
+        #    continue
     if best["station"] is None:
-        raise ValueError("No valid METAR found")
+        raise ValueError(f"No nearest airport with METAR found for {lat}, {lon}.")
     return best
 
 def fetch_METAR(airport_list: list) -> str:
@@ -222,13 +226,15 @@ def updateWeather(ICAO_station_data):
     if file_path.exists() and file_path.is_file():
         logging.warning(f"File {file_path} already exists. Skipping...")
         return None
+    current_map_lat = float(map_data[worldName][1])
+    current_map_lon = float(map_data[worldName][2])
     print(f"Requesting current weather at {map_data[worldName]} from Openweathermap.org...")
-    current_weather = request_current_weather(*map_data[worldName][1:3])
+    current_weather = request_current_weather(current_map_lat, current_map_lon)
     print(f"{timer() - start_time} s.", end = " ")
     print(f"{current_weather['current']}")
     print(timer() - start_time)
     print(f"✅ Loaded {len(ICAO_station_data)} ICAO airport entries.")
-    print(nearest_airport := get_nearest_metar_free(*map_data[worldName][1:3], ICAO_station_data))
+    print(nearest_airport := get_nearest_metar_free(current_map_lat, current_map_lon, ICAO_station_data))
     print(timer() - start_time)
     print(metar_cache := fetch_METAR([nearest_airport["station"]]).strip())
     # METAR is fetched but not used
