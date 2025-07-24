@@ -118,6 +118,9 @@ def fetch_current_worldName(folderpath):
         if "worldName=" in result_line:
             world_name = result_line.split("worldName=", 1)[1].split(', ')[0].strip()
             return world_name
+        else:
+            logging.WARNING(f"Unable to locate worldName in {latest_rpt}. Make sure, that a mission is running.")
+            return None
 
     except Exception as e:
         logging.error(f"An error occurred: {e}")
@@ -219,6 +222,8 @@ def updateWeather(ICAO_station_data, map_data):
     start_time = timer()
     logging.info(f"Fetching the worldName of the running Arma 3 session...")
     worldName = fetch_current_worldName(LOGFILE_FOLDER)
+    if worldName == None:
+        return None
     logging.info(f"{timer() - start_time} s.")
     logging.info(f"worldName={worldName}.")
     logging.info(f"{timer() - start_time} s.")
