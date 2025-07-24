@@ -160,7 +160,7 @@ def load_icao_latlon_from_file(filepath: str):
         reader = csv.DictReader(csvfile)
         for row in reader:
             icao = row["ident"].strip()
-            if len(icao) == 4 and row["type"] in ("large_airport", "medium_airport"):
+            if len(icao) == 4 and row["type"] in ("large_airport", "medium_airport", "small_airport"):
                 try:
                     lat = float(row["latitude_deg"])
                     lon = float(row["longitude_deg"])
@@ -179,12 +179,13 @@ def haversine(lat1, lon1, lat2, lon2):
         * math.cos(math.radians(lat2)) * math.sin(dlon/2)**2)
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
 
-def get_nearest_metar_free(lat: float, lon: float, icao_list):
+def get_nearest_METAR(lat: float, lon: float, icao_list, exclude_list=[]):
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     best = {"dist": float("inf"), "station": None}
     logging.info(f"Searching {len(icao_list)} airports for the closest one.")
     for icao in icao_list.keys():
-        
+        if icao in exclude_list:
+            continue
         logging.info(f"Checking {icao}...")
         d = haversine(lat, lon, 
                     float(icao_list[icao]["lat"]),
@@ -240,9 +241,15 @@ def updateWeather(ICAO_station_data, map_data):
     print(f"{current_weather['current']}")
     print(timer() - start_time)
     print(f"✅ Loaded {len(ICAO_station_data)} ICAO airport entries.")
-    print(nearest_airport := get_nearest_metar_free(current_map_lat, current_map_lon, ICAO_station_data))
-    print(timer() - start_time)
-    print(metar_cache := fetch_METAR([nearest_airport["station"]]).strip())
+    nearest_airport = get_nearest_METAR(current_map_lat, current_map_lon, ICAO_station_data)
+    metar_cache = fetch_METAR([nearest_airport["station"]]).strip()
+    airport_exclude_list = []
+    while metar_cache == "":
+        airport_exclude_list.append(nearest_airport["station"])
+        nearest_airport = get_nearest_METAR(current_map_lat, current_map_lon, ICAO_station_data, airport_exclude_list)
+        metar_cache = fetch_METAR([nearest_airport["station"]]).strip()
+    print(nearest_airport)
+    print(metar_cache)
     # METAR is fetched but not used
     print(timer() - start_time)   
     print(f"Extracting and converting weather data for Arma 3 use...")
