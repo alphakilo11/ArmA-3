@@ -242,6 +242,7 @@ def updateWeather(ICAO_station_data, map_data):
     print(timer() - start_time)
     print(f"✅ Loaded {len(ICAO_station_data)} ICAO airport entries.")
     nearest_airport = get_nearest_METAR(current_map_lat, current_map_lon, ICAO_station_data)
+    print(timer() - start_time)
     metar_cache = fetch_METAR([nearest_airport["station"]]).strip()
     airport_exclude_list = []
     while metar_cache == "":
