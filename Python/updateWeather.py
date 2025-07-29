@@ -12,7 +12,6 @@ Currently it has to be manually terminated.
 CAVEATS
     When a dedicated Server and a Client are running different worldNames on the same machine, this program might fetch the wrong Weatherdata.
 """
-#MISSING fog
 #MISSING process METAR data
 #ENHANCE add forecast
 #ENHANCE cleanup logging
@@ -214,6 +213,16 @@ def fetch_METAR(airport_list: list) -> str:
     response.raise_for_status()
     return response.text
 
+def find_ceiling(metar_string):
+    """Returns the ceiling of provided METAR string in feet or None if no ceiling was found."""
+    import re
+    pattern = re.compile(r"(BKN|OVC)(\d\d\d)")
+    match = pattern.search(metar_string)
+    if match:
+        return int(match.groups()[1]) * 100
+    else:
+        return None
+
 def updateWeather(ICAO_station_data, map_data):
     logging.basicConfig(level=logging.CRITICAL, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -252,8 +261,9 @@ def updateWeather(ICAO_station_data, map_data):
         metar_cache = fetch_METAR([nearest_airport["station"]]).strip()
     print(nearest_airport)
     print(metar_cache)
-    # METAR is fetched but not used
-    print(timer() - start_time)   
+    print(timer() - start_time)
+    print(f"Extracting relevant data from METAR...")
+    ceiling_AGL = find_ceiling(metar_cache) * 0.3048 # m
     print(f"Extracting and converting weather data for Arma 3 use...")
     current_weather_main = current_weather['current']["weather"][0]["main"].lower()
     precipitation = any(word in current_weather_main for word in ("rain", "thunderstorm", "snow"))
@@ -263,19 +273,22 @@ def updateWeather(ICAO_station_data, map_data):
     gustY = windY if "wind_gust" not in current_weather['current'].keys() else current_weather['current']["wind_gust"] * math.cos(bearing_reverse(current_weather['current']["wind_deg"]))
     visibility = (current_weather['current']["visibility"] if current_weather['current']["visibility"] < 7000 else 7000) # set FFT3 view range limit for performance
     clouds = current_weather['current']['clouds'] / 100
+    fog_altitude = 0
     if clouds > 0.5 and not precipitation: # avoid unintentional rain
+        if clouds >= 0.75:
+            fog_altitude = ceiling_AGL if ceiling_AGL else 600
         clouds = 0.5
     if "mist" in current_weather_main:
         fog = round(random.random(), 2)
     else:
-        fog = 0
+        fog = 0 if fog_altitude == 0 else 1 # consider ceiling
     if precipitation:
         rain = 1
     else:
         rain = 0
     precipitationType = 1 if "snow" in current_weather_main else 0
     lightning = 1 if "thunderstorm" in current_weather_main else 0
-    final_string = f"['{worldName}', {windX}, {windY}, {gustX}, {gustY}, {visibility}, {clouds}, {fog}, {rain}, {precipitationType}, {lightning}]"
+    final_string = f"['{worldName}', {windX}, {windY}, {gustX}, {gustY}, {visibility}, {clouds}, {fog}, {fog_altitude}, {rain}, {precipitationType}, {lightning}]"
     print(f"{timer() - start_time} s.", end = " ")
     print(f"Writing {final_string} to {output_filepath}...")
     try:
