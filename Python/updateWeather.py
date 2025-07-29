@@ -13,7 +13,6 @@ CAVEATS
     When a dedicated Server and a Client are running different worldNames on the same machine, this program might fetch the wrong Weatherdata.
 """
 #MISSING fog
-#MISSING rain
 #MISSING process METAR data
 #ENHANCE add forecast
 #ENHANCE cleanup logging
@@ -26,6 +25,7 @@ OUTPUT_FOLDER = r"C:\Spiele\Steam\steamapps\common\Arma 3\@AK_weatherdata"
 import datetime
 import logging
 import math
+import random
 from typing import Dict, List
 
 def bearing_reverse(bearing):
@@ -265,7 +265,10 @@ def updateWeather(ICAO_station_data, map_data):
     clouds = current_weather['current']['clouds'] / 100
     if clouds > 0.5 and not precipitation: # avoid unintentional rain
         clouds = 0.5
-    fog = 0
+    if "mist" in current_weather_main:
+        fog = round(random.random(), 2)
+    else:
+        fog = 0
     if precipitation:
         rain = 1
     else:
