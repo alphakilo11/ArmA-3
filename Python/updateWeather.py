@@ -269,7 +269,7 @@ def updateWeather(ICAO_station_data, map_data):
         rain = 1
     else:
         rain = 0
-    precipitationType = 0 #rain
+    precipitationType = 1 if "snow" in current_weather_main else 0
     lightning = 1 if "thunderstorm" in current_weather_main else 0
     final_string = f"['{worldName}', {windX}, {windY}, {gustX}, {gustY}, {visibility}, {clouds}, {fog}, {rain}, {precipitationType}, {lightning}]"
     print(f"{timer() - start_time} s.", end = " ")
