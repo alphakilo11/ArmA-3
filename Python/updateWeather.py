@@ -278,14 +278,17 @@ def updateWeather(ICAO_station_data, map_data):
         if clouds >= 0.75:
             fog_altitude = ceiling_AGL if ceiling_AGL else 600
         clouds = 0.5
+        
     if "mist" in current_weather_main:
         fog = round(random.random(), 2)
     else:
         fog = 0 if fog_altitude == 0 else 1 # consider ceiling
+
     if precipitation:
         rain = 1
     else:
         rain = 0
+
     precipitationType = 1 if "snow" in current_weather_main else 0
     lightning = 1 if "thunderstorm" in current_weather_main else 0
     final_string = f"['{worldName}', {windX}, {windY}, {gustX}, {gustY}, {visibility}, {clouds}, {fog}, {fog_altitude}, {rain}, {precipitationType}, {lightning}]"

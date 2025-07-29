@@ -153,20 +153,21 @@ AK_fnc_attack = {
 		};
 	};
 	_spawnedGroups
-};AK_fnc_ballisticData = {
+};AK_fnc_ballisticData = {   
 /*
 Collect ballistic data.
 The data is saved to localNamespace as variable named str _projectile. It includes following data:
 [0: str _unit, 1: _weapon, 2: _muzzle, 3: _mode, 4: _ammo, 5: _magazine, 6: str _gunner, 7: _shotTime, 8: _firerPos, 9: _muzzleVelocity, 10: typeOf _unit]
 ENHANCE  
  add inflicted vehicle damage  
- add inflicted casualities  
+ add inflicted casualities 
 HEADSUP  
  after attachTo the impact marker is not reliable  
 BUGS  
  SPE vehicles that are gradually destroyed by ammo fires may not be detected.  
  _firerPos is not consistant with where the bullet actually starts  
- 
+PONDER
+    use systemTimeUTC or diag_tickTime? diag_tickTime is 2.6x faster but the former provides more granularity in logging 
 EXAMPLE 1 
 { 
 _x addEventHandler ["Fired", {  
@@ -272,7 +273,8 @@ END EXAMPLE 1
   _submunitionKeys = ["Function", "Event Handler", "Projectile", "submunitionProjectile", "Position", "Velocity", "tickTime"]; 
   _submunitionValues = ["AK_fnc_ballisticData", "SubmunitionCreated", _projectile, _submunitionProjectile, _pos, _velocity, diag_tickTime]; 
   _submunitionMessage = _submunitionKeys createHashMapFromArray _submunitionValues; 
-  diag_log text (toJSON _submunitionMessage); 
+  diag_log text (toJSON _submunitionMessage);
+  if (AK_switch_ballisticDataDebug == true) then {systemChat toJSON _submunitionMessage};  
  }]; 
  _projectile addEventHandler ["Explode", {  
   params ["_projectile", "_pos", "_velocity"];
@@ -312,14 +314,15 @@ END EXAMPLE 1
         private _deletePos = getPos _projectile; 
         private _shotDistance = _deletePos distance (_projectileData select 8);
         private _timeAlive = diag_tickTime - (_projectileData select 7);
-        private _dataHashMap = ["Event", "Projectile", "TimeAlive", "Distance", "AGL", "Avg Speed"] createHashMapFromArray ["Deleted", _projectileString, _timeAlive, _shotDistance, _deletePos select 2, _shotDistance / _timeAlive];
+        private _dataHashMap = ["Function", "Event", "Projectile", "TimeAlive", "Distance", "AGL", "Avg Speed"] createHashMapFromArray ["AK_fnc_ballisticData", "Deleted", _projectileString, _timeAlive, _shotDistance, _deletePos select 2, _shotDistance / _timeAlive];
         diag_log text (toJSON _dataHashMap);
         localNamespace setVariable [_projectileString, nil];
         if (AK_switch_ballisticDataDebug == true) then {systemChat toJSON _dataHashMap}; //format ["%1 deleted at time %2", _projectile, systemTimeUTC];}; 
     }];
     private _showData = localNamespace getVariable [_projectileString, "None"];
     _showData pushBack (getNumber (configFile >> "CfgWeapons" >> (_showData select 1) >> "maxRange"));
-    private _logData = ["Unit", "Weapon", "Muzzle", "Mode", "Ammo", "Magazine", "Gunner", "Shottime", "Firer Position", "Muzzle Velocity", "Unittype", "Config maxRange"] createHashMapFromArray _showData;
+    _showData pushBack "AK_fnc_ballisticData";
+    private _logData = ["Unit", "Weapon", "Muzzle", "Mode", "Ammo", "Magazine", "Gunner", "Shottime", "Firer Position", "Muzzle Velocity", "Unittype", "Config maxRange", "Function"] createHashMapFromArray _showData;
     diag_log text toJSON _logData; 
     if (AK_switch_ballisticDataDebug == true) then {
         systemChat str _showData;
@@ -810,6 +813,71 @@ AK_fnc_createArtilleryShellWithCrater = {
     
      
 };
+AK_fnc_createPermanentCrater = {
+    /* 
+        Description: 
+            Spawns an artillery shell at a given position and deforms terrain using setTerrainHeight. 
+            Optionally damages nearby units. 
+     
+        Parameters: 
+            0: ARRAY - Position to strike [x, y, z] 
+            1: NUMBER - Depth of the crater (default: 2) 
+            2: NUMBER - Radius of crater(default: 10)
+            3: BOOL - should a generic shell be created  
+     
+        Example: 
+            [screenToWorld [0.5, 0.5], -20, 2 * 20, true, true] remoteExec ["AK_fnc_createPermanentCrater", 2];
+        
+        Enhance:
+            Create different crater decals
+            handle decals not present (eg GM)
+        Bugs:
+            Big craters are not walkable.
+            Grass is still inside the craters. (The size of the grass cutter after scaling seems to be inconsistant)
+            crater decals overlapping will cause flickering
+            watersurfaces filling deep craters have no waves
+    */ 
+     
+    params [ 
+        ["_targetPos", [0,0,0], [[]]], 
+        ["_craterdepth", 2, [0]], 
+        ["_radius", 15, [0]],
+        ["_createShell", true, [true]],
+        ["_createCraterVisuals", true, [true]] 
+    ];
+    _targetPos = [_targetPos] call TerrainLib_fnc_nearestTerrainPoint;
+     // Create explosion effect
+    if (_createShell == true) then { 
+        private _shellType = "Sh_155mm_AMOS"; //"RHS_9M79_1_F"; //"Bo_Mk82"; //"gm_rocket_luna_he_3r9_warhead"; //"Sh_155mm_AMOS"; 
+        private _shell = createVehicle [_shellType, _targetPos, [], 0, "CAN_COLLIDE"]; 
+        _shell setVelocity [0,0,-100]; 
+        _shell setVectorDirAndUp [[0, 0, -1], [1, 0, 0]];
+    };
+      
+    if (_createCraterVisuals == true) then {
+        // hide objects in radius
+        _objects = nearestTerrainObjects [ASLToAGL _targetPos, [], _radius, false];
+        { hideObjectGlobal _x } forEach _objects;
+              
+        createSimpleObject ["land_gm_nuke_crater_decal_01", _targetPos, false];      
+        /* DISABLED
+        // create permanent crater
+        
+        private _globalSimpleObject = createSimpleObject ["Crater", _targetPos, false];
+        if (_radius > 4) then {
+            _globalSimpleObject setObjectScale (_radius / 4);
+        };
+        
+        //remove grass
+        private _globalSimpleObject2 = createSimpleObject ["Land_ClutterCutter_large_F", ASLToAGL _targetPos, false]; 
+        _globalSimpleObject2 setObjectScale (_radius / 10);
+        */
+    };    
+    // Deform terrain (crater) 
+    [[_targetPos, _radius], _craterdepth, true, 1, 0, 2] call TerrainLib_fnc_addTerrainHeight;
+    
+     
+};
 /* ----------------------------------------------------------------------------  
  Function: AK_fnc_createRandomSoldier  
    
@@ -895,6 +963,44 @@ AK_fnc_createRandomSoldier = {
             };
         };
     } forEach (units _group);
+};
+AK_fnc_createWeatherFilename = {
+    /*
+     returns a string based on systemTimeUTC rounded down to half hours
+     created to be used with weather updates
+    Example
+        ['_weatherdata.sqf'] call AK_fnc_createWeatherFilename; 
+    */
+    params ["_endOfString"];
+    private _systemTimeUTC = systemTimeUTC;
+    private _filePath = "";
+    
+    AK_fnc_addLeadingZeros = {
+        params ["_inputString", "_desiredStringLength"];
+        while {count _inputString < _desiredStringLength} do {
+            _inputString = _inputString insert [0, '0'];
+        };
+        _inputString
+    };
+    
+    AK_fnc_roundDownMinutes = {
+        // rounds down to 30 minute intervals
+        params ["_value"];
+        private _result = 30;
+        if (_value < 30) then {_result = 0};
+        _result
+    };
+    
+    _filePath = _filePath +
+        str (_systemTimeUTC select 0) + 
+        ([str (_systemTimeUTC select 1), 2] call AK_fnc_addLeadingZeros) + 
+        ([str (_systemTimeUTC select 2), 2] call AK_fnc_addLeadingZeros) + 
+        ([str (_systemTimeUTC select 3), 2] call AK_fnc_addLeadingZeros) +
+        ([str ([_systemTimeUTC select 4] call AK_fnc_roundDownMinutes), 2] call AK_fnc_addLeadingZeros) +
+        '_' +
+        (toLower worldName) +
+        _endOfString;
+    _filePath
 };
 
 /* ----------------------------------------------------------------------------
@@ -1253,14 +1359,15 @@ Description:
 Parameters: 
     0: _position    - Position of flare <ARRAY>  (Default:[0, 0, 0]))
     1: _color       - Color of flare <STRING> (default: "WHITE")("WHITE", "RED", "GREEN", "YELLOW", "IR")
-    2: _height      - Height AGL <NUMBER> (default: 120) 
+    2: _height      - Height AGL <NUMBER> (default: 120)
+	3: _sinkrate	- Sinkrate <NUMBER> (default: -2)
  
 Returns: 
  NIL 
  
 Example: 
     (begin example) 
-        [player modelToWorld [0, 100, 0], "RED"] call AK_fnc_flare; 
+        [player modelToWorld [0, 100, 0], "RED", 120, -2] call AK_fnc_flare; 
     (end) 
  
 Author: 
@@ -2240,6 +2347,45 @@ AK_fnc_TypeRatio = {
 	};
 	_res
 };
+AK_fnc_updateWeatherfromFile = {
+    /*
+    Reads weather data from a file and sets it in-game using the ZEN EH. 
+    By updating the source file externally and running this function in regular intervals, it's possible to simulate "live" weather 
+    Prerequisites 
+        CBA 
+        ZEN 
+    */
+    
+    private _debug = true;
+    
+    if !(isServer) exitWith {diag_log "ERROR: AK_fnc_updateWeatherfromFile: Only the server should run this."};
+     
+    private _path = "\@AK_weatherdata\" + (['_weatherdata.sqf'] call AK_fnc_createWeatherFilename); 
+    private _forced = false; 
+    
+    if !(fileExists _path) exitWith { diag_log format ["ERROR: AK_fnc_updateWeatherfromFile: AK_fnc_updateWeatherfromFile: File (%1) does not exist!", _path]; ["ERROR: updateWeatherFromFile: File not found."] remoteExec ["hint", 0];};
+    private _weatherdata = call ([preprocessFile _path] call CBA_fnc_convertStringCode);
+    _weatherdata params ["_worldName", "_windX", "_windY", "_gustX", "_gustY", "_visibility", "_overcast", "_fog", "_fogAltitude", "_rain", "_precipitationType", "_lightning"]; 
+    if (worldName != _worldName) then {diag_log format ["WARNING: AK_fnc_updateWeatherfromFile: worldName in %1 does not match %2. Wrong weather data might be present.", _path, worldNAme]}; 
+    private _wind = [_windX, _windY, true];
+    _rainbow = 0;
+    _waves = 0;
+    _gusts = 0;
+    
+    [_visibility] remoteExec ["setViewDistance", 0, "viewDistance"];
+    [_visibility] remoteExec ["setObjectViewDistance", 0, "getObjectViewDistance"];
+    [5000^2 / (5000/_visibility * _visibility^2)] remoteExec ["setTerrainGrid", 0, "terrainGrid"];
+    
+    if (_fogAltitude != 0) then { // _fogAltitude != 0 triggers the creation of a virtual ceiling using fog with negative decay
+        private _mapHeight = getNumber (configFile >> "CfgWorlds" >> worldName >> "minHillsAltitude"); // defaults to 0 if minHilssAltitude is not set
+        0 setFog [fog, -1 * (50 / (_fogAltitude + _mapHeight)), _fogAltitude + _mapHeight]; // the required decay value depends on the fog altitude
+    } else { 0 setFog [fog, 0.1, 0];}; 
+    
+    ["ZEN_changeWeather", [_forced, _overcast, _rain, _precipitationType, _lightning, _rainbow, _waves, _wind, _gusts, _fog]] call CBA_fnc_globalEvent;
+    [str (["visibility", 'overcast', 'rain', 'precipitationType', 'lightning', 'rainbow', 'waves', 'wind', 'gusts', 'fog', "_fogAltitude"] createHashMapFromArray 
+    [_visibility, _overcast, _rain, _precipitationType, _lightning, _rainbow, _waves, [_windX, _windY] call BIS_fnc_magnitude, _gusts, _fog, _fogAltitude])] remoteExec ["hint", 0]; 
+     
+}; 
 /* ---------------------------------------------------------------------------- 
 Function: AK_fnc_weaponTest 
 Description: 
