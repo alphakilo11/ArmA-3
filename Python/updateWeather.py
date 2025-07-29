@@ -255,16 +255,22 @@ def updateWeather(ICAO_station_data, map_data):
     # METAR is fetched but not used
     print(timer() - start_time)   
     print(f"Extracting and converting weather data for Arma 3 use...")
+    current_weather_main = current_weather['current']["weather"][0]["main"].lower()
     windX = current_weather['current']["wind_speed"] * math.sin(bearing_reverse(current_weather['current']["wind_deg"]))
     windY = current_weather['current']["wind_speed"] * math.cos(bearing_reverse(current_weather['current']["wind_deg"]))
     gustX = windX if "wind_gust" not in current_weather['current'].keys() else current_weather['current']["wind_gust"] * math.sin(bearing_reverse(current_weather['current']["wind_deg"]))
     gustY = windY if "wind_gust" not in current_weather['current'].keys() else current_weather['current']["wind_gust"] * math.cos(bearing_reverse(current_weather['current']["wind_deg"]))
     visibility = (current_weather['current']["visibility"] if current_weather['current']["visibility"] < 7000 else 7000) # set FFT3 view range limit for performance
-    clouds = current_weather['current']['clouds'] / 100
+    cloud_multiplier = 1 if "rain" in current_weather_main else 0.5 # avoid unintentional rain
+    clouds = current_weather['current']['clouds'] / 100 * cloud_multiplier
     fog = 0
-    rain = 0 / 100
+    if ("rain" in current_weather_main or "thunderstorm" in current_weather_main):
+        rain = 1
+    else:
+        rain = 0
     precipitationType = 0 #rain
-    final_string = f"['{worldName}', {windX}, {windY}, {gustX}, {gustY}, {visibility}, {clouds}, {fog}, {rain}, {precipitationType}]"
+    lightning = 1 if "thunderstorm" in current_weather_main else 0
+    final_string = f"['{worldName}', {windX}, {windY}, {gustX}, {gustY}, {visibility}, {clouds}, {fog}, {rain}, {precipitationType}, {lightning}]"
     print(f"{timer() - start_time} s.", end = " ")
     print(f"Writing {final_string} to {output_filepath}...")
     try:
