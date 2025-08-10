@@ -263,7 +263,8 @@ def updateWeather(ICAO_station_data, map_data):
     print(metar_cache)
     print(timer() - start_time)
     print(f"Extracting relevant data from METAR...")
-    ceiling_AGL = find_ceiling(metar_cache) * 0.3048 # m
+    if ceiling_AGL := find_ceiling(metar_cache):
+        ceiling_AGL = ceiling_AGL * 0.3048 # m
     print(f"Extracting and converting weather data for Arma 3 use...")
     current_weather_main = current_weather['current']["weather"][0]["main"].lower()
     precipitation = any(word in current_weather_main for word in ("rain", "thunderstorm", "snow"))
