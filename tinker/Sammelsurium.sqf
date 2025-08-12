@@ -373,3 +373,36 @@ private _collected_results = [];
     _collected_results pushBack (_parameters createHashMapFromArray _results);
 } forEach _ammoList;
 _ammoList createHashMapFromArray _collected_results;
+
+
+// spawn vehicles from given mods
+_cfgArray = "((getNumber (_x >> 'scope') >= 2) && 
+ 
+  getText (_x >> 'vehicleClass') in ['Armored', 'Car', 'Air', 'Static'] 
+ 
+)" configClasses (configFile >> "CfgVehicles");
+systemChat str count _cfgArray;
+_specificVehicleList = [];
+{
+	if ("CUP" in (configName _x) or "CUP" in (configName _x)) then {
+		_specificVehicleList pushBack _x;
+	};
+} forEach _cfgArray;
+systemChat str count _specificVehicleList;
+_anchor = [23000, 18000, 0];
+_spacing = 25;
+_width = 1000;
+
+_xvalue = 0;
+_yvalue = 0;
+{
+	_pos = _anchor vectorAdd [_xvalue * _spacing, _yvalue * _spacing, 0];
+	_vehicle = configName _x;
+	_vehicle createVehicle _pos;
+	_xvalue = _xvalue + 1;
+	if (_xvalue * _spacing >= _width) then {
+		_xvalue = 0;
+		_yvalue = _yvalue + 1;
+	};
+	
+} forEach _specificVehicleList; 
