@@ -28,11 +28,13 @@ for "_i" from 1 to _number do {
 _location = [random worldSize, random worldSize, 0];
 _offset = [2000, 0, 0];
 [_number, _typeList1, _location, _location vectorAdd _offset, east, 50, "AWARE", 500, 1] spawn AK_fnc_spacedvehicles;
-[_number, _typeList2, _location vectorAdd _offset, _location, independent, 50, "AWARE", 500, 1] remoteExec ["AK_fnc_spacedvehicles", -2];
+[_number, _typeList2, _location vectorAdd _offset, _location, independent, 50, "AWARE", 500, 1] remoteExec ["AK_fnc_spacedvehicles", 2];
 
 // enable dynamic visiblity adjustment
-// AK_handle_dynVis = [{
+/* DISABLED
+ AK_handle_dynVis = [{
 	[{
 		[diag_fps, true, [1, 20, 25]] remoteExec ["AK_fnc_dynAdjustVisibility", 2];
 	}] remoteExec ["call", -2];
 }, 10] call CBA_fnc_addperFrameHandler;
+*/
