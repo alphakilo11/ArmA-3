@@ -33,7 +33,7 @@ AK_fnc_Benchmark = {
 	// parameters
 	params ["_visibility", "_vehicleTypeA", "_vehicleTypeB", "_strengthA", "_strengthB", "_logIntervall", "_battleDuration"];
 	// set the Map Data
-	private _BenchmarkMapData = createHashMapFromArray [
+	_BenchmarkMapData = createHashMapFromArray [
 		["Altis", createHashMapFromArray [
 			["curatorCamPos", [27252,21103.1,39.6024]],
 			["curatorCamDirAndUp", [[-0.970741,0.10446,-0.216445],[-0.215233,0.0231611,0.976276]]],
@@ -42,7 +42,7 @@ AK_fnc_Benchmark = {
 			["gefechtsStreifenBreite", 800]
 			]
 		],
-		["Weferlingen", createHashMapFromArray [
+		["gm_weferlingen_summer", createHashMapFromArray [
 			["curatorCamPos", [19763.5,19449.8,29.956]],
 			["curatorCamDirAndUp", [[-0.801397,-0.56934,-0.183415],[-0.149526,-0.106229,0.983031]]],
 			["sideAPos", [18000,19100,0]],
@@ -53,7 +53,7 @@ AK_fnc_Benchmark = {
 	];
 
 	// load mapData
-	private _currentMapData = _BenchmarkMapData get worldName;
+	_currentMapData = _BenchmarkMapData get worldName;
 	
 	//set weather and time
 	0 setOvercast 0;
@@ -64,8 +64,8 @@ AK_fnc_Benchmark = {
 	
 	// set camera
 	if (hasInterface == true) then {
-		curatorCamera setPos ((_BenchmarkMapData get worldName) get "curatorCamPos");
-		curatorCamera setVectorDirAndUp ((_BenchmarkMapData get worldName) get "curatorCamDirAndUp");
+		curatorCamera setPos (_currentMapData get "curatorCamPos");
+		curatorCamera setVectorDirAndUp (_currentMapData get "curatorCamDirAndUp");
 	};		
 	sleep 1;
 
