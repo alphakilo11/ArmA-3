@@ -1,6 +1,6 @@
 AK_fnc_ballisticData = {   
    
-    #define ID_HANDLE aKHabD2
+    #define ID_HANDLE aKHabD3
     AK_switch_ballisticDataDebug = false;
        
     (_this select 0) params ["_unit", "_weapon", "_muzzle", "_mode", "_ammo", "_magazine", "_projectile", "_gunner"];  
@@ -46,16 +46,6 @@ AK_fnc_ballisticData = {
     */
     hintSilent format ["HitPart: Impact Angle: %1. AA: %2", asin (_velocity vectorCos _normal), [_projectileOwner, _hitEntity] call AK_fnc_getAA]; 
  };  
-        // assign MPKilled EH to _hitEntity
-        if (_hitEntity getVariable ["AK_switch_MPKilledHandler", false] == false) then {
-            _hitEntity addMPEventHandler ["MPKilled", {
-                params ["_unit", "_killer", "_instigator", "_useEffects"];
-                _MPKValues = [str _unit, str _killer, str _instigator, str _useEffects, diag_tickTime, 'ID_HANDLE', "MPKilled"];
-                _MPKMessage = ["_unit", "_killer", "_instigator", "_useEffects", "tickTime", "ID", "Event"] createHashMapFromArray _MPKValues;
-                _MPKMessage spawn AK_fnc_logHashMap; 
-            }];
-            _hitEntity setVariable ["AK_switch_MPKilledHandler", true];
-        };    
         
       // assign "Dammaged" Event Handler to _hitEntity  
    if (_hitEntity getVariable ["AK_switch_DammagedHandler", false] == false) then {  
@@ -215,6 +205,6 @@ EXAMPLE 1
         _x setVariable ["AK_switch_ballisticData", true];
     };    
      
-} forEach allUnits;  
+} forEach (vehicles + allUnits); 
 END EXAMPLE 1  
 */
