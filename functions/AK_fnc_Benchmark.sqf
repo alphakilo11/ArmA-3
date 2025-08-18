@@ -92,7 +92,8 @@ AK_fnc_Benchmark = {
 			if (diag_tickTime < _endTime) then {
 				_fpsArray pushBack (round diag_fps);
 			} else {
-				diag_log format ["AK_fnc_Benchmark result: %1", _fpsArray];
+				_resultHashMap = LOG_ENTRY_KEY createHashMapFromArray _fpsArray;
+				[_resultHashMap] call AK_fnc_logHashMap;
 				[format ["AK_fnc_Benchmark terminated. Average FPS: %1. Average FPS 2: %2", _fpsArray call BIS_fnc_arithmeticMean, ((diag_frameno - _start_frameno) / (diag_tickTime - _startTime))]] remoteExec ["hint", 0];
 				[_handle] call CBA_fnc_removePerFrameHandler;
 			};
