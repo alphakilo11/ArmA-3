@@ -7,7 +7,7 @@
 // Version 4
 // WORKS in DS MP
 // CHANGED uiSleep to sleep (https//discordapp.com/channels/105462288051380224/105462984087728128/702843960330027098)
-_handle = [] spawn {
+_handle = [] spawn { // the _handle is pointless like this
 	feuer = 1;
 	while { feuer == 1 } do {
 		private _allHCs = entities "HeadlessClient_F";
