@@ -29,9 +29,17 @@ AK_fnc_Benchmark = {
 	  - Example vehicle pairings: "gm_ge_army_Leopard1a1a1", "gm_gc_army_t55a", "O_MBT_02_cannon_F", "B_MBT_01_cannon_F", "SPE_PzKpfwV_G","SPE_M4A3_76", "CUP_B_Challenger2_NATO", "CUP_O_T90_RU", "B_AMF_TANK_01", "B_AMF_AMX10_RCR_01_F", "vn_o_armor_t54b_01", "vn_b_armor_m48_01_02", "CSA38_ltm38_LATE2", "CSA38_lt35", "US85_M1A1", "CSLA_T72M1","rhs_t14_tv", "rhsusf_m1a2sep2wd_usarmy"
 	  - vehicles must be of beligerent sides, otherwise they will not fight.
 	*/ 
-
-	// parameters
+	LOG_ENTRY_KEY = "AK_fnc_Benchmark result"
 	params ["_visibility", "_vehicleTypeA", "_vehicleTypeB", "_strengthA", "_strengthB", "_logIntervall", "_battleDuration"];
+
+	// check estimated log entry char count
+	estCharCount = (count LOG_ENTRY_KEY) + (_battleDuration / _logIntervall) * 3 + 5;
+	if (estCharCount > 1022) then {
+		_warningMessage = format ["WARNING: The result log entry will likely exceed the char limit by around %1 chars", estCharCount - 1022];
+		systemChat _warningMessage;
+		diag_log _warningMessage;
+	}
+
 	// set the Map Data
 	_BenchmarkMapData = createHashMapFromArray [
 		["Altis", createHashMapFromArray [
