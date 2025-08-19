@@ -29,16 +29,8 @@ AK_fnc_Benchmark = {
 	  - Example vehicle pairings: "gm_ge_army_Leopard1a1a1", "gm_gc_army_t55a", "O_MBT_02_cannon_F", "B_MBT_01_cannon_F", "SPE_PzKpfwV_G","SPE_M4A3_76", "CUP_B_Challenger2_NATO", "CUP_O_T90_RU", "B_AMF_TANK_01", "B_AMF_AMX10_RCR_01_F", "vn_o_armor_t54b_01", "vn_b_armor_m48_01_02", "CSA38_ltm38_LATE2", "CSA38_lt35", "US85_M1A1", "CSLA_T72M1","rhs_t14_tv", "rhsusf_m1a2sep2wd_usarmy"
 	  - vehicles must be of beligerent sides, otherwise they will not fight.
 	*/ 
-	LOG_ENTRY_KEY = "AK_fnc_Benchmark result"
+	ID_HANDLE = "aKHaBe1";
 	params ["_visibility", "_vehicleTypeA", "_vehicleTypeB", "_strengthA", "_strengthB", "_logIntervall", "_battleDuration"];
-
-	// check estimated log entry char count
-	estCharCount = (count LOG_ENTRY_KEY) + (_battleDuration / _logIntervall) * 3 + 5;
-	if (estCharCount > 1022) then {
-		_warningMessage = format ["WARNING: The result log entry will likely exceed the char limit by around %1 chars", estCharCount - 1022];
-		systemChat _warningMessage;
-		diag_log _warningMessage;
-	}
 
 	// set the Map Data
 	_BenchmarkMapData = createHashMapFromArray [
@@ -87,19 +79,25 @@ AK_fnc_Benchmark = {
 	//record FPS
 	[
 		{
-			_this select 0 params ["_endTime", "_fpsArray", "_start_frameno", "_startTime"];
+			_this select 0 params ["_endTime", "_fpsArray", "_minfpsArray", "_start_frameno", "_startTime"];
 			_this select 1 params ["_handle"];
 			if (diag_tickTime < _endTime) then {
-				_fpsArray pushBack (round diag_fps);
+				_FPS = round diag_fps;
+				_minFPS = round diag_fpsmin;
+				_fpsArray pushBack _FPS;
+				_minfpsArray pushBack _minFPS;
+				hintSilent format ["AK_fnc_Benchmark running. %1 FPS. %2 min FPS", _FPS, _minFPS];
 			} else {
-				_resultHashMap = LOG_ENTRY_KEY createHashMapFromArray _fpsArray;
+				_resultHashMap = ["ID", "FPS"] createHashMapFromArray [ID_HANDLE, _fpsArray];
+				[_resultHashMap] call AK_fnc_logHashMap;
+				_resultHashMap = ["ID", "minFPS"] createHashMapFromArray [ID_HANDLE, _minfpsArray];
 				[_resultHashMap] call AK_fnc_logHashMap;
 				[format ["AK_fnc_Benchmark terminated. Average FPS: %1. Average FPS 2: %2", _fpsArray call BIS_fnc_arithmeticMean, ((diag_frameno - _start_frameno) / (diag_tickTime - _startTime))]] remoteExec ["hint", 0];
 				[_handle] call CBA_fnc_removePerFrameHandler;
 			};
 		},
 		_logIntervall,
-		[diag_tickTime + _battleDuration, [], diag_frameno, diag_tickTime]
+		[diag_tickTime + _battleDuration, [], [], diag_frameno, diag_tickTime]
 	] call CBA_fnc_addPerFrameHandler;
 	
 	// spawn units on server
