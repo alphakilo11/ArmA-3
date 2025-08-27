@@ -1,9 +1,11 @@
 # compatible with aKHabD1 and aKHabD2
+import A3_local_utility as arma
 from timeit import default_timer as timer
 start_time = timer()
 from datetime import datetime
 import json
 import re
+
 print(f"{timer() - start_time} finished imports")
 
 ID_PATTERN = re.compile(r'.*?aKHa(?P<function_handle>[a-zA-Z]{2})(?P<number>\d*)')
@@ -11,7 +13,7 @@ ID_PATTERN = re.compile(r'.*?aKHa(?P<function_handle>[a-zA-Z]{2})(?P<number>\d*)
 print(f"{timer() - start_time} finished static variables")
 
 
-with open(r'C:\Users\krend\AppData\Local\Arma 3\Arma3_x64_2025-08-18_09-47-02.rpt', encoding='utf-8') as file:
+with open(arma.find_latest_rpt_file(), encoding='utf-8') as file:
     data = file.readlines()
 print(f"{timer() - start_time} finished reading file.")
 cumulated_data = []

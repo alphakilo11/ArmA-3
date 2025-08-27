@@ -21,6 +21,7 @@ LOGFILE_FOLDER = r"C:\Users\krend\AppData\Local\Arma 3"
 MAP_DATA_FILEPATH = r"C:\Repositories\ArmA-3\data\A3_worldnames.csv"
 OUTPUT_FOLDER = r"C:\Spiele\Steam\steamapps\common\Arma 3\@AK_weatherdata"
 
+import A3_local_utility as arma
 import datetime
 import logging
 import math
@@ -78,17 +79,6 @@ def read_csv_to_dict(file_path: str, delimiter: str = ',') -> Dict[str, List[str
         print(f"Error reading file '{file_path}': {e}")
         raise
 
-def find_latest_rpt_file(directory):
-    """Find the most recently modified .rpt file in a directory."""
-    import glob
-    import os
-    rpt_files = glob.glob(os.path.join(directory, "*.rpt"))
-    if not rpt_files:
-        raise FileNotFoundError("No .rpt files found in the directory.")
-
-    latest_file = max(rpt_files, key=os.path.getmtime)
-    return latest_file
-
 def find_world_name_from_bottom(file_path):
     """Search for the first occurrence of 'worldName=' from the bottom of the file."""
     try:
@@ -107,13 +97,12 @@ def fetch_current_worldName(folderpath):
     logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s")
 
     try:
-        latest_rpt = find_latest_rpt_file(folderpath)
+        latest_rpt = arma.find_latest_rpt_file()
         logging.info(f"Latest .rpt file: {latest_rpt}")
 
         result_line = find_world_name_from_bottom(latest_rpt)
         logging.info(f"Found line: {result_line}")
 
-        # Optional: Extract just the world name (assuming format: "worldName=SomeWorld")
         if "worldName=" in result_line:
             world_name = result_line.split("worldName=", 1)[1].split(', ')[0].strip()
             return world_name
