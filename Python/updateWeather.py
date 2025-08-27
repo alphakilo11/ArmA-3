@@ -10,7 +10,8 @@ Companion program to inject live weather data into a running Arma 3 mission.
 Currently it has to be manually terminated.
 
 CAVEATS
-    When a dedicated Server and a Client are running different worldNames on the same machine, this program might fetch the wrong Weatherdata.
+    When a dedicated Server and a Client are running different worldNames on
+    the same machine, this program might fetch the wrong Weatherdata.
 """
 #MISSING process METAR data
 #ENHANCE add forecast
@@ -234,8 +235,8 @@ def updateWeather(ICAO_station_data, map_data):
         return None
     current_map_lat = float(map_data[worldName][1])
     current_map_lon = float(map_data[worldName][2])
-    print(f"\n{datetime.datetime.now()} Requesting current weather at \
-          {map_data[worldName]} from Openweathermap.org...")
+    print(f"\n{datetime.datetime.now()} Requesting current weather at "
+          "{map_data[worldName]} from Openweathermap.org...")
     current_weather = request_current_weather(current_map_lat, current_map_lon)
     print(f"{timer() - start_time} s.", end=" ")
     print(f"{current_weather['current']}")

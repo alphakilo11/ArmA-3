@@ -38,6 +38,4 @@ for event in cumulated_data:
 arma.print(f"{timer() - start_time} Analysis done!")
 arma.print(f"{shot_count} total shots registered.")
 arma.print(f"{kill_count} total kills registered.")
-arma.print(f"Unique shooting unittypes: {len(shooter_unittypes)}")
-
-#len(re.findall(pattern, data)))
+arma.print(f"Unique shooting unittypes: {len(shooter_unittypes)} ")

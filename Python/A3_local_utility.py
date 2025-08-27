@@ -1,5 +1,6 @@
 ARMA3_LOGFILE_DIRECTORY = r"C:\Users\krend\AppData\Local\Arma 3"
 
+
 def find_latest_rpt_file():
     """Find the most recently modified .rpt file in a directory."""
     import glob
