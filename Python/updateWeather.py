@@ -212,6 +212,7 @@ def find_ceiling(metar_string):
     else:
         return None
 
+
 def updateWeather(ICAO_station_data, map_data):
     logging.basicConfig(level=logging.CRITICAL, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -219,9 +220,9 @@ def updateWeather(ICAO_station_data, map_data):
     from timeit import default_timer as timer
 
     start_time = timer()
-    logging.info(f"Fetching the worldName of the running Arma 3 session...")
+    logging.info("Fetching the worldName of the running Arma 3 session...")
     worldName = fetch_current_worldName(LOGFILE_FOLDER)
-    if worldName == None:
+    if worldName is None:
         return None
     logging.info(f"{timer() - start_time} s.")
     logging.info(f"worldName={worldName}.")
@@ -233,9 +234,10 @@ def updateWeather(ICAO_station_data, map_data):
         return None
     current_map_lat = float(map_data[worldName][1])
     current_map_lon = float(map_data[worldName][2])
-    print(f"Requesting current weather at {map_data[worldName]} from Openweathermap.org...")
+    print(f"\n{datetime.datetime.now()} Requesting current weather at \
+          {map_data[worldName]} from Openweathermap.org...")
     current_weather = request_current_weather(current_map_lat, current_map_lon)
-    print(f"{timer() - start_time} s.", end = " ")
+    print(f"{timer() - start_time} s.", end=" ")
     print(f"{current_weather['current']}")
     print(timer() - start_time)
     print(f"✅ Loaded {len(ICAO_station_data)} ICAO airport entries.")
@@ -246,7 +248,8 @@ def updateWeather(ICAO_station_data, map_data):
     # try different airports until a METAR is fetched.
     while metar_cache == "":
         airport_exclude_list.append(nearest_airport["station"])
-        nearest_airport = get_nearest_METAR(current_map_lat, current_map_lon, ICAO_station_data, airport_exclude_list)
+        nearest_airport = get_nearest_METAR(current_map_lat,
+            current_map_lon,ICAO_station_data, airport_exclude_list)
         metar_cache = fetch_METAR([nearest_airport["station"]]).strip()
     print(nearest_airport)
     print(metar_cache)
