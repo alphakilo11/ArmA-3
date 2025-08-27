@@ -13,7 +13,7 @@ AK_fnc_spacedMovement = {
 	_destination = _this select 2;
 
 	// get the current position of the group 
-	_currentPos = getPos (leader _group);
+	_currentPos = getPosWorld (leader _group);
 
 	// Calculate the direction towards the destination 
 	_dir = _currentPos vectorFromTo _destination;
