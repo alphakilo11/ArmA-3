@@ -9,7 +9,7 @@
  */
 AK_fnc_graveDigger = {
 	{
-		private _grave = ("ACE_Grave" createVehicle getPos _x);
+		private _grave = ("Land_Grave_dirt_F" createVehicle getPosWorld _x);  // "ACE_Grave"
 		_grave setDir (getDir _x);
 		deleteVehicle _x;
 	} forEach allDeadMen;
