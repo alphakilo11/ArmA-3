@@ -63,7 +63,7 @@ from rich import print
 from rich.tree import Tree
 from timeit import default_timer as timer
 
-ID_FUNCTIONS = {"bD": "AK_fnc_ballisticData"}
+ID_FUNCTIONS = {"bD": "AK_fnc_ballisticData", "Be": "AK_fnc_Benchmark"}
 ID_HANDLE = "aKHa"
 LOGFILE_NUMBER = r'\b(?:\d+\.\d*|\.\d+|\d+)(?:[eE][+-]?\d+)?\b' # catches scientific, float and integers
 
@@ -266,124 +266,5 @@ def extract_run_data(input_filepath: str) -> dict:
     if len(marked_for_removal) > 0:
         for key in marked_for_removal:
             del run_data["Run Missiondata"][key]
-    print(f"{timer() - start_time} s.", end=" ")
+    print(f"{timer() - start_time} s extracting run data complete.")
     return (run_data)
-
-
-# # Testing
-
-# In[16]:
-
-
-if __name__ == "__main__":
-    filepath = "/content/drive/MyDrive/ArmA 3/Homebrew/Ballistik/AK_fnc_ballisticData/incoming/Arma3_x64_2025-08-19_06-53-32_aKHabD3.rpt"
-    spam = extract_run_data(filepath)
-    print(build_tree(spam))
-
-
-# In[18]:
-
-
-if __name__ == "__main__":
-    spam['Run Missiondata']["Mission 1"]["Extracted Lines"][0]["ID_HANDLE_dict"]["version_number"]
-
-
-# # Archive
-# To keep obsolete functions iot allow performance replication.
-
-# In[ ]:
-
-
-'''
-def fetch_between(text, start_marker, end_marker):
-    start_escaped = re.escape(start_marker.strip())
-    end_escaped = re.escape(end_marker.strip())
-    pattern = re.compile(
-        rf"{start_escaped}\n(.*?)(?={end_escaped})",
-        re.DOTALL
-    )
-    return re.search(pattern, text).group(1)
-
-def extract_mod_list(text):
-    """
-    Extracts all text between two long divider lines in a given string.
-
-    Returns the content in between or an empty string if not found.
-    """
-    start_marker = f"{'=' * 93} List of mods {'=' * 95}"
-    end_marker = f"{'=' * 202}"
-
-    start_index = text.find(start_marker)
-    end_index = text.find(end_marker, start_index + len(start_marker))
-
-    if start_index == -1 or end_index == -1:
-        return ""  # One or both markers not found
-
-    # Extract the content between the markers
-    return text[start_index + len(start_marker):end_index].strip()
-
-def process_mod_list(text):
-    pattern = re.compile(rf"\d\d:\d\d:\d\d (.*?)(?=\n)")
-    result = pattern.search(text)
-    return result.group(1)
-
-def extract_text_between_markers(text, start_marker, end_marker):
-    """
-    Extracts all text between two given marker strings using regular expressions.
-
-    Parameters:
-        text (str): The full input text.
-        start_marker (str): The exact start marker line.
-        end_marker (str): The exact end marker line.
-
-    Returns:
-        str: The content between the start and end markers, or an empty string if not found.
-    """
-    import re
-    # Escape the markers for safe regex use
-    start_escaped = re.escape(start_marker.strip())
-    end_escaped = re.escape(end_marker.strip())
-
-    # Build a regex pattern to match text between the markers
-    pattern = re.compile(
-        rf"{start_escaped}\n(.*?)(?={end_escaped})",
-        re.DOTALL
-    )
-
-    match = pattern.search(text)
-    return match.group(1).strip() if match else ""
-'''
-
-
-# # Performance
-
-# In[ ]:
-
-
-'''
-%%timeit
-lall = blub.split("\n")
-relevant_lines = []
-for line in lall:
-    if '"Function":"AK_fnc_ballisticData"' in line:
-        relevant_lines.append(line)
-
-%%timeit
-re.findall(r'(?<=\n).*?"Function":"AK_fnc_ballisticData".*?(?=\n)', blub)
-
-%%timeit
-rawtext.split(start_marker)[1].split(end_marker)[0]
-
-%%timeit
-extract_mod_list(rawtext)
-
-%%timeit
-extract_text_between_markers(rawtext, start_marker, end_marker)
-
-%%timeit
-fetch_between(rawtext, start_marker, end_marker)
-
-%%timeit
-all_in_one_exctract(rawtext)
-'''
-
