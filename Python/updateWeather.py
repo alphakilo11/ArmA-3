@@ -21,7 +21,7 @@ LOGFILE_FOLDER = r"C:\Users\krend\AppData\Local\Arma 3"
 MAP_DATA_FILEPATH = r"C:\Repositories\ArmA-3\data\A3_worldnames.csv"
 OUTPUT_FOLDER = r"C:\Spiele\Steam\steamapps\common\Arma 3\@AK_weatherdata"
 
-import A3_local_utility as arma
+import A3_local_utility as arma_local
 import datetime
 import logging
 import math
@@ -97,7 +97,7 @@ def fetch_current_worldName(folderpath):
     logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s")
 
     try:
-        latest_rpt = arma.find_latest_rpt_file()
+        latest_rpt = arma_local.find_latest_rpt_file()
         logging.info(f"Latest .rpt file: {latest_rpt}")
 
         result_line = find_world_name_from_bottom(latest_rpt)
