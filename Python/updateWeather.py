@@ -13,14 +13,9 @@ CAVEATS
     When a dedicated Server and a Client are running different worldNames on
     the same machine, this program might fetch the wrong Weatherdata.
 """
-#MISSING process METAR data
-#ENHANCE add forecast
-#ENHANCE cleanup logging
-
-AIRPORT_DATA_FILEPATH = r"C:\Repositories\ArmA-3\data\airports.csv"
-LOGFILE_FOLDER = r"C:\Users\krend\AppData\Local\Arma 3"
-MAP_DATA_FILEPATH = r"C:\Repositories\ArmA-3\data\A3_worldnames.csv"
-OUTPUT_FOLDER = r"C:\Spiele\Steam\steamapps\common\Arma 3\@AK_weatherdata"
+# MISSING process METAR data
+# ENHANCE add forecast
+# ENHANCE cleanup logging
 
 import A3_local_utility as arma_local
 import datetime
@@ -29,8 +24,15 @@ import math
 import random
 from typing import Dict, List
 
+AIRPORT_DATA_FILEPATH = r"C:\Repositories\ArmA-3\data\airports.csv"
+LOGFILE_FOLDER = r"C:\Users\krend\AppData\Local\Arma 3"
+MAP_DATA_FILEPATH = r"C:\Repositories\ArmA-3\data\A3_worldnames.csv"
+OUTPUT_FOLDER = r"C:\Spiele\Steam\steamapps\common\Arma 3\@AK_weatherdata"
+
+
 def bearing_reverse(bearing):
     return (bearing - 180) % 360
+
 
 def read_csv_to_dict(file_path: str, delimiter: str = ',') -> Dict[str, List[str]]:
     """
@@ -66,9 +68,10 @@ def read_csv_to_dict(file_path: str, delimiter: str = ',') -> Dict[str, List[str
                 values = row[1:]
 
                 if key in result:
-                    print(f"Warning: Duplicate key '{key}' found on row {row_number}, overwriting previous entry.")
+                    print(f"Warning: Duplicate key '{key}' found on row {row_number}, "
+                          "overwriting previous entry.")
                 if key == 'worldName':
-                    continue # skip header
+                    continue  # skip header
                 result[key] = values
 
         return result
@@ -79,6 +82,7 @@ def read_csv_to_dict(file_path: str, delimiter: str = ',') -> Dict[str, List[str
     except Exception as e:
         print(f"Error reading file '{file_path}': {e}")
         raise
+
 
 def find_world_name_from_bottom(file_path):
     """Search for the first occurrence of 'worldName=' from the bottom of the file."""
@@ -94,6 +98,7 @@ def find_world_name_from_bottom(file_path):
 
     raise ValueError("'worldName=' not found in the file.")
 
+
 def fetch_current_worldName(folderpath):
     logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -108,11 +113,13 @@ def fetch_current_worldName(folderpath):
             world_name = result_line.split("worldName=", 1)[1].split(', ')[0].strip()
             return world_name
         else:
-            logging.WARNING(f"Unable to locate worldName in {latest_rpt}. Make sure, that a mission is running.")
+            logging.WARNING(f"Unable to locate worldName in {latest_rpt}. "
+                            "Make sure, that a mission is running.")
             return None
 
     except Exception as e:
         logging.error(f"An error occurred: {e}")
+
 
 def request_current_weather(lat, lon):
     import requests
@@ -125,10 +132,13 @@ def request_current_weather(lat, lon):
     else:
         print(f"Error: {response.status_code}")
         return None
+
+
 def createOuputFileName(worldName, ending):
     current_UTC_time = datetime.datetime.now(datetime.UTC)
-    filename = f'{datetime.datetime.strftime(current_UTC_time, "%Y%m%d%H")}{"30" if current_UTC_time.minute >=30 else "00"}_{worldName.lower()}{ending}'
+    filename = f'{datetime.datetime.strftime(current_UTC_time, "%Y%m%d%H")}{"30" if current_UTC_time.minute >= 30 else "00"}_{worldName.lower()}{ending}'
     return filename
+
 
 def load_icao_latlon_from_file(filepath: str):
     """
@@ -159,14 +169,16 @@ def load_icao_latlon_from_file(filepath: str):
 
     return icao_coords
 
+
 def haversine(lat1, lon1, lat2, lon2):
     """Returns simple distance (Haversine)"""
-    R = 6371.0 # km
+    R = 6371.0  # km
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
-    a = (math.sin(dlat/2)**2 + math.cos(math.radians(lat1))
-        * math.cos(math.radians(lat2)) * math.sin(dlon/2)**2)
+    a = (math.sin(dlat/2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) *
+         math.sin(dlon/2)**2)
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+
 
 def get_nearest_METAR(lat: float, lon: float, icao_list, exclude_list=[]):
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -176,17 +188,16 @@ def get_nearest_METAR(lat: float, lon: float, icao_list, exclude_list=[]):
         if icao in exclude_list:
             continue
         logging.info(f"Checking {icao}...")
-        d = haversine(lat, lon, 
-                    float(icao_list[icao]["lat"]),
-                    float(icao_list[icao]["lon"]))
+        d = haversine(lat, lon, float(icao_list[icao]["lat"]), float(icao_list[icao]["lon"]))
         if d < best["dist"]:
-            #info = fetch(icao)
+            # info = fetch(icao)
             best = {"dist": d, "station": icao}
-        #except Exception:
+        # except Exception:
         #    continue
     if best["station"] is None:
         raise ValueError(f"No nearest airport with METAR found for {lat}, {lon}.")
     return best
+
 
 def fetch_METAR(airport_list: list) -> str:
     """Fetch METAR data"""
@@ -197,11 +208,12 @@ def fetch_METAR(airport_list: list) -> str:
         ids = airport_list[0]
     else:
         ids = "%2C".join(airport_list)
-    #try:
+    # try:
     url = f'https://aviationweather.gov/api/data/metar?ids={ids}'
     response = requests.get(url)
     response.raise_for_status()
     return response.text
+
 
 def find_ceiling(metar_string):
     """Returns the ceiling of provided METAR string in feet or None if no ceiling was found."""
@@ -249,34 +261,44 @@ def updateWeather(ICAO_station_data, map_data):
     # try different airports until a METAR is fetched.
     while metar_cache == "":
         airport_exclude_list.append(nearest_airport["station"])
-        nearest_airport = get_nearest_METAR(current_map_lat,
-            current_map_lon,ICAO_station_data, airport_exclude_list)
+        nearest_airport = get_nearest_METAR(current_map_lat, current_map_lon, ICAO_station_data,
+                                            airport_exclude_list)
         metar_cache = fetch_METAR([nearest_airport["station"]]).strip()
     print(nearest_airport)
     print(metar_cache)
     print(timer() - start_time)
-    print(f"Extracting relevant data from METAR...")
+    print("Extracting relevant data from METAR...")
     if ceiling_AGL := find_ceiling(metar_cache):
-        ceiling_AGL = ceiling_AGL * 0.3048 # m
-    print(f"Extracting and converting weather data for Arma 3 use...")
+        ceiling_AGL = ceiling_AGL * 0.3048  # m
+    print("Extracting and converting weather data for Arma 3 use...")
     current_weather_main = current_weather['current']["weather"][0]["main"].lower()
     precipitation = any(word in current_weather_main for word in ("rain", "thunderstorm", "snow"))
-    windX = current_weather['current']["wind_speed"] * math.sin(bearing_reverse(current_weather['current']["wind_deg"]))
-    windY = current_weather['current']["wind_speed"] * math.cos(bearing_reverse(current_weather['current']["wind_deg"]))
-    gustX = windX if "wind_gust" not in current_weather['current'].keys() else current_weather['current']["wind_gust"] * math.sin(bearing_reverse(current_weather['current']["wind_deg"]))
-    gustY = windY if "wind_gust" not in current_weather['current'].keys() else current_weather['current']["wind_gust"] * math.cos(bearing_reverse(current_weather['current']["wind_deg"]))
-    visibility = (current_weather['current']["visibility"] if current_weather['current']["visibility"] < 7000 else 7000) # set FFT3 view range limit for performance
+    windX = current_weather['current']["wind_speed"] * \
+        math.sin(bearing_reverse(current_weather['current']["wind_deg"]))
+    windY = current_weather['current']["wind_speed"] * \
+        math.cos(bearing_reverse(current_weather['current']["wind_deg"]))
+    gustX = windX if "wind_gust" not in current_weather['current'].keys() else \
+        current_weather['current']["wind_gust"] * \
+        math.sin(bearing_reverse(current_weather['current']["wind_deg"]))
+    gustY = windY if "wind_gust" not in current_weather['current'].keys() else \
+        current_weather['current']["wind_gust"] * \
+        math.cos(bearing_reverse(current_weather['current']["wind_deg"]))
+    visibility = (
+        current_weather['current']["visibility"] if
+        current_weather['current']["visibility"] < 7000 else
+        7000
+    )  # set FFT3 view range limit for performance
     clouds = current_weather['current']['clouds'] / 100
     fog_altitude = 0
-    if clouds > 0.5 and not precipitation: # avoid unintentional rain
+    if clouds > 0.5 and not precipitation:  # avoid unintentional rain
         if clouds >= 0.75:
             fog_altitude = ceiling_AGL if ceiling_AGL else 600
         clouds = 0.5
-        
+
     if "mist" in current_weather_main:
         fog = round(random.random(), 2)
     else:
-        fog = 0 if fog_altitude == 0 else 1 # consider ceiling
+        fog = 0 if fog_altitude == 0 else 1  # consider ceiling
 
     if precipitation:
         rain = 1
@@ -286,21 +308,21 @@ def updateWeather(ICAO_station_data, map_data):
     precipitationType = 1 if "snow" in current_weather_main else 0
     lightning = 1 if "thunderstorm" in current_weather_main else 0
     final_string = f"['{worldName}', {windX}, {windY}, {gustX}, {gustY}, {visibility}, {clouds}, {fog}, {fog_altitude}, {rain}, {precipitationType}, {lightning}]"
-    print(f"{timer() - start_time} s.", end = " ")
+    print(f"{timer() - start_time} s.", end=" ")
     print(f"Writing {final_string} to {output_filepath}...")
     try:
         with open(output_filepath, 'w') as file:
             file.write(final_string)
     except:
         print("WARNING: Could not write file.")
-    print(f"{timer() - start_time} s.", end = " ")
-    print(f'DONE!')
+    print(f"{timer() - start_time} s.", end=" ")
+    print('DONE!')
     return None
 
 
 def main():
     logging.basicConfig(level=logging.CRITICAL, format="%(asctime)s - %(levelname)s - %(message)s")
-    
+
     import time
 
     print("AK's updateWeather Companion for Arma 3 is running.")
@@ -312,8 +334,8 @@ def main():
     while True:
         time.sleep(15)
         updateWeather(ICAO_station_data, map_data)
-        print('.', end='', flush=True) # to see that the script is still awake
-     
+        print('.', end='', flush=True)  # to see that the script is still awake
+
 
 if __name__ == '__main__':
     main()
