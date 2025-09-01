@@ -3,6 +3,7 @@
 
 import re
 from datetime import datetime
+from datetime import timedelta
 import json
 from rich import print
 from rich.tree import Tree
@@ -126,7 +127,7 @@ def extract_marked_lines(data, logfile_datetime):
         ID_data = re.match(ID_PATTERN, line)
         if ID_data:
             split_line = line.strip().split(' ')
-            if len(split_line[0]) > 0 and split_line[0][0] in [str(x) for x in range(1, 13)]:
+            if len(split_line[0]) > 0 and split_line[0][0] in [str(x) for x in range(0, 13)]:
                 try:
                     log_timestamp = datetime.strptime(split_line[0], r"%H:%M:%S")
                 except ValueError:
@@ -144,7 +145,8 @@ def extract_marked_lines(data, logfile_datetime):
                 combined_dtg = datetime.combine(logfile_datetime.date(), log_timestamp.time())
                 # Detect if the time implies a shift in day
                 if log_timestamp.time() < logfile_datetime.time():
-                    combined_dtg += datetime.timedelta(days=1)
+                    combined_dtg += timedelta(days=1)
+                    # print(f"{__name__}: Detected shift in dtg. Adjusting...{combined_dtg}")
 
                 cumulated_data.append({"Log Timestamp": combined_dtg, "data_dict": log_line_dict,
                                        "ID_HANDLE_dict": transform(ID_data.groupdict())})
