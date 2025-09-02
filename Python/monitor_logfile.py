@@ -4,13 +4,13 @@ import logging
 import A3_local_utility as arma_local
 import Arma_3_Process_rpt_file as arma
 import numpy as np
-from timeit import default_timer as timer()
+from timeit import default_timer as timer
 
 LOGFILE_FOLDER = r"C:\Users\krend\AppData\Local\Arma 3"
 FILEPATH = arma_local.find_latest_rpt_file()
-POLL_INTERVAL = 1  # in seconds
+POLL_INTERVAL = 1  # s. Don't change this, as it will break the other intervals
 CLEANUP_INTERVAL = 180
-STATS_INTERVAL = 5
+STATS_INTERVAL = 60
 START_TIME = timer()
 RUN_METADATA = arma.extract_run_data(FILEPATH)["Run Metadata"]
 
@@ -29,40 +29,50 @@ def process_log_line(line: str):
     This function defines how to process each line from the log file.
     You can customize this to send alerts, write to DB, etc.
     """
-    def projectile_summary(projectile_dict):
-        if "Parent Projectile" in projectile_dict[0].keys():
-            return "Submunition not implemented yet"
-        try:
-            shooter_pos = projectile_dict[0]["FirerPosition"]
-        except KeyError:
-            print(f"Error processing {projectile_dict[0]}. Skipping...")
-            return None
-        deleted_pos = projectile_dict[-1]["Position"]
-        total_distance = np.linalg.norm(np.array(shooter_pos) - np.array(deleted_pos))
-        report = f'Time alive: {round(projectile_dict[-1]["tickTime"] - projectile_dict[0]["tickTime"], 2)}'\
-            f'Projectile Travel: {round(total_distance)} m.'
-        return report
-
     global counter
     logging.info(f"New log line: {line.strip()}")
     log_event_dict = arma.extract_marked_lines(line, RUN_METADATA["Current_time"])
     if log_event_dict:
-        data_dict = log_event_dict[0]["data_dict"]
-        if "FirerPosition" in data_dict.keys():
+        event_info = log_event_dict[0]["data_dict"]
+        projectile_id = event_info["Projectile"]
+        if "FirerPosition" in event_info.keys():
             for key in ["Unit", "Unittype", "Weapon", "Ammo"]:
-                arma.print(f"{key}: {data_dict[key]}", end=", ")
+                arma.print(f"{key}: {event_info[key]}", end=", ")
             print()
-            pending_projectiles[data_dict["Projectile"]] = [data_dict]
+            pending_projectiles[projectile_id] = [event_info]
             counter += 1
-        elif "Event" in data_dict.keys():
-            if data_dict["Projectile"] in pending_projectiles.keys():
-                pending_projectiles[data_dict["Projectile"]].append(data_dict)
-            else:
-                pending_projectiles[data_dict["Projectile"]] = [data_dict]
+        else:
+            if "Event" in event_info.keys():
+                try:
+                    if projectile_id in pending_projectiles.keys():
+                        pending_projectiles[projectile_id].append(event_info)
+                    else:
+                        pending_projectiles[projectile_id] = [event_info]
+                except KeyError:
+                    print(f"{__name__} KeyError: {event_info}")
+                    return None
 
-            if data_dict["Event"] == "Deleted":
-                print(projectile_summary(pending_projectiles[data_dict["Projectile"]]))
-                del pending_projectiles[data_dict["Projectile"]]
+                if event_info["Event"] == "Deleted":
+                    print(projectile_summary(pending_projectiles[projectile_id]))
+                    print(pending_projectiles)
+                    del pending_projectiles[projectile_id]
+
+
+def projectile_summary(projectile_dict):
+    try:
+        shooter_pos = projectile_dict[0]["FirerPosition"]
+    except KeyError:
+        print(f"Error processing {projectile_dict[0]} in {projectile_dict}. Skipping...")
+        return None
+    deleted_pos = projectile_dict[-1]["Position"]
+    total_distance = np.linalg.norm(np.array(shooter_pos) - np.array(deleted_pos))
+    report = f'Time alive: {round(projectile_dict[-1]["tickTime"] - projectile_dict[0]["tickTime"], 2)}'\
+        f'Projectile Travel: {round(total_distance)} m.'
+    return report
+
+
+def display_stats():
+    arma.print(f"{counter} total shots fired. {len(pending_projectiles)} pending projectiles.")
 
 
 def monitor_log_file():
@@ -81,7 +91,8 @@ def monitor_log_file():
                 if line:
                     process_log_line(line)
                 else:
-                    arma.print(f"{counter} total shots fired. {len(pending_projectiles)} pending projectiles.")
+                    if (round(timer() - START_TIME)) % STATS_INTERVAL == 0:
+                        display_stats()
                     time.sleep(POLL_INTERVAL)
 
                     # Check for log rotation
