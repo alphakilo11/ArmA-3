@@ -4,12 +4,13 @@ import logging
 import A3_local_utility as arma_local
 import Arma_3_Process_rpt_file as arma
 import numpy as np
+import statistics
 from timeit import default_timer as timer
 
 LOGFILE_FOLDER = r"C:\Users\krend\AppData\Local\Arma 3"
 FILEPATH = arma_local.find_latest_rpt_file()
 POLL_INTERVAL = 1  # s. Don't change this, as it will break the other intervals
-CLEANUP_INTERVAL = 180
+CLEANUP_INTERVAL = 190
 STATS_INTERVAL = 60
 START_TIME = timer()
 RUN_METADATA = arma.extract_run_data(FILEPATH)["Run Metadata"]
@@ -54,20 +55,21 @@ def process_log_line(line: str):
                     return None
 
                 if event_type == "Deleted":
-                    print(projectile_summary(pending_projectiles[projectile_id]))
+                    arma.print(projectile_summary(pending_projectiles[projectile_id]))
                     del pending_projectiles[projectile_id]
 
 
-def projectile_summary(projectile_dict):
+def projectile_summary(projectile_cumulation: list):
+    global running_stats
     try:
-        shooter_pos = projectile_dict[0]["FirerPosition"]
+        shooter_pos = projectile_cumulation[0]["FirerPosition"]
     except KeyError:
-        print(f"Error processing {projectile_dict[0]} in {projectile_dict}. Skipping...")
+        print(f"Error processing {projectile_cumulation[0]} in {projectile_cumulation}. Skipping...")
         return None
-    deleted_pos = projectile_dict[-1]["Position"]
-    total_distance = np.linalg.norm(np.array(shooter_pos) - np.array(deleted_pos))
-    time_alive = projectile_dict[-1]["tickTime"] - projectile_dict[0]["tickTime"]
-    avg_speed = total_distance / (time_alive if time_alive > 0 else 0.01)
+    deleted_pos = projectile_cumulation[-1]["Position"]
+    running_stats["Travel Distance"].append(total_distance := np.linalg.norm(np.array(shooter_pos) - np.array(deleted_pos)))
+    running_stats["Time Alive"].append(time_alive := projectile_cumulation[-1]["tickTime"] - projectile_cumulation[0]["tickTime"])
+    running_stats["Avg Speed"].append(avg_speed := total_distance / (time_alive if time_alive > 0 else 0.01))
 
     report = f'Time alive: {round(time_alive, 2)} '\
         f'Projectile Travel: {round(total_distance, 2)} m '\
@@ -77,6 +79,13 @@ def projectile_summary(projectile_dict):
 
 def display_stats():
     arma.print(f"{counter} total shots fired. {len(pending_projectiles)} pending projectiles.")
+    arma.print(f"Projectile Stats: {statistics.mean(running_stats['Time Alive'])} s mean Time Alive"
+               f"{statistics.mean(running_stats['Travel Distance'])} s mean Travel Distance"
+               f"{statistics.mean(running_stats['Avg Speed'])} s mean Avg Speed")
+
+
+def cleanup_pending_projectiles():
+    print("[CLEANUP PLACEHOLDER]")
 
 
 def monitor_log_file():
@@ -97,6 +106,8 @@ def monitor_log_file():
                 else:
                     if (round(timer() - START_TIME)) % STATS_INTERVAL == 0:
                         display_stats()
+                    if (round(timer() - START_TIME)) % CLEANUP_INTERVAL == 0:
+                        cleanup_pending_projectiles()
                     time.sleep(POLL_INTERVAL)
 
                     # Check for log rotation
@@ -116,5 +127,6 @@ def monitor_log_file():
 
 if __name__ == '__main__':
     counter = 0
+    running_stats = {"Time Alive": [], "Travel Distance": [], "Avg Speed": []}
     pending_projectiles = {}
     monitor_log_file()
