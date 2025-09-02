@@ -74,7 +74,7 @@ def projectile_summary(projectile_dict):
 
     report = f'Time alive: {round(time_alive, 2)} '\
         f'Projectile Travel: {round(total_distance, 2)} m '\
-        f'Avg. Speed: {avg_speed} m/s.'
+        f'Avg. Speed: {round(avg_speed)} m/s.'
     return report
 
 
