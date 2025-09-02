@@ -25,28 +25,25 @@ logging.basicConfig(
 
 
 def process_log_line(line: str):
-    """
-    This function defines how to process each line from the log file.
-    You can customize this to send alerts, write to DB, etc.
-    """
+
     global counter
+
     logging.info(f"New log line: {line.strip()}")
     log_event_dict = arma.extract_marked_lines(line, RUN_METADATA["Current_time"])
     if log_event_dict:
         event_info = log_event_dict[0]["data_dict"]
-        try:
-            projectile_id = event_info["Projectile"]
-        except KeyError:
-            print(f"{__name__} KeyError processing: {event_info}")
-            return None
-        if "FirerPosition" in event_info.keys():
-            for key in ["Unit", "Unittype", "Weapon", "Ammo"]:
-                arma.print(f"{key}: {event_info[key]}", end=", ")
-            print()
-            pending_projectiles[projectile_id] = [event_info]
-            counter += 1
+        event_type = event_info["Event"]
+        if event_type == "MPKilled":
+            print(event_info)
         else:
-            if "Event" in event_info.keys():
+            projectile_id = event_info["Projectile"]
+            if event_type == "Fired":
+                for key in ["Unit", "Unittype", "Weapon", "Ammo"]:
+                    arma.print(f"{key}: {event_info[key]}", end=", ")
+                print()
+                pending_projectiles[projectile_id] = [event_info]
+                counter += 1
+            else:
                 try:
                     if projectile_id in pending_projectiles.keys():
                         pending_projectiles[projectile_id].append(event_info)
@@ -56,7 +53,7 @@ def process_log_line(line: str):
                     print(f"{__name__} KeyError: {event_info}")
                     return None
 
-                if event_info["Event"] == "Deleted":
+                if event_type == "Deleted":
                     print(projectile_summary(pending_projectiles[projectile_id]))
                     del pending_projectiles[projectile_id]
 
