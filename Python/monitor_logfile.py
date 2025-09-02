@@ -4,11 +4,15 @@ import logging
 import A3_local_utility as arma_local
 import Arma_3_Process_rpt_file as arma
 import numpy as np
+from timeit import default_timer as timer()
 
 LOGFILE_FOLDER = r"C:\Users\krend\AppData\Local\Arma 3"
 FILEPATH = arma_local.find_latest_rpt_file()
-POLL_INTERVAL = 5  # in seconds
-RUN_METADATA = run_data = arma.extract_run_data(FILEPATH)["Run Metadata"]
+POLL_INTERVAL = 1  # in seconds
+CLEANUP_INTERVAL = 180
+STATS_INTERVAL = 5
+START_TIME = timer()
+RUN_METADATA = arma.extract_run_data(FILEPATH)["Run Metadata"]
 
 logging.basicConfig(
     level=logging.WARNING,
