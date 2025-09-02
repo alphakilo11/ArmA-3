@@ -43,8 +43,14 @@ def process_log_line(line: str):
                     arma.print(f"{key}: {event_info[key]}", end=", ")
                 print()
                 pending_projectiles[projectile_id] = [event_info]
-                running_stats["V0"].append(np.linalg.norm(event_info["Muzzle Velocity"]))
+                try:
+                    running_stats["V0"].append(np.linalg.norm(event_info["MuzzleVelocity"]))
+                except KeyError:
+                    print(f"{__name__} KeyError: {event_info}")
                 counter += 1
+                # workaround for data probing
+                if event_info["Unit"] == "zeus":
+                    print(event_info.keys())
             else:
                 try:
                     if projectile_id in pending_projectiles.keys():
