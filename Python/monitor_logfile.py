@@ -34,7 +34,11 @@ def process_log_line(line: str):
     log_event_dict = arma.extract_marked_lines(line, RUN_METADATA["Current_time"])
     if log_event_dict:
         event_info = log_event_dict[0]["data_dict"]
-        projectile_id = event_info["Projectile"]
+        try:
+            projectile_id = event_info["Projectile"]
+        except KeyError:
+            print(f"{__name__} KeyError processing: {event_info}")
+            return None
         if "FirerPosition" in event_info.keys():
             for key in ["Unit", "Unittype", "Weapon", "Ammo"]:
                 arma.print(f"{key}: {event_info[key]}", end=", ")
@@ -54,7 +58,6 @@ def process_log_line(line: str):
 
                 if event_info["Event"] == "Deleted":
                     print(projectile_summary(pending_projectiles[projectile_id]))
-                    print(pending_projectiles)
                     del pending_projectiles[projectile_id]
 
 
@@ -66,8 +69,20 @@ def projectile_summary(projectile_dict):
         return None
     deleted_pos = projectile_dict[-1]["Position"]
     total_distance = np.linalg.norm(np.array(shooter_pos) - np.array(deleted_pos))
-    report = f'Time alive: {round(projectile_dict[-1]["tickTime"] - projectile_dict[0]["tickTime"], 2)}'\
-        f'Projectile Travel: {round(total_distance)} m.'
+    time_alive = projectile_dict[-1]["tickTime"] - projectile_dict[0]["tickTime"]
+    try:
+        avg_speed = total_distance / time_alive
+    except OverflowError:
+        print(f"{__name__} OverflowError: {total_distance} m, {time_alive} s.")
+        return None
+    try:
+        rounded_avg_speed = round(avg_speed)
+    except OverflowError:
+        print(f"{__name__} OverflowError: {total_distance} m, {time_alive} s, {avg_speed} m/s.")
+        return None
+    report = f'Time alive: {round(time_alive, 2)} '\
+        f'Projectile Travel: {round(total_distance)} m '\
+        f'Avg. Speed: {rounded_avg_speed} m/s.'
     return report
 
 
