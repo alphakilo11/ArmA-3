@@ -43,6 +43,7 @@ def process_log_line(line: str):
                     arma.print(f"{key}: {event_info[key]}", end=", ")
                 print()
                 pending_projectiles[projectile_id] = [event_info]
+                running_stats["V0"].append(np.linalg.norm(event_info["Muzzle Velocity"]))
                 counter += 1
             else:
                 try:
@@ -79,9 +80,12 @@ def projectile_summary(projectile_cumulation: list):
 
 def display_stats():
     arma.print(f"{counter} total shots fired. {len(pending_projectiles)} pending projectiles.")
-    arma.print(f"Projectile Stats: {statistics.mean(running_stats['Time Alive'])} s mean Time Alive"
-               f"{statistics.mean(running_stats['Travel Distance'])} s mean Travel Distance"
-               f"{statistics.mean(running_stats['Avg Speed'])} s mean Avg Speed")
+    if len(running_stats["Travel Distance"]) > 0:
+        arma.print(f"Projectile Stats: "
+                f"{round(statistics.mean(running_stats['V0']))} m/s mean V0 "
+                f"{round(statistics.mean(running_stats['Time Alive']), 2)} s mean Time Alive "
+                f"{round(statistics.mean(running_stats['Travel Distance']))} s mean Travel Distance "
+                f"{round(statistics.mean(running_stats['Avg Speed']))} m/s mean Avg Speed")
 
 
 def cleanup_pending_projectiles():
@@ -127,6 +131,6 @@ def monitor_log_file():
 
 if __name__ == '__main__':
     counter = 0
-    running_stats = {"Time Alive": [], "Travel Distance": [], "Avg Speed": []}
+    running_stats = {"Time Alive": [], "Travel Distance": [], "Avg Speed": [], "V0": []}
     pending_projectiles = {}
     monitor_log_file()
