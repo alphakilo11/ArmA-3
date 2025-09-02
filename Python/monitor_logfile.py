@@ -70,19 +70,11 @@ def projectile_summary(projectile_dict):
     deleted_pos = projectile_dict[-1]["Position"]
     total_distance = np.linalg.norm(np.array(shooter_pos) - np.array(deleted_pos))
     time_alive = projectile_dict[-1]["tickTime"] - projectile_dict[0]["tickTime"]
-    try:
-        avg_speed = total_distance / time_alive
-    except OverflowError:
-        print(f"{__name__} OverflowError: {total_distance} m, {time_alive} s.")
-        return None
-    try:
-        rounded_avg_speed = round(avg_speed)
-    except OverflowError:
-        print(f"{__name__} OverflowError: {total_distance} m, {time_alive} s, {avg_speed} m/s.")
-        return None
+    avg_speed = total_distance / (time_alive if time_alive > 0 else 0.01)
+
     report = f'Time alive: {round(time_alive, 2)} '\
-        f'Projectile Travel: {round(total_distance)} m '\
-        f'Avg. Speed: {rounded_avg_speed} m/s.'
+        f'Projectile Travel: {round(total_distance, 2)} m '\
+        f'Avg. Speed: {avg_speed} m/s.'
     return report
 
 
