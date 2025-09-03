@@ -33,7 +33,11 @@ def process_log_line(line: str):
     log_event_dict = arma.extract_marked_lines(line, RUN_METADATA["Current_time"])
     if log_event_dict:
         event_info = log_event_dict[0]["data_dict"]
-        event_type = event_info["Event"]
+        try:
+            event_type = event_info["Event"]
+        except KeyError as exception:
+            print(f"{__name__} KeyError {exception}: {event_info}")
+            return None
         if event_type == "MPKilled":
             print(event_info)
         else:
