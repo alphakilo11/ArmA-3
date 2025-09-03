@@ -8,6 +8,7 @@ import statistics
 from timeit import default_timer as timer
 
 LOGFILE_FOLDER = r"C:\Users\krend\AppData\Local\Arma 3"
+ID_HANDLE = "aKHabD4"
 FILEPATH = arma_local.find_latest_rpt_file()
 POLL_INTERVAL = 1  # s. Don't change this, as it will break the other intervals
 CLEANUP_INTERVAL = 190
@@ -33,11 +34,13 @@ def process_log_line(line: str):
     log_event_dict = arma.extract_marked_lines(line, RUN_METADATA["Current_time"])
     if log_event_dict:
         event_info = log_event_dict[0]["data_dict"]
+        if ID_HANDLE not in event_info.values():
+            return None
         try:
             event_type = event_info["Event"]
         except KeyError as exception:
             print(f"{__name__} KeyError {exception}: {event_info}")
-            return None
+            raise KeyError
         if event_type == "MPKilled":
             print(event_info)
         else:
@@ -106,6 +109,12 @@ def monitor_log_file():
     """
     Monitors a log file for new entries, handles log rotation.
     """
+    # process data already present
+    with open(FILEPATH, 'r') as file:
+        present_lines = file.readlines()
+    for line in present_lines:
+        process_log_line(line)
+    
     logging.info(f"Starting to monitor {FILEPATH}")
     try:
         with open(FILEPATH, 'r') as file:
